@@ -1,0 +1,634 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国家/地区/品牌查询</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#07C160', // 微信绿作为主色调
+                        secondary: '#F5F5F5', // 浅灰色作为辅助色
+                        dark: '#333333', // 深色文本
+                        light: '#888888', // 浅色文本
+                        border: '#EEEEEE', // 边框颜色
+                        eu: '#003399', // 欧盟蓝色
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.05)',
+                        'hover': '0 5px 15px rgba(7, 193, 96, 0.1)',
+                    }
+                },
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans text-dark">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 transition-custom">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-globe text-primary text-2xl"></i>
+                <h1 class="text-xl font-bold text-dark">国家/地区/品牌查询</h1>
+            </div>
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 transition-custom">
+                <i class="fa fa-moon-o text-light"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 py-6 max-w-3xl">
+        <!-- 搜索区域 -->
+        <div class="bg-white rounded-xl shadow-card p-5 mb-6 transform transition-custom hover:shadow-hover">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="请输入简称、中文名称、英文名称或'欧盟'..." 
+                    class="w-full py-3 px-5 pl-12 rounded-lg border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-custom"
+                >
+                <i class="fa fa-search absolute left-5 top-1/2 -translate-y-1/2 text-light"></i>
+                <button id="search-btn" class="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-white px-4 py-1.5 rounded-lg transition-custom hover:bg-primary/90">
+                    搜索
+                </button>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 mt-4">
+                <span class="text-xs text-light px-2 py-1 bg-gray-100 rounded-full">例如: CHN</span>
+                <span class="text-xs text-light px-2 py-1 bg-gray-100 rounded-full">例如: 中国</span>
+                <span class="text-xs text-light px-2 py-1 bg-gray-100 rounded-full">例如: China</span>
+                <span class="text-xs text-white px-2 py-1 bg-eu rounded-full">搜索"欧盟"可显示所有成员国</span>
+            </div>
+        </div>
+
+        <!-- 搜索结果区域 -->
+        <div id="result-container" class="min-h-[200px] flex flex-col items-center justify-center">
+            <div id="initial-state" class="text-center py-10">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+                    <i class="fa fa-search text-primary text-2xl"></i>
+                </div>
+                <p class="text-light">请输入查询内容</p>
+            </div>
+            
+            <div id="loading-state" class="hidden text-center py-10">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-r-transparent mb-4"></div>
+                <p class="text-light">搜索中...</p>
+            </div>
+            
+            <div id="no-result" class="hidden text-center py-10">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                    <i class="fa fa-times text-light text-2xl"></i>
+                </div>
+                <p class="text-light">未找到匹配结果</p>
+            </div>
+            
+            <div id="results" class="w-full hidden"></div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t border-border mt-10 py-6">
+        <div class="container mx-auto px-4 text-center text-light text-sm">
+            <p>@2025 国家/地区/品牌查询工具</p>
+        </div>
+    </footer>
+
+    <!-- 结果卡片模板 (不显示，仅用于JS克隆) -->
+    <template id="result-card-template">
+        <div class="bg-white rounded-xl shadow-card p-5 mb-4 transform transition-custom hover:shadow-hover hover:translate-y-[-2px]">
+            <div class="flex justify-between items-start mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full code-badge"></span>
+                    <span class="eu-badge hidden bg-eu/10 text-eu text-xs px-2 py-0.5 rounded-full">
+                        <i class="fa fa-star mr-1"></i>欧盟成员国
+                    </span>
+                </div>
+                <button class="copy-btn text-light hover:text-primary transition-custom">
+                    <i class="fa fa-copy"></i>
+                </button>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between">
+                    <span class="text-light">简称:</span>
+                    <span class="code-value font-medium"></span>
+                </div>
+                <div class="border-t border-border my-1"></div>
+                <div class="flex justify-between">
+                    <span class="text-light">中文名称:</span>
+                    <span class="cn-value font-medium"></span>
+                </div>
+                <div class="border-t border-border my-1"></div>
+                <div class="flex justify-between">
+                    <span class="text-light">英文名称:</span>
+                    <span class="en-value font-medium"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- 通知提示 -->
+    <div id="toast" class="fixed top-5 right-5 bg-dark text-white px-4 py-2 rounded-lg shadow-lg transform translate-x-full transition-custom flex items-center gap-2 z-50">
+        <i class="fa fa-check-circle"></i>
+        <span>复制成功</span>
+    </div>
+
+    <script>
+        // 欧盟成员国中文名称列表
+        const euMemberStates = [
+            "奥地利", "比利时", "保加利亚", "塞浦路斯", "捷克", "克罗地亚", 
+            "丹麦", "爱沙尼亚", "芬兰", "法国", "德国", "希腊", "匈牙利", 
+            "爱尔兰", "意大利", "拉脱维亚", "罗马尼亚", "立陶宛", "卢森堡", 
+            "马耳他", "荷兰", "波兰", "葡萄牙", "斯洛伐克", "斯洛文尼亚", 
+            "西班牙", "瑞典"
+        ];
+
+        // 国家/地区数据
+        const countries = [
+            { code: "ABW", en: "Aruba", cn: "阿鲁巴" },
+            { code: "AFG", en: "Afghanistar", cn: "阿富汗" },
+            { code: "AGO", en: "Angola", cn: "安哥拉" },
+            { code: "AIA", en: "Anguilla", cn: "安圭拉" },
+            { code: "ALB", en: "Albanie", cn: "阿尔巴尼亚" },
+            { code: "AND", en: "Andorra", cn: "安道尔" },
+            { code: "ARE", en: "United Arab Emirates", cn: "阿联酋" },
+            { code: "ARG", en: "Argentina", cn: "阿根廷" },
+            { code: "ARM", en: "Armenia", cn: "亚美尼亚" },
+            { code: "ATA", en: "Antarctica", cn: "南极洲" },
+            { code: "AUS", en: "Australia", cn: "澳大利亚" },
+            { code: "AUT", en: "Austria", cn: "奥地利" },
+            { code: "AZE", en: "Azerbaijan", cn: "阿塞拜疆" },
+            { code: "BDI", en: "Burundi", cn: "布隆迪" },
+            { code: "BEL", en: "Belgium", cn: "比利时" },
+            { code: "BEN", en: "Benin", cn: "贝宁" },
+            { code: "BFA", en: "Burkina", cn: "布基纳法索" },
+            { code: "BGD", en: "Bangladesh", cn: "孟加拉" },
+            { code: "BGR", en: "Bulgaria", cn: "保加利亚" },
+            { code: "BHR", en: "Bahrain", cn: "巴林" },
+            { code: "BHS", en: "The Bahamas", cn: "巴哈马" },
+            { code: "BIH", en: "Bosnia &Herzegoving", cn: "波黑" },
+            { code: "BLR", en: "Belarus", cn: "白俄罗斯" },
+            { code: "BLZ", en: "Belize", cn: "伯利兹" },
+            { code: "BMU", en: "Bermuda", cn: "百慕大" },
+            { code: "BOL", en: "Bolivia", cn: "玻利维亚" },
+            { code: "BRA", en: "Brazil", cn: "巴西" },
+            { code: "BRB", en: "Barbados", cn: "巴巴多斯" },
+            { code: "BRN", en: "Brunei", cn: "文莱" },
+            { code: "BTN", en: "Bhutan", cn: "不丹" },
+            { code: "BWA", en: "Botswana", cn: "博茨瓦纳" },
+            { code: "CAF", en: "Central African Republic", cn: "中非" },
+            { code: "CAN", en: "Canada", cn: "加拿大" },
+            { code: "CHE", en: "Switzerland", cn: "瑞士" },
+            { code: "SUI", en: "Switzerland", cn: "瑞士" },
+            { code: "CHL", en: "Chile", cn: "智利" },
+            { code: "CHN", en: "China", cn: "中国（内地）" },
+            { code: "CIV", en: "Cote d'ivoire", cn: "科特迪瓦" },
+            { code: "CMR", en: "Cameroon", cn: "喀麦隆" },
+            { code: "COG", en: "Congo", cn: "刚果" },
+            { code: "COL", en: "Colombia", cn: "哥伦比亚" },
+            { code: "COM", en: "The Comoros", cn: "科摩罗" },
+            { code: "CPV", en: "Cape Verde", cn: "佛得角" },
+            { code: "CRI", en: "Costa Rica", cn: "哥斯达黎加" },
+            { code: "CUB", en: "Cuba", cn: "古巴" },
+            { code: "CYP", en: "Cyprus", cn: "塞浦路斯" },
+            { code: "CZE", en: "Czech Republic", cn: "捷克" },
+            { code: "DEU", en: "Germany", cn: "德国" },
+            { code: "GER", en: "Germany", cn: "德国" },
+            { code: "DJI", en: "Djibouti", cn: "吉布提" },
+            { code: "DMA", en: "Dominica", cn: "多米尼克" },
+            { code: "DNK", en: "Denmark", cn: "丹麦" },
+            { code: "DOM", en: "Dominican Republic", cn: "多米尼加" },
+            { code: "DZA", en: "Algeria", cn: "阿尔及利亚" },
+            { code: "ECU", en: "Ecuado", cn: "厄瓜多尔" },
+            { code: "EGY", en: "Egypt", cn: "埃及" },
+            { code: "ERI", en: "Eritrea", cn: "厄立特里亚" },
+            { code: "ESH", en: "Western Sahare", cn: "西撒哈拉" },
+            { code: "ESP", en: "Spain", cn: "西班牙" },
+            { code: "SPN", en: "Spain", cn: "西班牙" },
+            { code: "EST", en: "Estonia", cn: "爱沙尼亚" },
+            { code: "ETH", en: "Ethiopia", cn: "埃塞俄比亚" },
+            { code: "FIN", en: "Finland", cn: "芬兰" },
+            { code: "FRA", en: "France", cn: "法国" },
+            { code: "FRN", en: "France", cn: "法国" },
+            { code: "FSM", en: "Federated States of Vicronesis", cn: "密克罗尼西亚联邦" },
+            { code: "GAB", en: "Gabon", cn: "加蓬" },
+            { code: "GBR", en: "Great Britain (Inited kingdca;England)", cn: "英国" },
+            { code: "UKM", en: "Great Britain (Inited kingdca;England)", cn: "英国" },
+            { code: "GEO", en: "Georgia", cn: "格鲁吉亚" },
+            { code: "GHA", en: "Ghana", cn: "加纳" },
+            { code: "GIB", en: "Gibraltar", cn: "直布罗陀" },
+            { code: "GIN", en: "Guinea", cn: "几内亚" },
+            { code: "GLP", en: "Guadeloupe", cn: "瓜德罗普" },
+            { code: "GMB", en: "Gambia", cn: "冈比亚" },
+            { code: "GNB", en: "Guinea-Bissau", cn: "几内亚比绍" },
+            { code: "GNQ", en: "Equatorial Guinea", cn: "赤道几内亚" },
+            { code: "GRC", en: "Greece", cn: "希腊" },
+            { code: "GRD", en: "Grenada", cn: "格林纳达" },
+            { code: "GRL", en: "Greenland", cn: "格陵兰" },
+            { code: "GTM", en: "Guatemale", cn: "危地马拉" },
+            { code: "GUM", en: "Guam", cn: "关岛" },
+            { code: "GUY", en: "Guyana", cn: "圭亚那" },
+            { code: "HKG", en: "Hong Kong", cn: "香港" },
+            { code: "HND", en: "Honduras", cn: "洪都拉斯" },
+            { code: "HRV", en: "Croatia", cn: "克罗地亚" },
+            { code: "HTI", en: "Haiti", cn: "海地" },
+            { code: "HUN", en: "Hungary", cn: "匈牙利" },
+            { code: "IDN", en: "Indonesia", cn: "印尼" },
+            { code: "IND", en: "India", cn: "印度" },
+            { code: "IRL", en: "Ireland", cn: "爱尔兰" },
+            { code: "IRN", en: "Iran", cn: "伊朗" },
+            { code: "IRQ", en: "Iraq", cn: "伊拉克" },
+            { code: "ISL", en: "Iceland", cn: "冰岛" },
+            { code: "ISR", en: "Israel", cn: "以色列" },
+            { code: "ITA", en: "Italy", cn: "意大利" },
+            { code: "JAM", en: "Jamaica", cn: "牙买加" },
+            { code: "JOR", en: "Jordan", cn: "约旦" },
+            { code: "JPN", en: "Japan", cn: "日本" },
+            { code: "JAN", en: "Japan", cn: "日本" },
+            { code: "KAZ", en: "Kazakhstan", cn: "哈萨克斯坦" },
+            { code: "KEN", en: "Kenya", cn: "肯尼亚" },
+            { code: "KGZ", en: "Kyrgyzstar", cn: "吉尔吉斯斯坦" },
+            { code: "KHM", en: "Cambodia", cn: "柬埔寨" },
+            { code: "KIR", en: "Kiribati", cn: "基里巴斯" },
+            { code: "KOR", en: "South Korea", cn: "韩国" },
+            { code: "KWT", en: "Kuwait", cn: "科威特" },
+            { code: "KUW", en: "Kuwait", cn: "科威特" },
+            { code: "LAO", en: "Laos", cn: "老挝" },
+            { code: "LBN", en: "Lebanon", cn: "黎巴嫩" },
+            { code: "LBR", en: "Liberia", cn: "利比里亚" },
+            { code: "LBY", en: "Libya", cn: "利比亚" },
+            { code: "LCA", en: "St.Lucia", cn: "圣卢西亚" },
+            { code: "LIE", en: "Liechtenstein", cn: "列支敦士登" },
+            { code: "LKA", en: "Sri Lanka", cn: "斯里兰卡" },
+            { code: "LSO", en: "Lesotho", cn: "莱索托" },
+            { code: "LTU", en: "Lithuania", cn: "立陶宛" },
+            { code: "LUX", en: "Luxembourg", cn: "卢森堡" },
+            { code: "LVA", en: "Latvia", cn: "拉脱维亚" },
+            { code: "MAC", en: "Macao", cn: "澳门" },
+            { code: "MAR", en: "Morocco", cn: "摩洛哥" },
+            { code: "MCO", en: "Monaco", cn: "摩纳哥" },
+            { code: "MNC", en: "Monaco", cn: "摩纳哥" },
+            { code: "MDA", en: "Moldova", cn: "摩尔多瓦" },
+            { code: "MOL", en: "Moldova", cn: "摩尔多瓦" },
+            { code: "MDG", en: "Madagascar", cn: "马达加斯加" },
+            { code: "MDV", en: "Maldives", cn: "马尔代夫" },
+            { code: "MEX", en: "Mexico", cn: "墨西哥" },
+            { code: "MKD", en: "Republic of Macedonia(FYROM)", cn: "马其顿" },
+            { code: "MLI", en: "Mali", cn: "马里" },
+            { code: "MLT", en: "Malta", cn: "马耳他" },
+            { code: "MMR", en: "Myanmar(Burma)", cn: "缅甸" },
+            { code: "MNE", en: "Montenegrc", cn: "黑山" },
+            { code: "MNG", en: "Mongolia", cn: "蒙古国" },
+            { code: "MOZ", en: "Mozambique", cn: "莫桑比克" },
+            { code: "MRT", en: "Mauritania", cn: "毛里塔尼亚" },
+            { code: "MTQ", en: "Martinique", cn: "马提尼克" },
+            { code: "MUS", en: "Mauritius", cn: "毛里求斯" },
+            { code: "MWI", en: "Malawi", cn: "马拉维" },
+            { code: "MYS", en: "Malaysia", cn: "马来西亚" },
+            { code: "MAL", en: "Malaysia", cn: "马来西亚" },
+            { code: "MYT", en: "Mayotte", cn: "马约特" },
+            { code: "NAM", en: "Namibia", cn: "纳米比亚" },
+            { code: "NCL", en: "New Caledonia", cn: "新喀里多尼亚" },
+            { code: "NER", en: "Niger", cn: "尼日尔" },
+            { code: "NGA", en: "Nigeria", cn: "尼日利亚" },
+            { code: "NIC", en: "Nicaragua", cn: "尼加拉瓜" },
+            { code: "NIU", en: "Niue", cn: "纽埃" },
+            { code: "NLD", en: "Netherlands", cn: "荷兰" },
+            { code: "NED", en: "Netherlands", cn: "荷兰" },
+            { code: "NOR", en: "Norway", cn: "挪威" },
+            { code: "NPL", en: "Nepal", cn: "尼泊尔" },
+            { code: "NRU", en: "Nauru", cn: "瑙鲁" },
+            { code: "NZL", en: "New Zealand", cn: "新西兰" },
+            { code: "OMN", en: "Oman", cn: "阿曼" },
+            { code: "PAK", en: "Pakistan", cn: "巴基斯坦" },
+            { code: "PAN", en: "Panama", cn: "巴拿马" },
+            { code: "PER", en: "Peru", cn: "秘鲁" },
+            { code: "PHL", en: "The Philippines", cn: "菲律宾" },
+            { code: "PLW", en: "Palau", cn: "帕劳" },
+            { code: "PNG", en: "Papua New Guinea", cn: "巴布亚新几内亚" },
+            { code: "POL", en: "Poland", cn: "波兰" },
+            { code: "PRI", en: "Puerto Rico", cn: "波多黎各" },
+            { code: "PRK", en: "North Korea", cn: "朝鲜" },
+            { code: "PRT", en: "Portugal", cn: "葡萄牙" },
+            { code: "POR", en: "Portugal", cn: "葡萄牙" },
+            { code: "PRY", en: "Paraguay", cn: "巴拉圭" },
+            { code: "PSE", en: "Palestinian territories", cn: "巴勒斯坦" },
+            { code: "QAT", en: "Qatar", cn: "卡塔尔" },
+            { code: "REU", en: "Réunion", cn: "留尼汪" },
+            { code: "ROU", en: "Romania", cn: "罗马尼亚" },
+            { code: "ROM", en: "Romania", cn: "罗马尼亚" },
+            { code: "RUS", en: "Russian Federation", cn: "俄罗斯" },
+            { code: "RWA", en: "Rwanda", cn: "卢旺达" },
+            { code: "SAU", en: "Saudi Arabia", cn: "沙特阿拉伯" },
+            { code: "SDN", en: "Sudan", cn: "苏丹" },
+            { code: "SEN", en: "Senegal", cn: "塞内加尔" },
+            { code: "SGP", en: "Singapore", cn: "新加坡" },
+            { code: "SHN", en: "St.Helena &Dependencies", cn: "圣赫勒拿" },
+            { code: "SLE", en: "Sierra Leone", cn: "塞拉利昂" },
+            { code: "SLV", en: "E1 Salvador", cn: "萨尔瓦多" },
+            { code: "SMR", en: "San Marino", cn: "圣马力诺" },
+            { code: "SOM", en: "Somalia", cn: "索马里" },
+            { code: "SRB", en: "Serbia", cn: "塞尔维亚" },
+            { code: "SSD", en: "", cn: "南苏丹" },
+            { code: "SUR", en: "Suriname", cn: "苏里南" },
+            { code: "SVK", en: "Slovakia", cn: "斯洛伐克" },
+            { code: "SVN", en: "Sloyenia", cn: "斯洛文尼亚" },
+            { code: "SWE", en: "Sweden", cn: "瑞典" },
+            { code: "SWZ", en: "Swaziland", cn: "斯威士兰" },
+            { code: "SYC", en: "Seychelles", cn: "塞舌尔" },
+            { code: "SYR", en: "Syria", cn: "叙利亚" },
+            { code: "TCD", en: "Chad", cn: "乍得" },
+            { code: "TGO", en: "Togo", cn: "多哥" },
+            { code: "THA", en: "Thailand", cn: "泰国" },
+            { code: "TJK", en: "Tajikistan", cn: "塔吉克斯坦" },
+            { code: "TKL", en: "Tokelau", cn: "托克劳" },
+            { code: "TKM", en: "Turkmenistan", cn: "土库曼斯坦" },
+            { code: "TLS", en: "Timor-Leste(East Timor)", cn: "东帝汶" },
+            { code: "TON", en: "Tonga", cn: "汤加" },
+            { code: "TUN", en: "Tunisia", cn: "突尼斯" },
+            { code: "TUR", en: "Turkey", cn: "土耳其" },
+            { code: "TUV", en: "Tuvalu", cn: "图瓦卢" },
+            { code: "TWN", en: "Taiwan,Province of China", cn: "台湾" },
+            { code: "TPE", en: "Taiwan,Province of China", cn: "台湾" },
+            { code: "TZA", en: "Tanzania", cn: "坦桑尼亚" },
+            { code: "UGA", en: "Uganda", cn: "乌干达" },
+            { code: "UKR", en: "Ukraine", cn: "乌克兰" },
+            { code: "URY", en: "Uruguay", cn: "乌拉圭" },
+            { code: "USA", en: "United States of America(USA)", cn: "美国" },
+            { code: "UZB", en: "Uzhekistar", cn: "乌兹别克斯坦" },
+            { code: "VAT", en: "Vatican City(The Holy See)", cn: "梵蒂冈" },
+            { code: "VEN", en: "Venezuela", cn: "委内瑞拉" },
+            { code: "VNM", en: "Vietnam", cn: "越南" },
+            { code: "VIM", en: "Vietnam", cn: "越南" },
+            { code: "VUT", en: "Vanuatu", cn: "瓦努阿图" },
+            { code: "WSM", en: "Samoa", cn: "萨摩亚" },
+            { code: "YEM", en: "Yemen", cn: "也门" },
+            { code: "ZAF", en: "South Africa", cn: "南非" },
+            { code: "SAF", en: "South Africa", cn: "南非" },
+            { code: "ZMB", en: "Zambia", cn: "赞比亚" },
+            { code: "ZWE", en: "Zimbabwe", cn: "津巴布韦" },
+            { code: "EUR", en: "EUROPE", cn: "欧洲(欧标)" },
+            { code: "PRO", en: "PROORAL", cn: "博皓" },
+            { code: "STD", en: "STANDARD", cn: "标准" }
+        ];
+
+        // DOM元素
+        const searchInput = document.getElementById('search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const resultContainer = document.getElementById('result-container');
+        const initialState = document.getElementById('initial-state');
+        const loadingState = document.getElementById('loading-state');
+        const noResult = document.getElementById('no-result');
+        const results = document.getElementById('results');
+        const toast = document.getElementById('toast');
+        const themeToggle = document.getElementById('theme-toggle');
+        const header = document.querySelector('header');
+        const footer = document.querySelector('footer');
+
+        // 检查是否为欧盟成员国
+        function isEuMember(stateName) {
+            return euMemberStates.includes(stateName);
+        }
+
+        // 获取所有欧盟成员国
+        function getAllEuMembers() {
+            return countries.filter(country => isEuMember(country.cn));
+        }
+
+        // 搜索功能
+        function searchCountry(query) {
+            if (!query.trim()) {
+                showInitialState();
+                return;
+            }
+
+            showLoadingState();
+            
+            // 模拟搜索延迟，增强用户体验
+            setTimeout(() => {
+                const lowerQuery = query.toLowerCase().trim();
+                let matchedCountries;
+                
+                // 特殊处理：搜索"欧盟"显示所有欧盟成员国
+                if (lowerQuery === "欧盟" || lowerQuery === "eu") {
+                    matchedCountries = getAllEuMembers();
+                } else {
+                    matchedCountries = countries.filter(country => 
+                        country.code.toLowerCase().includes(lowerQuery) ||
+                        country.cn.toLowerCase().includes(lowerQuery) ||
+                        country.en.toLowerCase().includes(lowerQuery)
+                    );
+                    
+                    // 特殊处理：当搜索"PRO"时，排除TWN和TPE
+                    if (lowerQuery === "pro") {
+                        matchedCountries = matchedCountries.filter(country => 
+                            country.code !== "TWN" && country.code !== "TPE"
+                        );
+                    }
+                }
+                
+                if (matchedCountries.length > 0) {
+                    showResults(matchedCountries);
+                } else {
+                    showNoResult();
+                }
+            }, 300);
+        }
+
+        // 显示初始状态
+        function showInitialState() {
+            initialState.classList.remove('hidden');
+            loadingState.classList.add('hidden');
+            noResult.classList.add('hidden');
+            results.classList.add('hidden');
+        }
+
+        // 显示加载状态
+        function showLoadingState() {
+            initialState.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            noResult.classList.add('hidden');
+            results.classList.add('hidden');
+        }
+
+        // 显示无结果状态
+        function showNoResult() {
+            initialState.classList.add('hidden');
+            loadingState.classList.add('hidden');
+            noResult.classList.remove('hidden');
+            results.classList.add('hidden');
+        }
+
+        // 显示搜索结果
+        function showResults(matchedCountries) {
+            initialState.classList.add('hidden');
+            loadingState.classList.add('hidden');
+            noResult.classList.add('hidden');
+            results.classList.remove('hidden');
+            results.innerHTML = '';
+
+            // 添加结果计数和标题
+            const headerElement = document.createElement('div');
+            headerElement.className = 'mb-4';
+            
+            const titleElement = document.createElement('h2');
+            titleElement.className = 'text-lg font-semibold mb-1';
+            
+            const countElement = document.createElement('div');
+            countElement.className = 'text-light text-sm';
+            
+            // 如果是欧盟成员国列表，显示特定标题
+            const isEuSearch = matchedCountries.every(country => isEuMember(country.cn));
+            if (isEuSearch) {
+                titleElement.innerHTML = '<i class="fa fa-flag text-eu mr-2"></i>欧盟成员国列表';
+                countElement.textContent = `共 27个成员国`;
+            } else {
+                titleElement.textContent = '搜索结果';
+                countElement.textContent = `找到 ${matchedCountries.length} 个结果`;
+            }
+            
+            headerElement.appendChild(titleElement);
+            headerElement.appendChild(countElement);
+            results.appendChild(headerElement);
+
+            // 克隆模板并填充数据
+            const template = document.getElementById('result-card-template');
+            
+            matchedCountries.forEach(country => {
+                const clone = document.importNode(template.content, true);
+                
+                // 设置卡片数据
+                clone.querySelector('.code-badge').textContent = country.code;
+                clone.querySelector('.code-value').textContent = country.code;
+                clone.querySelector('.cn-value').textContent = country.cn;
+                clone.querySelector('.en-value').textContent = country.en || '-';
+                
+                // 检查是否为欧盟成员国，如果是则显示标识
+                if (isEuMember(country.cn)) {
+                    clone.querySelector('.eu-badge').classList.remove('hidden');
+                }
+                
+                // 添加复制功能
+                const copyBtn = clone.querySelector('.copy-btn');
+                copyBtn.addEventListener('click', () => {
+                    let textToCopy = `${country.code}\n${country.cn}\n${country.en}`;
+                    // 如果是欧盟成员国，在复制内容中也添加标识
+                    if (isEuMember(country.cn)) {
+                        textToCopy += "\n(欧盟成员国)";
+                    }
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        showToast('复制成功');
+                    }).catch(err => {
+                        showToast('复制失败，请手动复制');
+                        console.error('复制失败:', err);
+                    });
+                });
+                
+                results.appendChild(clone);
+            });
+
+            // 添加结果动画
+            const cards = results.querySelectorAll('.shadow-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 50 * index);
+            });
+        }
+
+        // 显示提示消息
+        function showToast(message) {
+            const toastText = toast.querySelector('span');
+            toastText.textContent = message;
+            
+            toast.classList.remove('translate-x-full');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 2000);
+        }
+
+        // 切换主题
+        let isDarkMode = false;
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            
+            if (isDarkMode) {
+                document.body.classList.add('bg-gray-900', 'text-white');
+                document.body.classList.remove('bg-gray-50', 'text-dark');
+                
+                header.classList.add('bg-gray-800');
+                header.classList.remove('bg-white');
+                
+                footer.classList.add('bg-gray-800', 'border-gray-700');
+                footer.classList.remove('bg-white', 'border-border');
+                
+                themeToggle.innerHTML = '<i class="fa fa-sun-o text-yellow-400"></i>';
+            } else {
+                document.body.classList.remove('bg-gray-900', 'text-white');
+                document.body.classList.add('bg-gray-50', 'text-dark');
+                
+                header.classList.remove('bg-gray-800');
+                header.classList.add('bg-white');
+                
+                footer.classList.remove('bg-gray-800', 'border-gray-700');
+                footer.classList.add('bg-white', 'border-border');
+                
+                themeToggle.innerHTML = '<i class="fa fa-moon-o text-light"></i>';
+            }
+        }
+
+        // 事件监听
+        searchBtn.addEventListener('click', () => {
+            searchCountry(searchInput.value);
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchCountry(searchInput.value);
+            }
+        });
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // 滚动效果
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                header.classList.add('shadow');
+            } else {
+                header.classList.remove('shadow');
+            }
+        });
+
+        // 初始化
+        showInitialState();
+    </script>
+</body>
+</html>
+    
