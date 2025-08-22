@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时光计算器</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6200ee;
+            --primary-light: #9e47ff;
+            --secondary: #03dac6;
+            --background: #f5f5f5;
+            --surface: #ffffff;
+            --error: #b00020;
+            --text-primary: rgba(0, 0, 0, 0.87);
+            --text-secondary: rgba(0, 0, 0, 0.6);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            position: relative;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+        
+        button:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            font-size: 18px;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .row {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .col {
+            flex: 1;
+        }
+        
+        @media (max-width: 600px) {
+            .row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>时光计算器</h1>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="date-diff">日期间隔</div>
+            <div class="tab" data-tab="date-add">日期加减</div>
+            <div class="tab" data-tab="time-add">时间加减</div>
+            <div class="tab" data-tab="week-add">星期加减</div>
+        </div>
+
+        <div class="tab-content active" id="date-diff">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="start-date">开始日期</label>
+                        <input type="date" id="start-date" required>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="end-date">结束日期</label>
+                        <input type="date" id="end-date" required>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="diff-type">计算类型</label>
+                <select id="diff-type">
+                    <option value="days">间隔天数</option>
+                    <option value="workdays">工作日天数</option>
+                    <option value="months">间隔月数</option>
+                    <option value="years">间隔年数</option>
+                </select>
+            </div>
+            <button id="calculate-diff">计算</button>
+            <div class="result" id="diff-result"></div>
+        </div>
+
+        <div class="tab-content" id="date-add">
+            <div class="form-group">
+                <label for="base-date">基准日期</label>
+                <input type="date" id="base-date" required>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="days-to-add">天数</label>
+                        <input type="number" id="days-to-add" placeholder="输入正数为加，负数为减" required>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label for="add-type">计算类型</label>
+                        <select id="add-type">
+                            <option value="calendar">日历天数</option>
+                            <option value="workdays">工作日</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button id="calculate-add">计算</button>
+            <div class="result" id="add-result"></div>
+        </div>
+
+        <div class="tab-content" id="time-add">
+            <div class="form-group">
+                <label for="base-datetime">基准日期时间</label>
+                <input type="datetime-local" id="base-datetime" required>
+            </div>
+            <div class="form-group">
+                <label for="minutes-to-add">分钟数</label>
+                <input type="number" id="minutes-to-add" placeholder="输入正数为加，负数为减" required>
+            </div>
+            <button id="calculate-time">计算</button>
+            <div class="result" id="time-result"></div>
+        </div>
+
+        <div class="tab-content" id="week-add">
+            <div class="form-group">
+                <label for="week-base-date">基准日期</label>
+                <input type="date" id="week-base-date" required>
+            </div>
+            <div class="form-group">
+                <label for="weeks-to-add">天数</label>
+                <input type="number" id="weeks-to-add" placeholder="输入正数为加，负数为减" required>
+            </div>
+            <button id="calculate-week">计算</button>
+            <div class="result" id="week-result"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置默认日期为今天
+            const today = new Date();
+            const todayStr = today.toISOString().split('T');
+            document.getElementById('start-date').value = todayStr;
+            document.getElementById('end-date').value = todayStr;
+            document.getElementById('base-date').value = todayStr;
+            document.getElementById('week-base-date').value = todayStr;
+            
+            // 设置默认日期时间为现在
+            const now = new Date();
+            const nowStr = now.toISOString().slice(0, 16);
+            document.getElementById('base-datetime').value = nowStr;
+            
+            // 标签切换
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    const tabContents = document.querySelectorAll('.tab-content');
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // 计算日期间隔
+            document.getElementById('calculate-diff').addEventListener('click', calculateDateDiff);
+            
+            // 计算日期加减
+            document.getElementById('calculate-add').addEventListener('click', calculateDateAdd);
+            
+            // 计算时间加减
+            document.getElementById('calculate-time').addEventListener('click', calculateTimeAdd);
+            
+            // 计算星期加减
+            document.getElementById('calculate-week').addEventListener('click', calculateWeekAdd);
+            
+            function calculateDateDiff() {
+                const startDate = new Date(document.getElementById('start-date').value);
+                const endDate = new Date(document.getElementById('end-date').value);
+                const diffType = document.getElementById('diff-type').value;
+                
+                if (startDate > endDate) {
+                    document.getElementById('diff-result').textContent = '开始日期不能晚于结束日期';
+                    return;
+                }
+                
+                let result;
+                const timeDiff = endDate - startDate;
+                const dayDiff = timeDiff / (1000 * 60 * 60 * 24);
+                
+                switch(diffType) {
+                    case 'days':
+                        result = `间隔天数: ${Math.floor(dayDiff)} 天`;
+                        break;
+                    case 'workdays':
+                        result = `工作日天数: ${calculateWorkdays(startDate, endDate)} 天`;
+                        break;
+                    case 'months':
+                        const monthDiff = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                                         (endDate.getMonth() - startDate.getMonth());
+                        result = `间隔月数: ${monthDiff} 个月`;
+                        break;
+                    case 'years':
+                        const yearDiff = endDate.getFullYear() - startDate.getFullYear();
+                        if (yearDiff < 1) {
+                            const monthDiff = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                                            (endDate.getMonth() - startDate.getMonth());
+                            result = `间隔时间: ${monthDiff} 个月`;
+                        } else {
+                            result = `间隔年数: ${yearDiff} 年`;
+                        }
+                        break;
+                }
+                
+                document.getElementById('diff-result').textContent = result;
+            }
+            
+            function calculateWorkdays(startDate, endDate) {
+                let count = 0;
+                const curDate = new Date(startDate);
+                
+                while (curDate <= endDate) {
+                    const dayOfWeek = curDate.getDay();
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                        count++;
+                    }
+                    curDate.setDate(curDate.getDate() + 1);
+                }
+                
+                return count;
+            }
+            
+            function calculateDateAdd() {
+                const baseDate = new Date(document.getElementById('base-date').value);
+                const daysToAdd = parseInt(document.getElementById('days-to-add').value);
+                const addType = document.getElementById('add-type').value;
+                
+                let resultDate;
+                if (addType === 'calendar') {
+                    resultDate = new Date(baseDate);
+                    resultDate.setDate(resultDate.getDate() + daysToAdd);
+                } else {
+                    resultDate = addWorkdays(baseDate, daysToAdd);
+                }
+                
+                const resultStr = resultDate.toLocaleDateString('zh-CN', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                });
+                
+                document.getElementById('add-result').textContent = `结果日期: ${resultStr}`;
+            }
+            
+            function addWorkdays(baseDate, days) {
+                const result = new Date(baseDate);
+                let remainingDays = Math.abs(days);
+                const direction = days > 0 ? 1 : -1;
+                
+                while (remainingDays > 0) {
+                    result.setDate(result.getDate() + direction);
+                    const dayOfWeek = result.getDay();
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                        remainingDays--;
+                    }
+                }
+                
+                return result;
+            }
+            
+            function calculateTimeAdd() {
+                const baseDatetime = new Date(document.getElementById('base-datetime').value);
+                const minutesToAdd = parseInt(document.getElementById('minutes-to-add').value);
+                
+                const resultDatetime = new Date(baseDatetime);
+                resultDatetime.setMinutes(resultDatetime.getMinutes() + minutesToAdd);
+                
+                const options = { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                };
+                
+                const resultStr = resultDatetime.toLocaleString('zh-CN', options);
+                document.getElementById('time-result').textContent = `结果时间: ${resultStr}`;
+            }
+            
+            function calculateWeekAdd() {
+                const baseDate = new Date(document.getElementById('week-base-date').value);
+                const weeksToAdd = parseInt(document.getElementById('weeks-to-add').value);
+                
+                const resultDate = new Date(baseDate);
+                resultDate.setDate(resultDate.getDate() + weeksToAdd * 7);
+                
+                const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+                const weekday = weekdays[resultDate.getDay()];
+                
+                const resultStr = resultDate.toLocaleDateString('zh-CN', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                });
+                
+                document.getElementById('week-result').textContent = `${resultStr} ${weekday}`;
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化日期
+            const initDates = () => {
+                const today = new Date();
+                const todayStr = today.toISOString().split('T');
+                const nowStr = today.toISOString().slice(0, 16);
+                
+                document.querySelectorAll('input[type="date"]').forEach(el => el.value = todayStr);
+                document.getElementById('base-datetime').value = nowStr;
+            };
+        
+            // 标签切换
+            const setupTabs = () => {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.tab, .tab-content').forEach(el => 
+                            el.classList.remove('active')
+                        );
+                        
+                        tab.classList.add('active');
+                        document.getElementById(tab.dataset.tab).classList.add('active');
+                    });
+                });
+                
+                // 修改标签文本
+                const weekTab = document.querySelector('[data-tab="week-add"]');
+                if(weekTab) weekTab.textContent = '星期加减';
+            };
+        
+            // 工作日计算
+            const calculateWorkdays = (start, end) => {
+                let count = 0;
+                const cur = new Date(start);
+                
+                while (cur <= end) {
+                    const day = cur.getDay();
+                    if (day % 6 !== 0) count++; // 0是周日，6是周六
+                    cur.setDate(cur.getDate() + 1);
+                }
+                return count;
+            };
+        
+            // 添加工作日
+            const addWorkdays = (date, days) => {
+                const result = new Date(date);
+                let remaining = Math.abs(days);
+                const dir = days > 0 ? 1 : -1;
+                
+                while (remaining > 0) {
+                    result.setDate(result.getDate() + dir);
+                    if (result.getDay() % 6 !== 0) remaining--;
+                }
+                return result;
+            };
+        
+            // 日期间隔计算
+            const calculateDateDiff = () => {
+                const start = new Date(document.getElementById('start-date').value);
+                const end = new Date(document.getElementById('end-date').value);
+                
+                if (start > end) {
+                    document.getElementById('diff-result').textContent = '开始日期不能晚于结束日期';
+                    return;
+                }
+                
+                const type = document.getElementById('diff-type').value;
+                let result;
+                
+                switch(type) {
+                    case 'days':
+                        result = `间隔天数: ${Math.floor((end - start) / 864e5)} 天`;
+                        break;
+                        
+                    case 'workdays':
+                        result = `工作日天数: ${calculateWorkdays(start, end)} 天`;
+                        break;
+                        
+                    case 'months':
+                        const months = (end.getFullYear() - start.getFullYear()) * 12 + 
+                                      (end.getMonth() - start.getMonth());
+                        result = `间隔月数: ${months} 个月`;
+                        break;
+                        
+                    case 'years':
+                        const totalMonths = (end.getFullYear() - start.getFullYear()) * 12 + 
+                                           (end.getMonth() - start.getMonth());
+                        result = totalMonths < 12 ? 
+                            `间隔时间: ${totalMonths} 个月` : 
+                            `间隔年数: ${Math.floor(totalMonths / 12)} 年`;
+                        break;
+                }
+                
+                document.getElementById('diff-result').textContent = result;
+            };
+        
+            // 日期加减计算
+            const calculateDateAdd = () => {
+                const base = new Date(document.getElementById('base-date').value);
+                const days = parseInt(document.getElementById('days-to-add').value);
+                const isWorkday = document.getElementById('add-type').value === 'workdays';
+                
+                const resultDate = isWorkday ? addWorkdays(base, days) : 
+                                  new Date(base.getTime() + days * 864e5);
+                
+                document.getElementById('add-result').textContent = 
+                    `结果日期: ${resultDate.toLocaleDateString('zh-CN')}`;
+            };
+        
+            // 时间加减计算
+            const calculateTimeAdd = () => {
+                const base = new Date(document.getElementById('base-datetime').value);
+                const mins = parseInt(document.getElementById('minutes-to-add').value);
+                
+                const result = new Date(base.getTime() + mins * 60000);
+                document.getElementById('time-result').textContent = 
+                    `结果时间: ${result.toLocaleString('zh-CN', {hour12: false})}`;
+            };
+        
+            // 天数加减计算（原星期加减修改为天数加减）
+            const calculateDayAdd = () => {
+                const base = new Date(document.getElementById('week-base-date').value);
+                const days = parseInt(document.getElementById('weeks-to-add').value);
+                
+                const result = new Date(base.getTime() + days * 864e5);
+                const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+                
+                document.getElementById('week-result').textContent = 
+                    `${result.toLocaleDateString('zh-CN')} 星期${weekdays[result.getDay()]}`;
+            };
+        
+            // 初始化
+            initDates();
+            setupTabs();
+            
+            // 绑定事件
+            document.getElementById('calculate-diff').addEventListener('click', calculateDateDiff);
+            document.getElementById('calculate-add').addEventListener('click', calculateDateAdd);
+            document.getElementById('calculate-time').addEventListener('click', calculateTimeAdd);
+            document.getElementById('calculate-week').addEventListener('click', calculateDayAdd);
+        });
+        
+    </script>
+</body>
+
+</html>
