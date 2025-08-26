@@ -163,17 +163,6 @@
             </div>
         </main>
 
-        <!-- 历史记录 -->
-        <section class="mb-10">
-            <h2 class="text-xl font-semibold mb-4 flex items-center">
-                <i class="fa fa-history text-primary mr-2" aria-hidden="true"></i>历史记录
-            </h2>
-            <div id="history-container" class="glass rounded-xl p-6 max-h-64 overflow-y-auto">
-                <p id="no-history" class="text-gray-500 text-center py-6">暂无计算记录</p>
-                <ul id="history-list" class="space-y-3 hidden"></ul>
-            </div>
-        </section>
-
         <!-- 时间单位转换参考 -->
         <section class="mb-16">
             <h2 class="text-xl font-semibold mb-4 flex items-center">
@@ -237,13 +226,9 @@
         const originalTimeEl = document.getElementById('original-time');
         const resultTimeEl = document.getElementById('result-time');
         const calculationDetailsEl = document.getElementById('calculation-details');
-        const historyContainer = document.getElementById('history-container');
-        const noHistoryEl = document.getElementById('no-history');
-        const historyListEl = document.getElementById('history-list');
 
         // 状态变量
         let currentOperation = 'add';
-        let history = JSON.parse(localStorage.getItem('timeCalculatorHistory')) || [];
 
         // 初始化 - 设置当前日期和时间
         function init() {
@@ -257,9 +242,6 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             baseTimeInput.value = `${hours}:${minutes}`;
-            
-            // 加载历史记录
-            renderHistory();
         }
 
         // 设置运算类型
@@ -373,9 +355,6 @@
             
             // 显示结果
             displayResult(baseTime, resultTime, amount, unit, operation);
-            
-            // 保存到历史记录
-            saveToHistory(baseTime, resultTime, amount, unit, operation);
         }
 
         // 显示计算结果
@@ -421,115 +400,6 @@
             setTimeout(() => {
                 calculateBtn.classList.remove('scale-95');
             }, 200);
-        }
-
-        // 保存到历史记录
-        function saveToHistory(originalTime, resultTime, amount, unit, operation) {
-            const unitNames = {
-                'second': '秒',
-                'minute': '分钟',
-                'hour': '小时',
-                'day': '天',
-                'week': '星期',
-                'month': '月',
-                'quarter': '季度',
-                'year': '年'
-            };
-            
-            const operationName = operation === 'add' ? '+' : '-';
-            
-            const record = {
-                id: Date.now(),
-                timestamp: new Date().toISOString(),
-                originalTime: originalTime.toISOString(),
-                resultTime: resultTime.toISOString(),
-                amount,
-                unit,
-                unitName: unitNames[unit],
-                operation
-            };
-            
-            // 添加到历史记录并限制数量
-            history.unshift(record);
-            if (history.length > 10) {
-                history = history.slice(0, 10);
-            }
-            
-            // 保存到localStorage
-            localStorage.setItem('timeCalculatorHistory', JSON.stringify(history));
-            
-            // 更新历史记录显示
-            renderHistory();
-        }
-
-        // 渲染历史记录
-        function renderHistory() {
-            if (history.length === 0) {
-                noHistoryEl.classList.remove('hidden');
-                historyListEl.classList.add('hidden');
-                return;
-            }
-            
-            noHistoryEl.classList.add('hidden');
-            historyListEl.classList.remove('hidden');
-            historyListEl.innerHTML = '';
-            
-            const options = { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit'
-            };
-            
-            history.forEach(record => {
-                const originalTime = new Date(record.originalTime);
-                const resultTime = new Date(record.resultTime);
-                const operationSymbol = record.operation === 'add' ? '+' : '-';
-                
-                const li = document.createElement('li');
-                li.className = 'p-3 bg-white/30 rounded-lg hover:bg-white/50 transition-custom';
-                li.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm text-gray-600">${originalTime.toLocaleString('zh-CN', options)}</p>
-                            <p class="font-medium">${operationSymbol} ${record.amount} ${record.unitName}</p>
-                            <p class="text-accent text-sm">${resultTime.toLocaleString('zh-CN', options)}</p>
-                        </div>
-                        <button class="text-gray-400 hover:text-primary transition-custom use-history" 
-                                data-id="${record.id}">
-                            <i class="fa fa-refresh" aria-hidden="true"></i>
-                        </button>
-                    </div>
-                `;
-                
-                historyListEl.appendChild(li);
-            });
-            
-            // 添加使用历史记录的事件监听
-            document.querySelectorAll('.use-history').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const recordId = parseInt(e.currentTarget.dataset.id);
-                    const record = history.find(r => r.id === recordId);
-                    
-                    if (record) {
-                        const originalTime = new Date(record.originalTime);
-                        
-                        // 设置基础时间为历史记录中的原始时间
-                        baseDateInput.value = originalTime.toISOString().split('T')[0];
-                        
-                        const hours = String(originalTime.getHours()).padStart(2, '0');
-                        const minutes = String(originalTime.getMinutes()).padStart(2, '0');
-                        baseTimeInput.value = `${hours}:${minutes}`;
-                        
-                        // 添加按钮动画
-                        e.currentTarget.classList.add('scale-90');
-                        setTimeout(() => {
-                            e.currentTarget.classList.remove('scale-90');
-                        }, 200);
-                    }
-                });
-            });
         }
 
         // 初始化页面
