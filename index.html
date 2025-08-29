@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多HTML文件嵌入程序</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- 配置Tailwind自定义颜色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        accent: '#722ED1',
+                        neutral: '#F2F3F5',
+                        dark: '#1D2129'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .nav-active {
+                @apply bg-primary text-white border-l-4 border-secondary;
+            }
+            .iframe-container {
+                @apply relative overflow-hidden rounded-lg shadow-lg transition-all duration-300;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-md py-4 px-6 sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-code-fork text-primary text-2xl"></i>
+                <h1 class="text-xl font-bold text-primary">HTML嵌入管理器</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="refreshBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <i class="fa fa-refresh text-gray-600"></i>
+                </button>
+                <button id="fullscreenBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                    <i class="fa fa-expand text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容区 -->
+    <main class="flex-1 flex flex-col md:flex-row container mx-auto w-full p-4">
+        <!-- 侧边导航 -->
+        <nav class="w-full md:w-64 bg-white rounded-lg shadow-md p-4 mb-4 md:mb-0 md:mr-4">
+            <h2 class="text-lg font-semibold mb-4 pb-2 border-b border-gray-200">页面导航</h2>
+            <ul class="space-y-1">
+                <li>
+                    <a href="page1.html" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="首页内容">
+                        <i class="fa fa-home mr-2 text-primary"></i>首页
+                    </a>
+                </li>
+                <li>
+                    <a href="page2.html" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="数据展示">
+                        <i class="fa fa-bar-chart mr-2 text-primary"></i>数据展示
+                    </a>
+                </li>
+                <li>
+                    <a href="page3.html" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="表单示例">
+                        <i class="fa fa-wpforms mr-2 text-primary"></i>表单示例
+                    </a>
+                </li>
+                <li>
+                    <a href="page4.html" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="图片画廊">
+                        <i class="fa fa-picture-o mr-2 text-primary"></i>图片画廊
+                    </a>
+                </li>
+                <li>
+                    <a href="https://example.com" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="外部网站">
+                        <i class="fa fa-external-link mr-2 text-primary"></i>外部网站
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 内容显示区 -->
+        <div class="flex-1 flex flex-col">
+            <!-- 内容标题栏 -->
+            <div class="bg-white rounded-t-lg shadow-md p-4 flex justify-between items-center">
+                <h2 id="contentTitle" class="text-lg font-semibold">请选择左侧导航加载内容</h2>
+                <div class="text-sm text-gray-500" id="pageInfo">未加载任何页面</div>
+            </div>
+            
+            <!-- iframe容器 -->
+            <div class="iframe-container flex-1 border border-t-0 border-gray-200 rounded-b-lg">
+                <iframe 
+                    id="contentFrame" 
+                    src="" 
+                    class="w-full h-full"
+                    frameborder="0"
+                    title="内容显示区域">
+                    您的浏览器不支持iframe标签，无法查看内容。
+                </iframe>
+            </div>
+            
+            <!-- 状态信息 -->
+            <div class="mt-4 bg-white rounded-lg shadow-md p-4">
+                <h3 class="font-medium mb-2">状态信息</h3>
+                <div id="statusMessage" class="text-sm text-gray-600">等待加载内容...</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-4 px-6 mt-6">
+        <div class="container mx-auto text-center text-sm">
+            <p>HTML嵌入管理器 &copy; 2023 | 用于嵌入和管理多个HTML页面</p>
+        </div>
+    </footer>
+
+    <script>
+        // 获取DOM元素
+        const contentFrame = document.getElementById('contentFrame');
+        const contentTitle = document.getElementById('contentTitle');
+        const pageInfo = document.getElementById('pageInfo');
+        const statusMessage = document.getElementById('statusMessage');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        // 初始化导航链接点击事件
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 更新导航激活状态
+                navLinks.forEach(l => l.classList.remove('nav-active'));
+                this.classList.add('nav-active');
+                
+                // 获取目标URL和标题
+                const targetUrl = this.getAttribute('href');
+                const targetTitle = this.getAttribute('data-title');
+                
+                // 更新标题
+                contentTitle.textContent = targetTitle;
+                pageInfo.textContent = `当前页面: ${targetUrl}`;
+                
+                // 显示加载状态
+                statusMessage.textContent = `正在加载 ${targetUrl}...`;
+                statusMessage.className = 'text-sm text-blue-600';
+                
+                // 加载目标页面
+                loadIframeContent(targetUrl);
+            });
+        });
+        
+        // 加载iframe内容
+        function loadIframeContent(url) {
+            // 清除之前的内容
+            contentFrame.src = '';
+            
+            // 设置新的源
+            setTimeout(() => {
+                contentFrame.src = url;
+            }, 100);
+        }
+        
+        // 监听iframe加载事件
+        contentFrame.addEventListener('load', function() {
+            try {
+                // 尝试获取页面标题（同域情况下）
+                let pageTitle = '';
+                try {
+                    pageTitle = contentFrame.contentDocument.title ? 
+                                `（${contentFrame.contentDocument.title}）` : '';
+                } catch (e) {
+                    // 跨域时无法访问内容，忽略错误
+                    pageTitle = '（外部网站）';
+                }
+                
+                statusMessage.textContent = `页面加载完成 ${pageTitle}`;
+                statusMessage.className = 'text-sm text-green-600';
+            } catch (error) {
+                statusMessage.textContent = `加载完成，但无法获取页面信息`;
+                statusMessage.className = 'text-sm text-yellow-600';
+            }
+        });
+        
+        // 监听iframe错误事件
+        contentFrame.addEventListener('error', function() {
+            statusMessage.textContent = `页面加载失败，请检查URL是否正确`;
+            statusMessage.className = 'text-sm text-red-600';
+        });
+        
+        // 刷新按钮功能
+        refreshBtn.addEventListener('click', function() {
+            if (contentFrame.src) {
+                statusMessage.textContent = `正在刷新页面...`;
+                statusMessage.className = 'text-sm text-blue-600';
+                contentFrame.src = contentFrame.src;
+            } else {
+                statusMessage.textContent = `请先加载一个页面再刷新`;
+                statusMessage.className = 'text-sm text-yellow-600';
+            }
+        });
+        
+        // 全屏按钮功能
+        fullscreenBtn.addEventListener('click', function() {
+            const iframeContainer = document.querySelector('.iframe-container');
+            
+            if (!document.fullscreenElement) {
+                if (iframeContainer.requestFullscreen) {
+                    iframeContainer.requestFullscreen();
+                } else if (iframeContainer.webkitRequestFullscreen) { /* Safari */
+                    iframeContainer.webkitRequestFullscreen();
+                } else if (iframeContainer.msRequestFullscreen) { /* IE11 */
+                    iframeContainer.msRequestFullscreen();
+                }
+                fullscreenBtn.innerHTML = '<i class="fa fa-compress text-gray-600"></i>';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) { /* Safari */
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) { /* IE11 */
+                    document.msExitFullscreen();
+                }
+                fullscreenBtn.innerHTML = '<i class="fa fa-expand text-gray-600"></i>';
+            }
+        });
+        
+        // 默认加载第一个页面
+        setTimeout(() => {
+            navLinks[0].click();
+        }, 500);
+    </script>
+</body>
+</html>
