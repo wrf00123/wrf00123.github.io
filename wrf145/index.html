@@ -3,250 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>多HTML文件嵌入程序</title>
+    <title>多页面嵌入系统</title>
     <!-- 引入Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入Font Awesome -->
+    <!-- 引入Font Awesome图标 -->
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-    
-    <!-- 配置Tailwind自定义颜色 -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#165DFF',
-                        secondary: '#36CFC9',
-                        accent: '#722ED1',
-                        neutral: '#F2F3F5',
-                        dark: '#1D2129'
-                    },
-                    fontFamily: {
-                        inter: ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                }
-            }
+    <style>
+        /* 自定义滚动条样式 */
+        .sidebar-scrollbar::-webkit-scrollbar {
+            width: 5px;
         }
-    </script>
-    
-    <!-- 自定义工具类 -->
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .content-auto {
-                content-visibility: auto;
-            }
-            .nav-active {
-                @apply bg-primary text-white border-l-4 border-secondary;
-            }
-            .iframe-container {
-                @apply relative overflow-hidden rounded-lg shadow-lg transition-all duration-300;
-            }
+        
+        .sidebar-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background: #c5c5c5;
+            border-radius: 10px;
+        }
+        
+        .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* 加载动画 */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="font-inter bg-gray-50 text-dark min-h-screen flex flex-col">
-    <!-- 顶部导航栏 -->
-    <header class="bg-white shadow-md py-4 px-6 sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fa fa-code-fork text-primary text-2xl"></i>
-                <h1 class="text-xl font-bold text-primary">HTML嵌入管理器</h1>
-            </div>
-            <div class="flex items-center space-x-4">
-                <button id="refreshBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                    <i class="fa fa-refresh text-gray-600"></i>
-                </button>
-                <button id="fullscreenBtn" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                    <i class="fa fa-expand text-gray-600"></i>
-                </button>
-            </div>
+<body class="bg-gray-100 h-screen flex overflow-hidden">
+    <!-- 侧边导航栏 - 带滚动条 -->
+    <aside class="w-64 bg-white shadow-md flex flex-col h-full sidebar-scrollbar overflow-y-auto">
+        <!-- 导航标题 -->
+        <div class="p-4 border-b flex items-center">
+            <i class="fa fa-th-large text-indigo-600 text-xl mr-3"></i>
+            <h1 class="text-lg font-bold text-gray-800">页面导航</h1>
         </div>
-    </header>
-
-    <!-- 主要内容区 -->
-    <main class="flex-1 flex flex-col md:flex-row container mx-auto w-full p-4">
-        <!-- 侧边导航 -->
-        <nav class="w-full md:w-64 bg-white rounded-lg shadow-md p-4 mb-4 md:mb-0 md:mr-4">
-            <h2 class="text-lg font-semibold mb-4 pb-2 border-b border-gray-200">页面导航</h2>
+        
+        <!-- 导航菜单 -->
+        <nav class="p-2 flex-1">
             <ul class="space-y-1">
                 <li>
-                    <a href="page1.html" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="首页内容">
-                        <i class="fa fa-home mr-2 text-primary"></i>首页
+                    <a href="home.html" class="nav-link flex items-center px-4 py-3 rounded-lg bg-indigo-50 text-indigo-700 font-medium transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-home w-5 text-center mr-3"></i>
+                        <span>首页</span>
                     </a>
                 </li>
+                
                 <li>
-                    <a href="page2.html" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="数据展示">
-                        <i class="fa fa-bar-chart mr-2 text-primary"></i>数据展示
+                    <a href="dashboard.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-tachometer w-5 text-center mr-3"></i>
+                        <span>数据面板</span>
                     </a>
                 </li>
+                
                 <li>
-                    <a href="page3.html" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="表单示例">
-                        <i class="fa fa-wpforms mr-2 text-primary"></i>表单示例
+                    <a href="form.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-file-text w-5 text-center mr-3"></i>
+                        <span>表单示例</span>
                     </a>
                 </li>
+                
                 <li>
-                    <a href="page4.html" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="图片画廊">
-                        <i class="fa fa-picture-o mr-2 text-primary"></i>图片画廊
+                    <a href="gallery.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-picture-o w-5 text-center mr-3"></i>
+                        <span>图片画廊</span>
                     </a>
                 </li>
+                
+                <!-- 添加更多菜单项以演示滚动条 -->
                 <li>
-                    <a href="https://example.com" class="nav-link block px-4 py-3 rounded hover:bg-gray-100 transition-colors" data-title="外部网站">
-                        <i class="fa fa-external-link mr-2 text-primary"></i>外部网站
+                    <a href="page1.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-file w-5 text-center mr-3"></i>
+                        <span>文档页面1</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="page2.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-file w-5 text-center mr-3"></i>
+                        <span>文档页面2</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="page3.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-calendar w-5 text-center mr-3"></i>
+                        <span>日历应用</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="page4.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-map-marker w-5 text-center mr-3"></i>
+                        <span>地图工具</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="page5.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-calculator w-5 text-center mr-3"></i>
+                        <span>计算器</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="page6.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-clock-o w-5 text-center mr-3"></i>
+                        <span>时钟应用</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="page7.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-check-square-o w-5 text-center mr-3"></i>
+                        <span>待办事项</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="page8.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-comments w-5 text-center mr-3"></i>
+                        <span>留言板</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="page9.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-star w-5 text-center mr-3"></i>
+                        <span>评分系统</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="page10.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
+                       data-target="contentFrame">
+                        <i class="fa fa-search w-5 text-center mr-3"></i>
+                        <span>搜索工具</span>
                     </a>
                 </li>
             </ul>
         </nav>
-
-        <!-- 内容显示区 -->
-        <div class="flex-1 flex flex-col">
-            <!-- 内容标题栏 -->
-            <div class="bg-white rounded-t-lg shadow-md p-4 flex justify-between items-center">
-                <h2 id="contentTitle" class="text-lg font-semibold">请选择左侧导航加载内容</h2>
-                <div class="text-sm text-gray-500" id="pageInfo">未加载任何页面</div>
+        
+        <!-- 底部信息 -->
+        <div class="p-4 border-t text-center text-sm text-gray-500">
+            <p>© 2024 多页面系统</p>
+        </div>
+    </aside>
+    
+    <!-- 主内容区域 -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- 顶部工具栏 -->
+        <header class="bg-white shadow-sm p-4 flex items-center justify-between">
+            <h2 id="currentPageTitle" class="text-lg font-semibold text-gray-800">首页</h2>
+            
+            <div class="flex items-center space-x-3">
+                <button id="refreshBtn" class="flex items-center px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors">
+                    <i class="fa fa-refresh mr-2"></i>
+                    <span>刷新</span>
+                </button>
+                
+                <button id="fullscreenBtn" class="flex items-center px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors">
+                    <i class="fa fa-expand mr-2"></i>
+                    <span>全屏</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- 内容显示区域 -->
+        <div class="flex-1 relative overflow-hidden">
+            <!-- 加载指示器 -->
+            <div id="loadingIndicator" class="absolute inset-0 bg-white/80 flex items-center justify-center hidden z-10">
+                <div class="flex flex-col items-center">
+                    <div class="loader mb-3"></div>
+                    <p id="loadingText" class="text-gray-600">加载中...</p>
+                </div>
             </div>
             
-            <!-- iframe容器 -->
-            <div class="iframe-container flex-1 border border-t-0 border-gray-200 rounded-b-lg">
-                <iframe 
-                    id="contentFrame" 
-                    src="" 
-                    class="w-full h-full"
-                    frameborder="0"
-                    title="内容显示区域">
-                    您的浏览器不支持iframe标签，无法查看内容。
-                </iframe>
-            </div>
-            
-            <!-- 状态信息 -->
-            <div class="mt-4 bg-white rounded-lg shadow-md p-4">
-                <h3 class="font-medium mb-2">状态信息</h3>
-                <div id="statusMessage" class="text-sm text-gray-600">等待加载内容...</div>
-            </div>
+            <!-- 主iframe -->
+            <iframe id="contentFrame" 
+                    src="home.html" 
+                    class="w-full h-full border-0"
+                    title="内容显示区域"
+                    sandbox="allow-same-origin allow-scripts allow-forms">
+                您的浏览器不支持iframe标签，请升级浏览器。
+            </iframe>
         </div>
     </main>
 
-    <!-- 页脚 -->
-    <footer class="bg-dark text-white py-4 px-6 mt-6">
-        <div class="container mx-auto text-center text-sm">
-            <p>HTML嵌入管理器 &copy; 2023 | 用于嵌入和管理多个HTML页面</p>
-        </div>
-    </footer>
-
     <script>
-        // 获取DOM元素
-        const contentFrame = document.getElementById('contentFrame');
-        const contentTitle = document.getElementById('contentTitle');
-        const pageInfo = document.getElementById('pageInfo');
-        const statusMessage = document.getElementById('statusMessage');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        
-        // 初始化导航链接点击事件
-        navLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentFrame = document.getElementById('contentFrame');
+            const currentPageTitle = document.getElementById('currentPageTitle');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const loadingText = document.getElementById('loadingText');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            
+            // 导航链接点击事件
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 更新导航选中状态
+                    navLinks.forEach(item => {
+                        item.classList.remove('bg-indigo-50', 'text-indigo-700', 'font-medium');
+                        item.classList.add('text-gray-700', 'hover:bg-gray-100');
+                    });
+                    this.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                    this.classList.add('bg-indigo-50', 'text-indigo-700', 'font-medium');
+                    
+                    // 获取页面信息
+                    const targetUrl = this.getAttribute('href');
+                    const pageName = this.querySelector('span').textContent;
+                    
+                    // 更新标题和加载状态
+                    currentPageTitle.textContent = pageName;
+                    loadingText.textContent = `加载${pageName}中...`;
+                    loadingIndicator.classList.remove('hidden');
+                    
+                    // 加载页面到iframe
+                    contentFrame.src = targetUrl;
+                });
+            });
+            
+            // iframe加载完成事件
+            contentFrame.addEventListener('load', function() {
+                loadingIndicator.classList.add('hidden');
                 
-                // 更新导航激活状态
-                navLinks.forEach(l => l.classList.remove('nav-active'));
-                this.classList.add('nav-active');
+                // 尝试获取子页面标题
+                try {
+                    const childTitle = contentFrame.contentDocument.title;
+                    if (childTitle) {
+                        currentPageTitle.textContent = childTitle;
+                    }
+                } catch (e) {
+                    // 跨域时可能无法访问，忽略错误
+                }
+            });
+            
+            // 刷新按钮事件
+            refreshBtn.addEventListener('click', function() {
+                const currentSrc = contentFrame.src;
+                loadingIndicator.classList.remove('hidden');
+                loadingText.textContent = '刷新中...';
+                contentFrame.src = currentSrc;
+            });
+            
+            // 全屏按钮事件
+            fullscreenBtn.addEventListener('click', function() {
+                const iframeContainer = contentFrame.parentElement;
                 
-                // 获取目标URL和标题
-                const targetUrl = this.getAttribute('href');
-                const targetTitle = this.getAttribute('data-title');
-                
-                // 更新标题
-                contentTitle.textContent = targetTitle;
-                pageInfo.textContent = `当前页面: ${targetUrl}`;
-                
-                // 显示加载状态
-                statusMessage.textContent = `正在加载 ${targetUrl}...`;
-                statusMessage.className = 'text-sm text-blue-600';
-                
-                // 加载目标页面
-                loadIframeContent(targetUrl);
+                if (!document.fullscreenElement) {
+                    // 进入全屏
+                    if (iframeContainer.requestFullscreen) {
+                        iframeContainer.requestFullscreen();
+                    } else if (iframeContainer.webkitRequestFullscreen) {
+                        iframeContainer.webkitRequestFullscreen();
+                    } else if (iframeContainer.msRequestFullscreen) {
+                        iframeContainer.msRequestFullscreen();
+                    }
+                    this.innerHTML = '<i class="fa fa-compress mr-2"></i><span>退出全屏</span>';
+                } else {
+                    // 退出全屏
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                    this.innerHTML = '<i class="fa fa-expand mr-2"></i><span>全屏</span>';
+                }
             });
         });
-        
-        // 加载iframe内容
-        function loadIframeContent(url) {
-            // 清除之前的内容
-            contentFrame.src = '';
-            
-            // 设置新的源
-            setTimeout(() => {
-                contentFrame.src = url;
-            }, 100);
-        }
-        
-        // 监听iframe加载事件
-        contentFrame.addEventListener('load', function() {
-            try {
-                // 尝试获取页面标题（同域情况下）
-                let pageTitle = '';
-                try {
-                    pageTitle = contentFrame.contentDocument.title ? 
-                                `（${contentFrame.contentDocument.title}）` : '';
-                } catch (e) {
-                    // 跨域时无法访问内容，忽略错误
-                    pageTitle = '（外部网站）';
-                }
-                
-                statusMessage.textContent = `页面加载完成 ${pageTitle}`;
-                statusMessage.className = 'text-sm text-green-600';
-            } catch (error) {
-                statusMessage.textContent = `加载完成，但无法获取页面信息`;
-                statusMessage.className = 'text-sm text-yellow-600';
-            }
-        });
-        
-        // 监听iframe错误事件
-        contentFrame.addEventListener('error', function() {
-            statusMessage.textContent = `页面加载失败，请检查URL是否正确`;
-            statusMessage.className = 'text-sm text-red-600';
-        });
-        
-        // 刷新按钮功能
-        refreshBtn.addEventListener('click', function() {
-            if (contentFrame.src) {
-                statusMessage.textContent = `正在刷新页面...`;
-                statusMessage.className = 'text-sm text-blue-600';
-                contentFrame.src = contentFrame.src;
-            } else {
-                statusMessage.textContent = `请先加载一个页面再刷新`;
-                statusMessage.className = 'text-sm text-yellow-600';
-            }
-        });
-        
-        // 全屏按钮功能
-        fullscreenBtn.addEventListener('click', function() {
-            const iframeContainer = document.querySelector('.iframe-container');
-            
-            if (!document.fullscreenElement) {
-                if (iframeContainer.requestFullscreen) {
-                    iframeContainer.requestFullscreen();
-                } else if (iframeContainer.webkitRequestFullscreen) { /* Safari */
-                    iframeContainer.webkitRequestFullscreen();
-                } else if (iframeContainer.msRequestFullscreen) { /* IE11 */
-                    iframeContainer.msRequestFullscreen();
-                }
-                fullscreenBtn.innerHTML = '<i class="fa fa-compress text-gray-600"></i>';
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) { /* Safari */
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) { /* IE11 */
-                    document.msExitFullscreen();
-                }
-                fullscreenBtn.innerHTML = '<i class="fa fa-expand text-gray-600"></i>';
-            }
-        });
-        
-        // 默认加载第一个页面
-        setTimeout(() => {
-            navLinks[0].click();
-        }, 500);
     </script>
 </body>
 </html>
+    
