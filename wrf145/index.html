@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>多页面嵌入系统</title>
+    <title>实用工具小程序</title>
     <!-- 引入Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- 引入Font Awesome图标 -->
@@ -44,158 +45,145 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-100 h-screen flex overflow-hidden">
     <!-- 侧边导航栏 - 带滚动条 -->
     <aside class="w-64 bg-white shadow-md flex flex-col h-full sidebar-scrollbar overflow-y-auto">
         <!-- 导航标题 -->
         <div class="p-4 border-b flex items-center">
             <i class="fa fa-th-large text-indigo-600 text-xl mr-3"></i>
-            <h1 class="text-lg font-bold text-gray-800">页面导航</h1>
+            <h1 class="text-lg font-bold text-gray-800">实用工具小程序</h1>
         </div>
-        
+
         <!-- 导航菜单 -->
         <nav class="p-2 flex-1">
             <ul class="space-y-1">
                 <li>
-                    <a href="home.html" class="nav-link flex items-center px-4 py-3 rounded-lg bg-indigo-50 text-indigo-700 font-medium transition-all" 
-                       data-target="contentFrame">
+                    <a href="home.html" class="nav-link flex items-center px-4 py-3 rounded-lg bg-indigo-50 text-indigo-700 font-medium transition-all" data-target="contentFrame">
                         <i class="fa fa-home w-5 text-center mr-3"></i>
                         <span>首页</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="dashboard.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page1.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-tachometer w-5 text-center mr-3"></i>
                         <span>数据面板</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="form.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page2.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-file-text w-5 text-center mr-3"></i>
                         <span>表单示例</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="gallery.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page3.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-picture-o w-5 text-center mr-3"></i>
                         <span>图片画廊</span>
                     </a>
                 </li>
-                
+
                 <!-- 添加更多菜单项以演示滚动条 -->
                 <li>
-                    <a href="page1.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page4.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-file w-5 text-center mr-3"></i>
                         <span>文档页面1</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="page2.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page5.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-file w-5 text-center mr-3"></i>
                         <span>文档页面2</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="page3.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page6.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-calendar w-5 text-center mr-3"></i>
                         <span>日历应用</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="page4.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page7.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-map-marker w-5 text-center mr-3"></i>
                         <span>地图工具</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="page5.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page8.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-calculator w-5 text-center mr-3"></i>
                         <span>计算器</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="page6.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page9.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-clock-o w-5 text-center mr-3"></i>
                         <span>时钟应用</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="page7.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page10.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-check-square-o w-5 text-center mr-3"></i>
                         <span>待办事项</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="page8.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page11.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-comments w-5 text-center mr-3"></i>
                         <span>留言板</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="page9.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page12.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-star w-5 text-center mr-3"></i>
                         <span>评分系统</span>
                     </a>
                 </li>
-                
+
                 <li>
-                    <a href="page10.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" 
-                       data-target="contentFrame">
+                    <a href="page13.html" class="nav-link flex items-center px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition-all" data-target="contentFrame">
                         <i class="fa fa-search w-5 text-center mr-3"></i>
                         <span>搜索工具</span>
                     </a>
                 </li>
             </ul>
         </nav>
-        
+
         <!-- 底部信息 -->
         <div class="p-4 border-t text-center text-sm text-gray-500">
-            <p>© 2024 多页面系统</p>
+            <p>@2024 多页面系统</p>
         </div>
     </aside>
-    
+
     <!-- 主内容区域 -->
     <main class="flex-1 flex flex-col overflow-hidden">
         <!-- 顶部工具栏 -->
         <header class="bg-white shadow-sm p-4 flex items-center justify-between">
             <h2 id="currentPageTitle" class="text-lg font-semibold text-gray-800">首页</h2>
-            
+
             <div class="flex items-center space-x-3">
                 <button id="refreshBtn" class="flex items-center px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors">
                     <i class="fa fa-refresh mr-2"></i>
                     <span>刷新</span>
                 </button>
-                
+
                 <button id="fullscreenBtn" class="flex items-center px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 rounded-md text-gray-700 transition-colors">
                     <i class="fa fa-expand mr-2"></i>
                     <span>全屏</span>
                 </button>
             </div>
         </header>
-        
+
         <!-- 内容显示区域 -->
         <div class="flex-1 relative overflow-hidden">
             <!-- 加载指示器 -->
@@ -205,13 +193,9 @@
                     <p id="loadingText" class="text-gray-600">加载中...</p>
                 </div>
             </div>
-            
+
             <!-- 主iframe -->
-            <iframe id="contentFrame" 
-                    src="home.html" 
-                    class="w-full h-full border-0"
-                    title="内容显示区域"
-                    sandbox="allow-same-origin allow-scripts allow-forms">
+            <iframe id="contentFrame" src="home.html" class="w-full h-full border-0" title="内容显示区域" sandbox="allow-same-origin allow-scripts allow-forms">
                 您的浏览器不支持iframe标签，请升级浏览器。
             </iframe>
         </div>
@@ -308,5 +292,5 @@
         });
     </script>
 </body>
+
 </html>
-    
