@@ -52,6 +52,13 @@
             }
         }
     </style>
+    
+    <!-- 全局字体大小调整，解决GitHub Pages显示过小问题 -->
+    <style>
+        html {
+            font-size: 16px !important;
+        }
+    </style>
 </head>
 
 <body class="bg-wechat-gray font-sans text-wechat-text h-screen overflow-hidden">
@@ -65,17 +72,27 @@
                 </h1>
             </div>
 
-            <!-- 搜索框 - 修复重叠问题，调整了内边距 -->
+            <!-- 搜索框区域 - 移除搜索图标 -->
             <div class="p-3 border-b border-wechat-border">
-                <div class="relative">
-                    <i class="fa fa-search absolute left-0.5 top-1/2 -translate-y-1/2 text-wechat-textLight"></i>
-                    <input type="text" id="sidebar-search" placeholder="" class="wechat-input pl-11 pr-4 text-sm py-2.5">
+                <!-- 搜索按钮 -->
+                <button id="search-button" class="w-full flex items-center justify-center bg-wechat-gray rounded-full px-4 py-2.5 text-wechat-text hover:bg-wechat-grayDark transition-colors">
+                    <i class="fa fa-search mr-2 text-wechat-textLight"></i>
+                    <span>点击搜索</span>
+                </button>
+                
+                <!-- 搜索框容器 - 默认隐藏，已移除搜索图标 -->
+                <div id="search-box-container" class="relative hidden mt-2">
+                    <input type="text" id="sidebar-search" placeholder="" class="wechat-input pl-4 pr-10 text-base py-2.5">
+                    <!-- 清空按钮 -->
+                    <button id="clear-search" class="absolute right-3 top-1/2 -translate-y-1/2 text-wechat-textLight hidden">
+                        <i class="fa fa-times"></i>
+                    </button>
                 </div>
             </div>
 
             <nav class="p-1">
                 <ul class="space-y-1">
-                    <!-- 动态生成10个导航项 - 类似微信联系人 -->
+                    <!-- 动态生成10个导航项 -->
                 </ul>
             </nav>
 
@@ -89,12 +106,12 @@
 
         <!-- 主内容区 -->
         <main class="flex-1 flex flex-col overflow-hidden max-h-screen">
-            <!-- 顶部导航 - 类似微信聊天顶部 -->
+            <!-- 顶部导航 -->
             <header class="bg-white border-b border-wechat-border p-3 flex justify-between items-center z-10">
                 <button id="menu-toggle" class="md:hidden p-2 rounded-full hover:bg-wechat-gray">
                     <i class="fa fa-bars text-wechat-text"></i>
                 </button>
-                <h2 id="page-title" class="text-base font-medium">技术资源</h2>
+                <h2 id="page-title" class="text-lg font-medium">技术资源</h2>
                 <div class="flex items-center">
                     <button id="search-toggle" class="p-2 rounded-full hover:bg-wechat-gray">
                         <i class="fa fa-search text-wechat-text"></i>
@@ -105,40 +122,40 @@
                 </div>
             </header>
 
-            <!-- 搜索栏 - 类似微信聊天页搜索 -->
+            <!-- 搜索栏 -->
             <div id="search-container" class="bg-white border-b border-wechat-border p-3 hidden">
                 <div class="relative">
-                    <input type="text" id="search-input" placeholder="搜索网站..." class="wechat-input text-sm">
+                    <input type="text" id="search-input" placeholder="搜索网站..." class="wechat-input text-base">
                     <button id="search-close" class="absolute right-3 top-1/2 -translate-y-1/2 text-wechat-textLight">
                         <i class="fa fa-times"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- 页面内容 - 改为每行三个网站的网格布局 -->
+            <!-- 页面内容 -->
             <div id="pages-container" class="flex-1 overflow-y-auto bg-wechat-gray p-4">
                 <!-- 页面内容将动态生成 -->
             </div>
 
-            <!-- 底部导航栏 - 仅在移动端显示，类似微信底部导航 -->
+            <!-- 底部导航栏 -->
             <div class="md:hidden bg-white border-t border-wechat-border flex justify-around py-2">
                 <button class="flex flex-col items-center text-wechat-green">
                     <i class="fa fa-th-large text-lg"></i>
-                    <span class="text-xs mt-1">导航</span>
+                    <span class="text-sm mt-1">导航</span>
                 </button>
                 <button class="flex flex-col items-center text-wechat-textLight">
                     <i class="fa fa-star-o text-lg"></i>
-                    <span class="text-xs mt-1">收藏</span>
+                    <span class="text-sm mt-1">收藏</span>
                 </button>
                 <button class="flex flex-col items-center text-wechat-textLight">
                     <i class="fa fa-user-o text-lg"></i>
-                    <span class="text-xs mt-1">我的</span>
+                    <span class="text-sm mt-1">我的</span>
                 </button>
             </div>
         </main>
     </div>
 
-    <!-- 移动端遮罩 - 类似微信侧边栏遮罩 -->
+    <!-- 移动端遮罩 -->
     <div id="overlay" class="fixed inset-0 bg-black/30 z-10 hidden md:hidden"></div>
 
     <script>
@@ -190,9 +207,7 @@
                     { name: "GitHud Proxy", url: "https://ghfast.top/", desc: "GitHud加速下载" },
                     { name: "时间瓶子", url: "https://timebottle.toolooz.com/", desc: "时间小工具" },
                     { name: "LRC歌词编辑", url: "https://timebottle.toolooz.com/", desc: "歌词编辑" },
-                    { name: "中国传统色", url: "https://noneko.cn/", desc: "色系查询" },
-                  
-        
+                    { name: "中国传统色", url: "https://noneko.cn/", desc: "色系查询" }
                 ]
             },
             {
@@ -204,9 +219,7 @@
                     { name: "FastStone Capture", url: "https://www.faststonecapture.cn/", desc: "截长图" },
                     { name: "小旺AI截图", url: "https://www.xiaowang.com/", desc: "截长图" },
                     { name: "方方格子", url: "http://www.ffcell.com/", desc: "excel插件" },
-                    { name: "51PPT模板", url: "https://www.51pptmoban.com/ppt-soft/", desc: "PPT插件" },
-                  
-                    
+                    { name: "51PPT模板", url: "https://www.51pptmoban.com/ppt-soft/", desc: "PPT插件" }
                 ]
             },
             {
@@ -226,8 +239,7 @@
                     { name: "知识星球", url: "https://wx.zsxq.com/login", desc: "资料下载" },
                     { name: "百度文库", url: "https://wenku.baidu.com/?fr=brandad_2&_wkts_=1755328356957", desc: "资料下载" },
                     { name: "腾讯文档", url: "https://docs.qq.com/desktop/?nlc=1", desc: "资料下载" },
-                    { name: "仪器信息网", url: "https://www.instrument.com.cn/", desc: "资料下载" },
-                    
+                    { name: "仪器信息网", url: "https://www.instrument.com.cn/", desc: "资料下载" }
                 ]
             },
             {
@@ -241,7 +253,6 @@
                   { name: "163邮箱", url: "https://mail.163.com/", desc: "邮箱" },
                   { name: "问卷星", url: "https://www.wjx.cn/newwjx/manage/myquestionnaires.aspx?randomt=1744110951", desc: "问卷调查" },
                   { name: "百度一下", url: "https://www.baidu.com/index.php?tn=75144485_2_dg&ch=1", desc: "百度搜索" }
-        
                 ]
             },
             {
@@ -258,7 +269,6 @@
                     { name: "秘塔AI搜索", url: "https://metaso.cn/", desc: "在线AI" },
                     { name: "飞书文档", url: "https://www.feishu.cn/accounts/page/ug_register?template_id=7168397144091885571&tracking_code=701BB000000AemRYAS&utm_from=baidusem_keyword_pc_office_pinpai_pinpai_pinpai&device=PC&e_keywordid=880420485112&bd_vid=10542092342281201260", desc: "在线AI" },
                     { name: "文小言", url: "http://www.wenxiaoyan.com/pc", desc: "AI软件" }
-                    
                 ]
             },
             {
@@ -275,7 +285,6 @@
                     { name: "国家标准化管理委员会", url: "https://www.sac.gov.cn/index.html", desc: "国家标准化管理委员会" },
                     { name: "国家卫生健康委员会", url: "http://www.nhc.gov.cn/", desc: "国家卫生健康委员会" },
                     { name: "中国合格评定国家认可委员会", url: "https://ltbzh.mofcom.gov.cn/ltbz/view/bzfk/listBzfk.jsp", desc: "中国合格评定国家认可委员会" },
-                    
                     { name: "卫健委政务服务平台", url: "https://www.nhc.gov.cn/wjw/wsbzxx/wsbz.shtml", desc: "国家卫生健康委员会政务服务平台" },  
                     { name: "食品生产许可获证查询", url: "https://spaqjg.e-cqs.cn/spscxk/", desc: "食品生产许可获证查询" },
                     { name: "特种设备公示信息查询", url: "https://cnse.samr.gov.cn/info-pub/pub", desc: "特种设备公示信息查询" },
@@ -336,7 +345,6 @@
                 websites: [
                     { name: "LetMeEnglish.com", url: "https://letmeenglish.com/", desc: "英语学习" },
                     { name: "网上厨房", url: "https://www.xiaochushuo.com/", desc: "菜谱查询" }
-                  
                 ]
             }
         ];
@@ -354,6 +362,11 @@
         const searchClose = document.getElementById('search-close');
         const sidebarSearch = document.getElementById('sidebar-search');
         
+        // 左侧搜索框元素
+        const searchButton = document.getElementById('search-button');
+        const searchBoxContainer = document.getElementById('search-box-container');
+        const clearSearch = document.getElementById('clear-search');
+        
         // 初始化导航菜单
         function initNavigation() {
             // 保存所有导航项以便搜索
@@ -367,7 +380,7 @@
                         <div class="w-8 h-8 rounded-md bg-wechat-green/10 flex items-center justify-center mr-3 flex-shrink-0">
                             <i class="fa ${page.icon} text-wechat-green"></i>
                         </div>
-                        <span class="truncate">${page.title}</span>
+                        <span class="truncate text-base">${page.title}</span>
                     </a>
                 `;
                 navList.appendChild(li);
@@ -409,7 +422,7 @@
             showPage(1);
         }
         
-        // 显示指定页面 - 改为每行三个网站的网格布局
+        // 显示指定页面
         function showPage(pageId) {
             // 更新导航激活状态
             document.querySelectorAll('.nav-item').forEach(item => {
@@ -427,10 +440,10 @@
             // 更新页面标题
             pageTitle.textContent = pageData.title;
         
-            // 生成页面内容 - 每行三个网站的网格布局
+            // 生成页面内容
             let pageContent = `
                 <div class="mb-4">
-                    <h3 class="text-xs text-wechat-textLight uppercase font-medium tracking-wider px-2">
+                    <h3 class="text-sm text-wechat-textLight uppercase font-medium tracking-wider px-2">
                         ${pageData.title}
                     </h3>
                 </div>
@@ -458,11 +471,11 @@
                                     <div class="w-8 h-8 rounded-md bg-wechat-green/10 flex items-center justify-center mr-2 flex-shrink-0">
                                         <i class="fa fa-globe text-wechat-green"></i>
                                     </div>
-                                    <h4 class="font-medium text-base text-wechat-text truncate">${website.name}</h4>
+                                    <h4 class="font-medium text-lg text-wechat-text truncate">${website.name}</h4>
                                 </div>
-                                <p class="text-sm text-wechat-textLight mb-2 line-clamp-2">${website.desc}</p>
+                                <p class="text-base text-wechat-textLight mb-2 line-clamp-2">${website.desc}</p>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-sm text-wechat-textLight bg-wechat-gray px-1.5 py-0.5 rounded">${domain}</span>
+                                    <span class="text-base text-wechat-textLight bg-wechat-gray px-1.5 py-0.5 rounded">${domain}</span>
                                     <i class="fa fa-angle-right text-wechat-textLight"></i>
                                 </div>
                             </div>
@@ -478,7 +491,7 @@
             pagesContainer.scrollTop = 0;
         }
         
-        // 初始化搜索功能 - 搜索结果也改为网格布局
+        // 初始化搜索功能
         function initSearch() {
             // 搜索框显示/隐藏
             searchToggle.addEventListener('click', () => {
@@ -528,10 +541,10 @@
                     });
                 });
         
-                // 显示搜索结果 - 同样使用网格布局
+                // 显示搜索结果
                 let resultsHTML = `
                     <div class="mb-4">
-                        <h3 class="text-xs text-wechat-textLight uppercase font-medium tracking-wider px-2">
+                        <h3 class="text-sm text-wechat-textLight uppercase font-medium tracking-wider px-2">
                             搜索结果: "${searchTerm}"
                         </h3>
                     </div>
@@ -543,7 +556,7 @@
                     resultsHTML += `
                         <div class="col-span-full p-8 text-center">
                             <i class="fa fa-search text-3xl text-wechat-grayDark mb-3"></i>
-                            <p class="text-wechat-textLight text-sm">没有找到匹配的网站</p>
+                            <p class="text-wechat-textLight text-base">没有找到匹配的网站</p>
                         </div>
                     `;
                 } else {
@@ -565,13 +578,13 @@
                                                 <i class="fa ${website.pageIcon} text-wechat-green"></i>
                                             </div>
                                             <div>
-                                                <h4 class="font-medium text-sm text-wechat-text truncate">${website.name}</h4>
-                                                <span class="text-xs text-wechat-textLight">${website.pageTitle}</span>
+                                                <h4 class="font-medium text-lg text-wechat-text truncate">${website.name}</h4>
+                                                <span class="text-sm text-wechat-textLight">${website.pageTitle}</span>
                                             </div>
                                         </div>
-                                        <p class="text-xs text-wechat-textLight mb-2 line-clamp-2">${website.desc}</p>
+                                        <p class="text-base text-wechat-textLight mb-2 line-clamp-2">${website.desc}</p>
                                         <div class="flex items-center justify-between">
-                                            <span class="text-xs text-wechat-textLight bg-wechat-gray px-1.5 py-0.5 rounded">${domain}</span>
+                                            <span class="text-base text-wechat-textLight bg-wechat-gray px-1.5 py-0.5 rounded">${domain}</span>
                                             <i class="fa fa-angle-right text-wechat-textLight"></i>
                                         </div>
                                     </div>
@@ -586,7 +599,7 @@
             });
         }
         
-        // 移动端菜单切换 - 类似微信侧边栏切换
+        // 移动端菜单切换
         function initMobileMenu() {
             menuToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('hidden');
@@ -609,11 +622,51 @@
             });
         }
         
+        // 初始化左侧搜索功能
+        function initSidebarSearch() {
+            // 点击搜索按钮显示/隐藏搜索框
+            searchButton.addEventListener('click', () => {
+                searchBoxContainer.classList.toggle('hidden');
+                if (!searchBoxContainer.classList.contains('hidden')) {
+                    sidebarSearch.focus(); // 自动聚焦
+                }
+            });
+        
+            // 搜索框输入事件 - 控制清空按钮显示
+            sidebarSearch.addEventListener('input', () => {
+                if (sidebarSearch.value.trim() !== '') {
+                    clearSearch.classList.remove('hidden');
+                } else {
+                    clearSearch.classList.add('hidden');
+                }
+            });
+        
+            // 清空搜索内容
+            clearSearch.addEventListener('click', () => {
+                sidebarSearch.value = '';
+                clearSearch.classList.add('hidden');
+                // 触发搜索事件以显示所有项目
+                const event = new Event('input', { bubbles: true });
+                sidebarSearch.dispatchEvent(event);
+            });
+        
+            // 点击页面其他区域关闭搜索框
+            document.addEventListener('click', (e) => {
+                const isClickInside = searchButton.contains(e.target) || 
+                                     searchBoxContainer.contains(e.target);
+                                     
+                if (!isClickInside && window.innerWidth >= 768) {
+                    searchBoxContainer.classList.add('hidden');
+                }
+            });
+        }
+        
         // 初始化应用
         function initApp() {
             initNavigation();
             initMobileMenu();
             initSearch();
+            initSidebarSearch();
         }
         
         // 启动应用
@@ -622,3 +675,4 @@
 </body>
 
 </html>
+    
