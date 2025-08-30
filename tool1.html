@@ -4,551 +4,619 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>内部专业资源导航</title>
-    <!-- 引入Tailwind CSS -->
+    <title>微信风格 - 内部专业网站导航</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
-    <!-- 配置Tailwind自定义颜色和字体 - 飞书风格 -->
+    <!-- 配置Tailwind自定义主题 - 微信风格 -->
     <script>
         tailwind.config = {
-          theme: {
-            extend: {
-              colors: {
-                // 飞书主色调
-                primary: '#2563EB', // 飞书蓝
-                'primary-light': '#EFF6FF',
-                'primary-dark': '#1D4ED8',
-                secondary: '#F8FAFC',
-                accent: '#EF4444',
-                dark: '#1E293B',
-                'gray-medium': '#64748B',
-                'gray-light': '#CBD5E1',
-                'gray-bg': '#F1F5F9'
-              },
-              fontFamily: {
-                sans: ['Inter', 'system-ui', 'sans-serif'],
-              },
-              boxShadow: {
-                'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                'dropdown': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-              }
-            },
-          }
+            theme: {
+                extend: {
+                    colors: {
+                        wechat: {
+                            green: '#07C160',
+                            greenDark: '#00B42A',
+                            greenLight: '#E7F8E0',
+                            gray: '#F5F5F5',
+                            grayDark: '#E5E5E5',
+                            text: '#333333',
+                            textLight: '#888888',
+                            border: '#EEEEEE'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                }
+            }
         }
     </script>
 
-    <!-- 自定义工具类 -->
     <style type="text/tailwindcss">
         @layer utilities {
-      .content-auto {
-        content-visibility: auto;
-      }
-      .hover-lift {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-      .hover-lift:hover {
-        transform: translateY(-1px);
-      }
-      .footer-scroll-container {
-        overflow-y: auto;
-        scrollbar-width: thin;
-      }
-      .footer-scroll-container::-webkit-scrollbar {
-        width: 4px;
-      }
-      .footer-scroll-container::-webkit-scrollbar-track {
-        background: #f1f5f9;
-        border-radius: 2px;
-      }
-      .footer-scroll-container::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 2px;
-      }
-      .footer-scroll-container::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-      }
-    }
-  </style>
-
-    <style>
-        /* 确保页面无外围滚动条 */
-        html, body {
-          overflow: hidden;
-          height: 100%;
-        }
-        
-        /* 修复下拉框宽度与一级菜单完全一致 */
-        .menu-item {
-          position: relative;
-          padding: 0;
-          margin: 0;
-        }
-        
-        .menu-item > button {
-          width: 100%;
-          box-sizing: border-box;
-        }
-        
-        .menu-item .submenu {
-          width: 100%;
-          box-sizing: border-box;
-          left: 0;
-          right: 0;
-        }
-        
-        /* 二级菜单滚动条样式 - 飞书风格 */
-        .submenu-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-        
-        .submenu-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        
-        .submenu-scrollbar::-webkit-scrollbar-thumb {
-          background: #CBD5E1;
-          border-radius: 2px;
-        }
-        
-        .submenu-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #94A3B8;
-        }
-        
-        /* 下拉菜单动画 */
-        .menu-item .submenu {
-          opacity: 0;
-          transform: translateY(4px);
-          pointer-events: none;
-          transition: opacity 0.2s ease, transform 0.2s ease;
-        }
-        
-        .menu-item.group:hover .submenu {
-          opacity: 1;
-          transform: translateY(0);
-          pointer-events: auto;
-        }
-        
-        /* 链接图标动画 */
-        .submenu-item a .external-icon {
-          opacity: 0;
-          transform: translateX(-3px);
-          transition: opacity 0.15s ease, transform 0.15s ease;
-        }
-        
-        .submenu-item a:hover .external-icon {
-          opacity: 1;
-          transform: translateX(0);
-        }
-        
-        /* 底部滚动控制按钮 */
-        .scroll-btn {
-          transition: all 0.2s ease;
-        }
-        
-        .scroll-btn:hover {
-          background-color: #e2e8f0;
-          color: #2563eb;
-        }
-        
-        .scroll-btn:active {
-          background-color: #cbd5e1;
+            .content-auto {
+                content-visibility: auto;
+            }
+            .wechat-card {
+                @apply bg-white rounded-lg border border-wechat-border overflow-hidden transition-all duration-200;
+            }
+            .wechat-card-hover {
+                @apply hover:shadow-md hover:bg-wechat-gray/50;
+            }
+            .nav-item-active {
+                @apply bg-wechat-greenLight text-wechat-green border-l-4 border-wechat-green;
+            }
+            .wechat-input {
+                @apply bg-wechat-gray rounded-full px-4 py-2 text-wechat-text focus:outline-none focus:ring-2 focus:ring-wechat-green/30 w-full;
+            }
         }
     </style>
 </head>
 
-<body class="font-sans bg-gray-bg text-dark min-h-screen flex flex-col">
-    <!-- 页面头部 - 飞书风格导航栏 -->
-    <header class="bg-white border-b border-gray-light py-3 px-6 md:px-12">
-        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            <!-- 网站标题 -->
-            <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-md bg-primary-light flex items-center justify-center">
-                    <i class="fa fa-compass text-primary"></i>
-                </div>
-                <h1 class="text-lg md:text-xl font-semibold text-dark">专业资源导航</h1>
+<body class="bg-wechat-gray font-sans text-wechat-text h-screen overflow-hidden">
+    <div class="flex h-screen max-h-screen">
+        <!-- 侧边导航栏 - 类似微信通讯录 -->
+        <aside id="sidebar" class="w-64 bg-white border-r border-wechat-border hidden md:block transition-all duration-300 z-20 overflow-y-auto">
+            <div class="p-4 border-b border-wechat-border">
+                <h1 class="text-lg font-semibold text-wechat-text flex items-center">
+                    <i class="fa fa-link mr-2 text-wechat-green"></i>
+                    <span>专业网站导航</span>
+                </h1>
             </div>
 
-            <!-- 搜索区域 - 飞书风格搜索框 -->
-            <div class="relative w-full md:w-80">
-                <input type="text" id="search-input" placeholder="搜索资源..." class="w-full pl-9 pr-10 py-2 rounded-md border border-gray-light bg-gray-bg/70 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm">
-                <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-medium text-sm"></i>
-                <button id="clear-btn" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-medium opacity-0 pointer-events-none transition-all duration-200">
-                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full transition-all duration-200">
-                        <i class="fa fa-times text-xs"></i>
-                    </span>
+            <!-- 搜索框 - 修复重叠问题，调整了内边距 -->
+            <div class="p-3 border-b border-wechat-border">
+                <div class="relative">
+                    <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-wechat-textLight"></i>
+                    <input type="text" id="sidebar-search" placeholder="" class="wechat-input pl-9 pr-4 text-sm py-2.5">
+                </div>
+            </div>
+
+            <nav class="p-1">
+                <ul class="space-y-1">
+                    <!-- 动态生成10个导航项 - 类似微信联系人 -->
+                </ul>
+            </nav>
+
+            <div class="p-3 border-t border-wechat-border text-xs text-wechat-textLight">
+                <div class="flex items-center">
+                    <i class="fa fa-info-circle mr-2"></i>
+                    <span>共10个分类，100个专业网站</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden max-h-screen">
+            <!-- 顶部导航 - 类似微信聊天顶部 -->
+            <header class="bg-white border-b border-wechat-border p-3 flex justify-between items-center z-10">
+                <button id="menu-toggle" class="md:hidden p-2 rounded-full hover:bg-wechat-gray">
+                    <i class="fa fa-bars text-wechat-text"></i>
                 </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- 主内容区 -->
-    <main class="flex-grow overflow-hidden container mx-auto px-4 py-6 md:py-8">
-        <!-- 菜单容器 - 飞书网格布局 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
-            <!-- 一级菜单1 -->
-            <div class="menu-item group">
-                <button class="bg-white rounded-md py-3 px-4 text-left font-medium flex justify-between items-center hover:bg-primary hover:text-white transition-all duration-200 shadow-card hover-lift">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa fa-download text-primary group-hover:text-white w-5 text-center"></i>
-                        <span>标准查询下载</span>
-                    </div>
-                    <i class="fa fa-angle-right text-xs transition-transform duration-200 group-hover:rotate-90"></i>
-                </button>
-                <!-- 二级菜单 - 与一级菜单同宽 -->
-                <div class="submenu hidden group-hover:block absolute z-10 mt-1.5 bg-white rounded-md shadow-dropdown submenu-scrollbar max-h-[180px] overflow-y-auto">
-                    <ul class="submenu-items p-1.5">
-                        <li class="submenu-item"><a href="http://cx.cnca.cn/CertECloud/index/index/page" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">全国认证认可信息公共服务平台 <i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://std.samr.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">全国标准信息公共服务平台
-                                <i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://openstd.samr.gov.cn/bzgk/gb/index" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家标准全文公开系统<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-audit-procedures-and-forms" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">MDSAP标准 <i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.iso.org/home.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">ISO官网<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://dljs123.com/#/search/criteria" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">小绿典标准 <i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="http://down.foodmate.net/wap/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">食品伙伴网 <i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://jzxx.vip/search/pan_view_search.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">标准图集学习交流 <i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.webfree.net/home" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">建筑标准 <i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 一级菜单2 -->
-            <div class="menu-item group">
-                <button class="bg-white rounded-md py-3 px-4 text-left font-medium flex justify-between items-center hover:bg-primary hover:text-white transition-all duration-200 shadow-card hover-lift">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa fa-cog text-primary group-hover:text-white w-5 text-center"></i>
-
-                        <span>工具箱</span>
-                    </div>
-                    <i class="fa fa-angle-right text-xs transition-transform duration-200 group-hover:rotate-90"></i>
-                </button>
-                <!-- 二级菜单 - 与一级菜单同宽 -->
-                <div class="submenu hidden group-hover:block absolute z-10 mt-1.5 bg-white rounded-md shadow-dropdown submenu-scrollbar max-h-[180px] overflow-y-auto">
-                    <ul class="submenu-items p-1.5">
-                        <li class="submenu-item"><a href="https://www.voidtools.com/zh-cn/downloads/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">海量文件检索（含指定文字） <i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://wrf00123.github.io/tool2.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家/地区/品牌查询<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://wrf00123.github.io/tool4.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">时光计算器<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://wrf00123.github.io/tool7.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">部门编号查询<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://wrf00123.github.io/tool8.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">时间计划小程序<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://wrf00123.github.io/tool5.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">txt文本导出工具<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.faststonecapture.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">电脑截长图1（推荐）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.xiaowang.com/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">电脑截长图2（win10及上）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.officeplus.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">微软officePLUS<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://wx.zsxq.com/login" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">知识星球（文档下载）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://wenku.baidu.com/?fr=brandad_2&_wkts_=1755328356957" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">百度文库（文档下载）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://docs.qq.com/desktop/?nlc=1" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">腾讯文档（文档下载）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.instrument.com.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">仪器信息网（文档下载）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://mail.163.com/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">163邮箱<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.wjx.cn/newwjx/manage/myquestionnaires.aspx?randomt=1744110951" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">问卷星<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="http://www.ffcell.com/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">方方格子<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 一级菜单3 -->
-            <div class="menu-item group">
-                <button class="bg-white rounded-md py-3 px-4 text-left font-medium flex justify-between items-center hover:bg-primary hover:text-white transition-all duration-200 shadow-card hover-lift">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa fa-question-circle text-red-500 group-hover:text-white w-5 text-center"></i>
-                        <span>AI大模型</span>
-                    </div>
-                    <i class="fa fa-angle-right text-xs transition-transform duration-200 group-hover:rotate-90"></i>
-                </button>
-                <!-- 二级菜单 - 与一级菜单同宽 -->
-                <div class="submenu hidden group-hover:block absolute z-10 mt-1.5 bg-white rounded-md shadow-dropdown submenu-scrollbar max-h-[180px] overflow-y-auto">
-                    <ul class="submenu-items p-1.5">
-                        <li class="submenu-item"><a href="https://chat.deepseek.com/sign_in" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">DeepSeek<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://ima.qq.com/?webFrom=10000028" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">ima<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://chat.baidu.com/search?isShowHello=1&extParams=%7B%22out_enter_type%22%3A%22sidebar_dialog%22%2C%22enter_type%22%3A%22sidebar_dialog%22%2C%22forceRefresh%22%3Atrue%7D" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">百度AI<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.doubao.com/chat/?channel=baidu_pz&from_login=1" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">豆包<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://yuanbao.tencent.com/chat/naQivTmsDa" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">腾讯元宝<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://kimi.moonshot.cn/?data_source=tracer&utm_campaign=TR_D0pcUf08&utm_content=&utm_medium=%E7%99%BE%E5%BA%A6&utm_source=baidu_search&utm_term=" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">KiMi<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://metaso.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">秘塔AI搜索<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.feishu.cn/accounts/page/ug_register?template_id=7168397144091885571&tracking_code=701BB000000AemRYAS&utm_from=baidusem_keyword_pc_office_pinpai_pinpai_pinpai&device=PC&e_keywordid=880420485112&bd_vid=10542092342281201260" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">飞书文档<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="http://www.wenxiaoyan.com/pc" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">文小言（软件）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 其他菜单保持不变 -->
-            <!-- 一级菜单4 -->
-            <div class="menu-item group">
-                <button class="bg-white rounded-md py-3 px-4 text-left font-medium flex justify-between items-center hover:bg-primary hover:text-white transition-all duration-200 shadow-card hover-lift">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa fa-tasks text-blue-500 group-hover:text-white w-5 text-center"></i>
-                        <span>思维导图</span>
-                    </div>
-                    <i class="fa fa-angle-right text-xs transition-transform duration-200 group-hover:rotate-90"></i>
-                </button>
-                <!-- 二级菜单 - 与一级菜单同宽 -->
-                <div class="submenu hidden group-hover:block absolute z-10 mt-1.5 bg-white rounded-md shadow-dropdown submenu-scrollbar max-h-[180px] overflow-y-auto">
-                    <ul class="submenu-items p-1.5">
-                        <li class="submenu-item"><a href="https://app.diagrams.net/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">drow.io（推荐）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://doc.weixin.qq.com/doc/w3_AVIAJQZzAN0CNkmGg65d7TfGE18Kf?scode=ABsA2wdTAEoQ9BRPlFAVIAJQZzAN0" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">WPS画流程图（软件）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://excalidraw.com/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">Excalidraw<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.processon.com/login" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">process on<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-            <!-- 其他菜单保持不变 -->
-            <!-- 一级菜单4 -->
-            <div class="menu-item group">
-                <button class="bg-white rounded-md py-3 px-4 text-left font-medium flex justify-between items-center hover:bg-primary hover:text-white transition-all duration-200 shadow-card hover-lift">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa fa-link text-purple-500 group-hover:text-white w-5 text-center"></i>
-                        <span>在线翻译</span>
-                    </div>
-                    <i class="fa fa-angle-right text-xs transition-transform duration-200 group-hover:rotate-90"></i>
-                </button>
-                <!-- 二级菜单 - 与一级菜单同宽 -->
-                <div class="submenu hidden group-hover:block absolute z-10 mt-1.5 bg-white rounded-md shadow-dropdown submenu-scrollbar max-h-[180px] overflow-y-auto">
-                    <ul class="submenu-items p-1.5">
-                        <li class="submenu-item"><a href="https://www.deepl.com/zh/translator" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">DeepL翻译<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://cn.bing.com/translator" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">微软翻译<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://fanyi.youdao.com/#/TextTranslate" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">有道翻译<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-            <!-- 其他菜单保持不变 -->
-            <!-- 一级菜单4 -->
-            <div class="menu-item group">
-                <button class="bg-white rounded-md py-3 px-4 text-left font-medium flex justify-between items-center hover:bg-primary hover:text-white transition-all duration-200 shadow-card hover-lift">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa fa-book text-primary group-hover:text-white w-5 text-center"></i>
-                        <span>法律法规</span>
-                    </div>
-                    <i class="fa fa-angle-right text-xs transition-transform duration-200 group-hover:rotate-90"></i>
-                </button>
-                <!-- 二级菜单 - 与一级菜单同宽 -->
-                <div class="submenu hidden group-hover:block absolute z-10 mt-1.5 bg-white rounded-md shadow-dropdown submenu-scrollbar max-h-[180px] overflow-y-auto">
-                    <ul class="submenu-items p-1.5">
-                        <li class="submenu-item"><a href="https://flk.npc.gov.cn/index" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家法律法规数据库<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.samr.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家市场监督管理总局</a></li>
-                        <li class="submenu-item"><a href="https://www.sac.gov.cn/index.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家标准化管理委员会</a></li>
-
-                        <li class="submenu-item"><a href="https://www.nmpa.gov.cn/index.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家药品监督管理局<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">中央人民政府</a></li>
-                        <li class="submenu-item"><a href="http://www.gsxt.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家企业信用信息公示系统<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="http://www.cnipa.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家知识产权局</a></li>
-                        <li class="submenu-item"><a href="https://www.mee.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">生态环境部<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.nhc.gov.cn/wjw/wsbzxx/wsbz.shtml" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">卫健委</a></li>
-                        <li class="submenu-item"><a href="https://ltbzh.mofcom.gov.cn/ltbz/view/bzfk/listBzfk.jsp" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">商务部<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.mem.gov.cn/fw/flfgbz/bz/bzwb/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">应急管理部</a></li>
-                        <li class="submenu-item"><a href="https://www.mohrss.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">人力资源和社会保障部</a></li>
-                        <li class="submenu-item"><a href="http://www.moj.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">司法部</a></li>
-                        <li class="submenu-item"><a href="http://www.mof.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">财政部</a></li>
-                        <li class="submenu-item"><a href="https://www.fmprc.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">外交部</a></li>
-                        <li class="submenu-item"><a href="https://www.chinatax.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家税务总局</a></li>
-                        <li class="submenu-item"><a href="http://www.customs.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">海关总署</a></li>
-                        <li class="submenu-item"><a href="https://www.ndrc.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家发展和改革委员会</a></li>
-                        <li class="submenu-item"><a href="https://www.most.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">科学技术部</a></li>
-                        <li class="submenu-item"><a href="https://www.miit.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">工业和信息化部</a></li>
-                        <li class="submenu-item"><a href="http://www.nhc.gov.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国家卫生健康委员会</a></li>
-                        <li class="submenu-item"><a href="https://www.mohurd.gov.cn/xinwen/jsyw/index.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">住房和城乡建设部</a></li>
-                    </ul>
-                </div>
-            </div>
-            <!-- 其他菜单保持不变 -->
-            <!-- 一级菜单4 -->
-            <div class="menu-item group">
-                <button class="bg-white rounded-md py-3 px-4 text-left font-medium flex justify-between items-center hover:bg-primary hover:text-white transition-all duration-200 shadow-card hover-lift">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa fa-book text-primary group-hover:text-white w-5 text-center"></i>
-                        <span>法规（国外）</span>
-                    </div>
-                    <i class="fa fa-angle-right text-xs transition-transform duration-200 group-hover:rotate-90"></i>
-                </button>
-                <!-- 二级菜单 - 与一级菜单同宽 -->
-                <div class="submenu hidden group-hover:block absolute z-10 mt-1.5 bg-white rounded-md shadow-dropdown submenu-scrollbar max-h-[180px] overflow-y-auto">
-                    <ul class="submenu-items p-1.5">
-                        <li class="submenu-item"><a href="https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">美国FDA（注册）<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.ecfr.gov/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">美国CFR</a></li>
-                        <li class="submenu-item"><a href="https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">加拿大卫生局（注册）</a></li>
-                        <li class="submenu-item"><a href="https://lois-laws.justice.gc.ca/eng/regulations/SOR-98-282/index.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">加拿大法规SOR/98-282</a></li>
-                        <li class="submenu-item"><a href="https://eur-lex.europa.eu/homepage.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">欧盟EUR-Lex（MDR_IVDR）</a></li>
-                        <li class="submenu-item"><a href="https://echa.europa.eu/candidate-list-table" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">REACH清单</a></li>
-                        <li class="submenu-item"><a href="https://www.pmda.go.jp/review-services/drug-reviews/foreign-mfr/0003.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">日本PMDA（注册）</a></li>
-                        <li class="submenu-item"><a href="https://www.tga.gov.au/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">澳大利亚TGA</a></li>
-                        <li class="submenu-item"><a href="https://www.gesetze-im-internet.de/mpg/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">德国MPG</a></li>
-                        <li class="submenu-item"><a href="https://www.bfarm.de/DE/Medizinprodukte/Ueberblick/Gesetze-und-Verordnungen/_node.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">德国BfArM</a></li>
-                        <li class="submenu-item"><a href="https://webstore.iec.ch/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">国际电工委员会（IEC）</a></li>
-                    </ul>
-                </div>
-            </div>
-            <!-- 其他菜单保持不变 -->
-            <!-- 一级菜单4 -->
-            <div class="menu-item group">
-                <button class="bg-white rounded-md py-3 px-4 text-left font-medium flex justify-between items-center hover:bg-primary hover:text-white transition-all duration-200 shadow-card hover-lift">
-                    <div class="flex items-center gap-2.5">
-                        <i class="fa fa-sticky-note text-orange-500 group-hover:text-white w-5 text-center"></i>
-                        <span>学教程</span>
-                    </div>
-                    <i class="fa fa-angle-right text-xs transition-transform duration-200 group-hover:rotate-90"></i>
-                </button>
-                <!-- 二级菜单 - 与一级菜单同宽 -->
-                <div class="submenu hidden group-hover:block absolute z-10 mt-1.5 bg-white rounded-md shadow-dropdown submenu-scrollbar max-h-[180px] overflow-y-auto">
-                    <ul class="submenu-items p-1.5">
-                        <li class="submenu-item"><a href="https://wrf00123.github.io/tool6.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">技能看点<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.lanrenexcel.com/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">懒人Excel<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.excelhome.net/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">Excel之家<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="https://www.wordlm.cn/" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">Word联盟<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                        <li class="submenu-item"><a href="http://ffcell.com/WenKu/Data/2016051616004881.html" target="_blank" class="block px-3.5 py-2 hover:bg-primary-light rounded-md transition-colors text-sm flex justify-between items-center">方方格子不显示<i class="fa fa-external-link text-xs text-gray-medium external-icon ml-1"></i></a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- 其他菜单省略... -->
-        </div>
-    </main>
-
-    <!-- 页脚备注栏 -->
-    <footer class="bg-white border-t border-gray-light py-3 px-6 mt-auto">
-        <div class="container mx-auto">
-            <div class="flex items-start">
-                <!-- 底部文字内容 - 多行显示 -->
-                <div class="flex-grow pr-4">
-                    <div class="footer-scroll-container h-16">
-                        <div class="footer-content text-gray-medium text-xs leading-relaxed">
-                            内部专业资源导航系统，用户须知见“学教程”中的“技能看点”顶部<br>
-                            最后更新: 2025-8-15<br>
-                            联系管理员: xxx<br>
-                            注：本系统仅用于内部办公<br>
-                            系统版本: v2.1.1<br>
-                            技术支持: XXX (ext:XXX)
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 右侧上下控制按钮 -->
-                <div class="ml-2 flex flex-col items-center">
-                    <button id="scroll-up" class="scroll-btn w-6 h-6 flex items-center justify-center rounded-full text-gray-medium hover:bg-gray-light transition-colors mb-1">
-                        <i class="fa fa-chevron-up text-xs"></i>
+                <h2 id="page-title" class="text-base font-medium">技术资源</h2>
+                <div class="flex items-center">
+                    <button id="search-toggle" class="p-2 rounded-full hover:bg-wechat-gray">
+                        <i class="fa fa-search text-wechat-text"></i>
                     </button>
-                    <button id="scroll-down" class="scroll-btn w-6 h-6 flex items-center justify-center rounded-full text-gray-medium hover:bg-gray-light transition-colors">
-                        <i class="fa fa-chevron-down text-xs"></i>
+                    <button class="ml-2 p-2 rounded-full hover:bg-wechat-gray md:hidden">
+                        <i class="fa fa-ellipsis-v text-wechat-text"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 搜索栏 - 类似微信聊天页搜索 -->
+            <div id="search-container" class="bg-white border-b border-wechat-border p-3 hidden">
+                <div class="relative">
+                    <input type="text" id="search-input" placeholder="搜索网站..." class="wechat-input text-sm">
+                    <button id="search-close" class="absolute right-3 top-1/2 -translate-y-1/2 text-wechat-textLight">
+                        <i class="fa fa-times"></i>
                     </button>
                 </div>
             </div>
-        </div>
-    </footer>
+
+            <!-- 页面内容 - 改为每行三个网站的网格布局 -->
+            <div id="pages-container" class="flex-1 overflow-y-auto bg-wechat-gray p-4">
+                <!-- 页面内容将动态生成 -->
+            </div>
+
+            <!-- 底部导航栏 - 仅在移动端显示，类似微信底部导航 -->
+            <div class="md:hidden bg-white border-t border-wechat-border flex justify-around py-2">
+                <button class="flex flex-col items-center text-wechat-green">
+                    <i class="fa fa-th-large text-lg"></i>
+                    <span class="text-xs mt-1">导航</span>
+                </button>
+                <button class="flex flex-col items-center text-wechat-textLight">
+                    <i class="fa fa-star-o text-lg"></i>
+                    <span class="text-xs mt-1">收藏</span>
+                </button>
+                <button class="flex flex-col items-center text-wechat-textLight">
+                    <i class="fa fa-user-o text-lg"></i>
+                    <span class="text-xs mt-1">我的</span>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- 移动端遮罩 - 类似微信侧边栏遮罩 -->
+    <div id="overlay" class="fixed inset-0 bg-black/30 z-10 hidden md:hidden"></div>
 
     <script>
-        // 保持原有脚本功能不变
+        // 网站数据 - 10个页面，每个页面10个网址
+        const websiteData = [
+            {
+                id: 1,
+                title: "标准查询",
+                icon: "fa-code",
+                websites: [
+                    { name: "全国认证认可信息公共服务平台", url: "http://cx.cnca.cn/CertECloud/index/index/page", desc: "全国认证认可信息公共服务平台" },
+                    { name: "全国标准信息公共服务平台", url: "https://std.samr.gov.cn/", desc: "全国标准信息公共服务平台" },
+                    { name: "国家标准全文公开系统", url: "https://openstd.samr.gov.cn/bzgk/gb/index", desc: "国家标准全文公开系统" },
+                    { name: "MDSAP标准", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-audit-procedures-and-forms", desc: "MDSAP Audit Procedures and Forms | FDA" },
+                    { name: "ISO官网", url: "https://www.iso.org/home.html", desc: "ISO官网" },
+                    { name: "小绿典", url: "https://dljs123.com/#/search/criteria", desc: "标准下载" },
+                    { name: "食品伙伴网", url: "http://down.foodmate.net/wap/", desc: "食品标准下载" },
+                    { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" },
+                    { name: "化学品安全法规标准信息平台", url: "https://law.chemicalsafety.org.cn/", desc: "化学品标准下载" },
+                    { name: "协筑资源", url: "https://www.webfree.net/home", desc: "建筑标准下载" }
+                ]
+            },
+            {
+                id: 2,
+                title: "效率工具",
+                icon: "fa-paint-brush",
+                websites: [
+                    { name: "AQL抽样", url: "https://wrf00123.github.io/tool3.html", desc: "查询程序" },
+                    { name: "国家/地区/品牌查询", url: "https://wrf00123.github.io/tool2.html", desc: "查询程序" },
+                    { name: "部门编号查询", url: "https://wrf00123.github.io/tool7.html", desc: "查询程序" },
+                    { name: "时间计划小程序", url: "https://wrf00123.github.io/tool8.html", desc: "日期计划程序" },
+                    { name: "时光计算器", url: "https://wrf00123.github.io/tool4.html", desc: "日期计算" },
+                    { name: "txt文本导出工具", url: "https://wrf00123.github.io/tool5.html", desc: "文本工具" },
+                    { name: "drow.io", url: "https://app.diagrams.net/", desc: "流程图" },
+                    { name: "Excalidraw", url: "https://excalidraw.com/", desc: "流程图" },
+                    { name: "process on", url: "https://www.processon.com/login", desc: "流程图" },
+                    { name: "CDKM", url: "https://www.processon.com/login", desc: "文件格式转换" },
+                    { name: "Smallpdf", url: "https://www.processon.com/login", desc: "PDF工具" },
+                    { name: "ALL TO ALL", url: "https://www.alltoall.net/", desc: "PDF工具" },
+                    { name: "Dpdf", url: "https://www.dpdf.com/", desc: "PDF工具" },
+                    { name: "ChartCube", url: "https://chartcube.alipay.com/", desc: "在线图表制作工具" },
+                    { name: "Tiny Wow", url: "https://tinywow.com/", desc: "工具汇集" },
+                    { name: "SVG Repo", url: "https://www.svgrepo.com/", desc: "图标工具" },
+                    { name: "imgdiet", url: "https://www.imgdiet.com/zh-CN", desc: "图片压缩工具" },
+                    { name: "GitHud", url: "https://github.com/", desc: "GitHud" },
+                    { name: "HTML工具", url: "https://www.jyshare.com/front-end/61/", desc: "HTML工具" },
+                    { name: "Office Tool Plus", url: "https://otp.landian.vip/zh-cn/#google_vignette", desc: "一键部署Office" },
+                    { name: "GitHud Proxy", url: "https://ghfast.top/", desc: "GitHud加速下载" },
+                    { name: "时间瓶子", url: "https://timebottle.toolooz.com/", desc: "时间小工具" },
+                    { name: "LRC歌词编辑", url: "https://timebottle.toolooz.com/", desc: "歌词编辑" },
+                    { name: "中国传统色", url: "https://noneko.cn/", desc: "色系查询" },
+                  
+        
+                ]
+            },
+            {
+                id: 3,
+                title: "专业软件",
+                icon: "fa-graduation-cap",
+                websites: [
+                    { name: "Everything", url: "https://www.voidtools.com/zh-cn/downloads/", desc: "文件检索" },
+                    { name: "FastStone Capture", url: "https://www.faststonecapture.cn/", desc: "截长图" },
+                    { name: "小旺AI截图", url: "https://www.xiaowang.com/", desc: "截长图" },
+                    { name: "方方格子", url: "http://www.ffcell.com/", desc: "excel插件" },
+                    { name: "51PPT模板", url: "https://www.51pptmoban.com/ppt-soft/", desc: "PPT插件" },
+                  
+                    
+                ]
+            },
+            {
+                id: 4,
+                title: "模板下载",
+                icon: "fa-cubes",
+                websites: [
+                    { name: "微软officePLUS", url: "https://www.officeplus.cn/", desc: "ppt/word/excel" },
+                    { name: "优品PPT", url: "https://www.ypppt.com/", desc: "ppt/ppt元素/课件/字体" },
+                    { name: "爱PPT", url: "https://www.2ppt.com/", desc: "ppt" },
+                    { name: "第1PPT", url: "https://www.1ppt.com/tags/419/", desc: "ppt/ppt元素/字体/音效/课件" },
+                    { name: "站长素材", url: "https://sc.chinaz.com/ppt/", desc: "ppt/图片/简历/字体/音效/PSD" },
+                    { name: "51PPT模板", url: "https://www.51pptmoban.com/", desc: "ppt/ppt元素" },
+                    { name: "微软officePLUS", url: "https://www.officeplus.cn/", desc: "ppt/word/excel" },
+                    { name: "简历下载", url: "https://jianlixiazai.cn/", desc: "简历" },
+                    { name: "Z-Library", url: "https://zh.zlib.by/", desc: "书籍下载" },
+                    { name: "知识星球", url: "https://wx.zsxq.com/login", desc: "资料下载" },
+                    { name: "百度文库", url: "https://wenku.baidu.com/?fr=brandad_2&_wkts_=1755328356957", desc: "资料下载" },
+                    { name: "腾讯文档", url: "https://docs.qq.com/desktop/?nlc=1", desc: "资料下载" },
+                    { name: "仪器信息网", url: "https://www.instrument.com.cn/", desc: "资料下载" },
+                    
+                ]
+            },
+            {
+                id: 5,
+                title: "常用网站",
+                icon: "fa-bar-chart",
+                websites: [
+                  { name: "微软翻译", url: "https://cn.bing.com/translator", desc: "在线翻译" },
+                  { name: "DeepL翻译", url: "https://www.deepl.com/zh/translator", desc: "在线翻译" },
+                  { name: "有道翻译", url: "https://fanyi.youdao.com/#/TextTranslate", desc: "在线翻译" },
+                  { name: "163邮箱", url: "https://mail.163.com/", desc: "邮箱" },
+                  { name: "问卷星", url: "https://www.wjx.cn/newwjx/manage/myquestionnaires.aspx?randomt=1744110951", desc: "问卷调查" },
+                  { name: "百度一下", url: "https://www.baidu.com/index.php?tn=75144485_2_dg&ch=1", desc: "百度搜索" }
+        
+                ]
+            },
+            {
+                id: 6,
+                title: "AI大模型",
+                icon: "fa-line-chart",
+                websites: [
+                    { name: "DeepSeek", url: "https://chat.deepseek.com/sign_in", desc: "在线AI" },
+                    { name: "ima", url: "https://ima.qq.com/?webFrom=10000028", desc: "在线AI" },
+                    { name: "豆包", url: "https://www.doubao.com/chat/?channel=baidu_pz&from_login=1", desc: "在线AI" },
+                    { name: "百度AI", url: "https://chat.baidu.com/search?isShowHello=1&extParams=%7B%22out_enter_type%22%3A%22sidebar_dialog%22%2C%22enter_type%22%3A%22sidebar_dialog%22%2C%22forceRefresh%22%3Atrue%7D", desc: "在线AI" },
+                    { name: "腾讯元宝", url: "https://yuanbao.tencent.com/chat/naQivTmsDa", desc: "在线AI" },
+                    { name: "扣子空间", url: "https://space.coze.cn/?from=landingpage&keywordid=%E6%89%A3%E5%AD%90%E7%A9%BA%E9%97%B4-&msclkid=beda8a449f5a1495141ee2f6e949910b&utm_campaign=486599295&utm_content=home&utm_id=0&utm_medium=sem&utm_source=bing&utm_source_platform=pc&utm_term=coze_bing_sem_dm_cpc_pc_czkj_pp_guanw_1&category=7524912604796452873", desc: "在线AI" },
+                    { name: "秘塔AI搜索", url: "https://metaso.cn/", desc: "在线AI" },
+                    { name: "飞书文档", url: "https://www.feishu.cn/accounts/page/ug_register?template_id=7168397144091885571&tracking_code=701BB000000AemRYAS&utm_from=baidusem_keyword_pc_office_pinpai_pinpai_pinpai&device=PC&e_keywordid=880420485112&bd_vid=10542092342281201260", desc: "在线AI" },
+                    { name: "文小言", url: "http://www.wenxiaoyan.com/pc", desc: "AI软件" }
+                    
+                ]
+            },
+            {
+                id: 7,
+                title: "国内法规/认证信息",
+                icon: "fa-newspaper-o",
+                websites: [
+                    { name: "国家法律法规数据库", url: "https://flk.npc.gov.cn/index", desc: "国家法律法规数据库" },
+                    { name: "国家市场监督管理总局", url: "https://www.samr.gov.cn/", desc: "国家市场监督管理总局" },
+                    { name: "国家药品监督管理局", url: "https://www.nmpa.gov.cn/index.html", desc: "国家药品监督管理局" },
+                    { name: "国家税务总局", url: "https://www.chinatax.gov.cn/", desc: "国家税务总局" },
+                    { name: "国家知识产权局", url: "http://www.cnipa.gov.cn/", desc: "国家知识产权局" },
+                    { name: "国家发展和改革委员会", url: "https://www.ndrc.gov.cn/", desc: "国家发展和改革委员会" },
+                    { name: "国家标准化管理委员会", url: "https://www.sac.gov.cn/index.html", desc: "国家标准化管理委员会" },
+                    { name: "国家卫生健康委员会", url: "http://www.nhc.gov.cn/", desc: "国家卫生健康委员会" },
+                    { name: "中国合格评定国家认可委员会", url: "https://ltbzh.mofcom.gov.cn/ltbz/view/bzfk/listBzfk.jsp", desc: "中国合格评定国家认可委员会" },
+                    
+                    { name: "国家卫生健康委员会政务服务平台", url: "https://www.nhc.gov.cn/wjw/wsbzxx/wsbz.shtml", desc: "国家卫生健康委员会政务服务平台" },  
+                    { name: "食品生产许可获证企业信息查询平台", url: "https://spaqjg.e-cqs.cn/spscxk/", desc: "食品生产许可获证企业信息查询平台" },
+                    { name: "全国特种设备公示信息查询平台", url: "https://cnse.samr.gov.cn/info-pub/pub", desc: "全国特种设备公示信息查询平台" },
+                    { name: "国家企业信用信息公示系统", url: "http://www.gsxt.gov.cn/", desc: "国家企业信用信息公示系统" }, 
+                    { name: "食品经营许可管理系统", url: "https://spjyxk.gsxt.gov.cn/cfdaPub/index/page/", desc: "食品经营许可管理系统" },
+                    { name: "全国职业卫生放射卫生技术服务机构管理信息系统", url: "https://jsfw.zyjkfw.cn/", desc: "全国职业卫生放射卫生技术服务机构管理信息系统" },
+                    { name: "中国电子质量监督(e-CQS)公共服务门户", url: "https://psp.e-cqs.cn/egov/iwantMore.jsp?type=1", desc: "中国电子质量监督(e-CQS)公共服务门户" },
+                    { name: "中央人民政府", url: "https://www.gov.cn/", desc: "中央人民政府" },
+                    { name: "生态环境部", url: "https://www.mee.gov.cn/", desc: "生态环境部" },
+                    { name: "商务部", url: "https://ltbzh.mofcom.gov.cn/ltbz/view/bzfk/listBzfk.jsp", desc: "商务部" },
+                    { name: "应急管理部", url: "https://www.mem.gov.cn/fw/flfgbz/bz/bzwb/", desc: "应急管理部" },
+                    { name: "人力资源和社会保障部", url: "https://www.mohrss.gov.cn/", desc: "人力资源和社会保障部" },
+                    { name: "司法部", url: "http://www.moj.gov.cn/", desc: "司法部" },
+                    { name: "财政部", url: "http://www.mof.gov.cn/", desc: "财政部" },
+                    { name: "外交部", url: "https://www.fmprc.gov.cn/", desc: "外交部" },
+                    { name: "科学技术部", url: "https://www.most.gov.cn/", desc: "科学技术部" },
+                    { name: "工业和信息化部", url: "https://www.miit.gov.cn/", desc: "工业和信息化部" },
+                    { name: "住房和城乡建设部", url: "https://www.mohurd.gov.cn/xinwen/jsyw/index.html", desc: "住房和城乡建设部" },
+                    { name: "海关总署", url: "http://www.customs.gov.cn/", desc: "海关总署" }
+                ]
+            },
+            {
+                id: 8,
+                title: "法规（国外）",
+                icon: "fa-tasks",
+                websites: [
+                    { name: "美国FDA", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm/", desc: "产品注册查询" },
+                    { name: "美国CFR", url: "https://www.ecfr.gov/", desc: "Code of Federal Regulations" },
+                    { name: "加拿大卫生局（注册）", url: "https://health-products.canada.ca/mdall-limh/prepareSearch?type=active", desc: "产品注册查询" },
+                    { name: "加拿大法规SOR/98-282", url: "https://lois-laws.justice.gc.ca/eng/regulations/SOR-98-282/index.html", desc: "SOR/98-282法规下载" },
+                    { name: "欧盟EUR-Lex（MDR_IVDR）", url: "https://eur-lex.europa.eu/homepage.html", desc: "EU 2017/745下载" },
+                    { name: "REACH清单", url: "https://echa.europa.eu/candidate-list-table", desc: "REACH查询" },
+                    { name: "日本PMDA（注册）", url: "https://www.pmda.go.jp/review-services/drug-reviews/foreign-mfr/0003.html", desc: "产品注册查询" },
+                    { name: "澳大利亚TGA", url: "https://www.tga.gov.au/", desc: "澳大利亚医疗器械" },
+                    { name: "德国MPG", url: "https://www.gesetze-im-internet.de/mpg/", desc: "德国医疗器械" },
+                    { name: "德国BfArM", url: "https://www.bfarm.de/DE/Medizinprodukte/Ueberblick/Gesetze-und-Verordnungen/_node.html", desc: "德国医疗器械" },
+                    { name: "国际电工委员会（IEC）", url: "https://webstore.iec.ch/", desc: "国际电工委员会（IEC）" }
+                ]
+            },
+            {
+                id: 9,
+                title: "学教程",
+                icon: "fa-cloud",
+                websites: [
+                    { name: "技能看点", url: "https://wrf00123.github.io/tool6.html", desc: "教程查询" },
+                    { name: "懒人Excel", url: "https://www.lanrenexcel.com/", desc: "Excel教程" },
+                    { name: "Excel之家", url: "https://www.excelhome.net/", desc: "Excel教程" },
+                    { name: "Word联盟", url: "https://www.wordlm.cn/", desc: "Word教程" },
+                    { name: "优品PPT", url: "https://www.ypppt.com/jiaocheng/", desc: "PPT教程" },
+                    { name: "51PPT模板", url: "https://www.51pptmoban.com/jiaocheng/", desc: "PPT教程" },
+                    { name: "方方格子不显示", url: "http://ffcell.com/WenKu/Data/2016051616004881.html", desc: "方方格子不显示教程" }
+                ]
+            },
+            {
+                id: 10,
+                title: "其他网站",
+                icon: "fa-bolt",
+                websites: [
+                    { name: "LetMeEnglish.com", url: "https://letmeenglish.com/", desc: "英语学习" },
+                    { name: "网上厨房", url: "https://www.xiaochushuo.com/", desc: "菜谱查询" }
+                  
+                ]
+            }
+        ];
+        
+        // DOM元素
+        const sidebar = document.getElementById('sidebar');
+        const navList = sidebar.querySelector('ul');
+        const pagesContainer = document.getElementById('pages-container');
+        const pageTitle = document.getElementById('page-title');
+        const menuToggle = document.getElementById('menu-toggle');
+        const overlay = document.getElementById('overlay');
+        const searchToggle = document.getElementById('search-toggle');
+        const searchContainer = document.getElementById('search-container');
         const searchInput = document.getElementById('search-input');
-        const clearBtn = document.getElementById('clear-btn');
-        const submenuItems = document.querySelectorAll('.submenu-item');
-        const menuItems = document.querySelectorAll('.menu-item');
-        const scrollUpBtn = document.getElementById('scroll-up');
-        const scrollDownBtn = document.getElementById('scroll-down');
-        const footerContainer = document.querySelector('.footer-scroll-container');
+        const searchClose = document.getElementById('search-close');
+        const sidebarSearch = document.getElementById('sidebar-search');
         
-        // 搜索处理函数
-        function handleSearch() {
-          const searchTerm = searchInput.value.toLowerCase().trim();
-          
-          // 显示/隐藏清空按钮
-          if (searchTerm) {
-            clearBtn.classList.remove('opacity-0', 'pointer-events-none');
-          } else {
-            clearBtn.classList.add('opacity-0', 'pointer-events-none');
-          }
-          
-          // 过滤二级菜单选项
-          submenuItems.forEach(item => {
-            const text = item.textContent.toLowerCase();
-            if (text.includes(searchTerm)) {
-              item.style.display = 'block';
-              item.closest('.menu-item').style.display = 'block';
-            } else {
-              item.style.display = 'none';
-              
-              const hasVisibleChildren = Array.from(item.parentElement.children).some(
-                child => child.style.display !== 'none'
-              );
-              
-              if (!hasVisibleChildren) {
-                item.closest('.menu-item').style.display = 'none';
-              }
-            }
-          });
-          
-          if (!searchTerm) {
-            menuItems.forEach(item => {
-              item.style.display = 'block';
-            });
-          }
-        }
-        
-        // 清空搜索框
-        function clearSearch() {
-          searchInput.value = '';
-          clearBtn.classList.add('opacity-0', 'pointer-events-none');
-          handleSearch();
-        }
-        
-        // 底部滚动控制
-        function scrollFooter(direction) {
-          const scrollAmount = 30;
-          if (direction === 'up') {
-            footerContainer.scrollBy({ top: -scrollAmount, behavior: 'smooth' });
-          } else {
-            footerContainer.scrollBy({ top: scrollAmount, behavior: 'smooth' });
-          }
-        }
-        
-        // 事件监听
-        clearBtn.addEventListener('mouseenter', () => {
-          clearBtn.querySelector('span').classList.add('bg-accent/10', 'text-accent');
-        });
-        
-        clearBtn.addEventListener('mouseleave', () => {
-          clearBtn.querySelector('span').classList.remove('bg-accent/10', 'text-accent');
-        });
-        
-        scrollUpBtn.addEventListener('click', () => scrollFooter('up'));
-        scrollDownBtn.addEventListener('click', () => scrollFooter('down'));
-        
-        footerContainer.addEventListener('wheel', (e) => {
-          e.preventDefault();
-          footerContainer.scrollTop += e.deltaY;
-        });
-        
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowUp') {
-            scrollFooter('up');
-          } else if (e.key === 'ArrowDown') {
-            scrollFooter('down');
-          }
-        });
-        
-        searchInput.addEventListener('input', handleSearch);
-        clearBtn.addEventListener('click', clearSearch);
-        
-        document.addEventListener('click', (e) => {
-          if (!e.target.closest('.menu-item')) {
-            document.querySelectorAll('.submenu').forEach(submenu => {
-              submenu.classList.add('hidden');
-            });
-          }
-        });
-        
-        document.querySelectorAll('.menu-item button').forEach(button => {
-          button.addEventListener('click', (e) => {
-            const submenu = e.currentTarget.nextElementSibling;
-            const isHidden = submenu.classList.contains('hidden');
+        // 初始化导航菜单
+        function initNavigation() {
+            // 保存所有导航项以便搜索
+            const allNavItems = [];
             
-            document.querySelectorAll('.submenu').forEach(sm => {
-              sm.classList.add('hidden');
+            websiteData.forEach(page => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <a href="#" class="nav-item block px-3 py-2.5 rounded text-wechat-text hover:bg-wechat-gray transition-colors flex items-center" 
+                       data-page="${page.id}">
+                        <div class="w-8 h-8 rounded-md bg-wechat-green/10 flex items-center justify-center mr-3 flex-shrink-0">
+                            <i class="fa ${page.icon} text-wechat-green"></i>
+                        </div>
+                        <span class="truncate">${page.title}</span>
+                    </a>
+                `;
+                navList.appendChild(li);
+                allNavItems.push({
+                    element: li,
+                    title: page.title,
+                    id: page.id
+                });
             });
-            
-            if (isHidden) {
-              submenu.classList.remove('hidden');
-            }
-          });
-        });
         
-        handleSearch();
+            // 侧边栏搜索功能
+            sidebarSearch.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                allNavItems.forEach(item => {
+                    if (searchTerm === '' || item.title.toLowerCase().includes(searchTerm)) {
+                        item.element.classList.remove('hidden');
+                    } else {
+                        item.element.classList.add('hidden');
+                    }
+                });
+            });
+        
+            // 添加导航点击事件
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = parseInt(this.getAttribute('data-page'));
+                    showPage(pageId);
+                    
+                    // 在移动设备上点击导航后关闭侧边栏
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('hidden');
+                        overlay.classList.add('hidden');
+                    }
+                });
+            });
+        
+            // 默认显示第一个页面
+            showPage(1);
+        }
+        
+        // 显示指定页面 - 改为每行三个网站的网格布局
+        function showPage(pageId) {
+            // 更新导航激活状态
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (parseInt(item.getAttribute('data-page')) === pageId) {
+                    item.classList.add('nav-item-active');
+                } else {
+                    item.classList.remove('nav-item-active');
+                }
+            });
+        
+            // 找到对应的页面数据
+            const pageData = websiteData.find(page => page.id === pageId);
+            if (!pageData) return;
+        
+            // 更新页面标题
+            pageTitle.textContent = pageData.title;
+        
+            // 生成页面内容 - 每行三个网站的网格布局
+            let pageContent = `
+                <div class="mb-4">
+                    <h3 class="text-xs text-wechat-textLight uppercase font-medium tracking-wider px-2">
+                        ${pageData.title}
+                    </h3>
+                </div>
+                
+                <!-- 网格布局：移动端1列，平板2列，桌面3列 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            `;
+        
+            // 生成网站卡片
+            pageData.websites.forEach((website, index) => {
+                // 提取域名作为辅助信息
+                let domain = '';
+                try {
+                    const urlObj = new URL(website.url);
+                    domain = urlObj.hostname.replace('www.', '');
+                } catch (e) {
+                    domain = website.url;
+                }
+        
+                pageContent += `
+                    <a href="${website.url}" target="_blank" rel="noopener noreferrer">
+                        <div class="wechat-card wechat-card-hover h-full">
+                            <div class="p-3">
+                                <div class="flex items-start mb-2">
+                                    <div class="w-8 h-8 rounded-md bg-wechat-green/10 flex items-center justify-center mr-2 flex-shrink-0">
+                                        <i class="fa fa-globe text-wechat-green"></i>
+                                    </div>
+                                    <h4 class="font-medium text-sm text-wechat-text truncate">${website.name}</h4>
+                                </div>
+                                <p class="text-xs text-wechat-textLight mb-2 line-clamp-2">${website.desc}</p>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs text-wechat-textLight bg-wechat-gray px-1.5 py-0.5 rounded">${domain}</span>
+                                    <i class="fa fa-angle-right text-wechat-textLight"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            });
+        
+            pageContent += `</div>`;
+            pagesContainer.innerHTML = pageContent;
+        
+            // 平滑滚动到顶部
+            pagesContainer.scrollTop = 0;
+        }
+        
+        // 初始化搜索功能 - 搜索结果也改为网格布局
+        function initSearch() {
+            // 搜索框显示/隐藏
+            searchToggle.addEventListener('click', () => {
+                searchContainer.classList.toggle('hidden');
+                if (!searchContainer.classList.contains('hidden')) {
+                    searchInput.focus();
+                }
+            });
+        
+            searchClose.addEventListener('click', () => {
+                searchContainer.classList.add('hidden');
+                searchInput.value = '';
+                // 恢复当前页面显示
+                const activeNav = document.querySelector('.nav-item-active');
+                if (activeNav) {
+                    const pageId = parseInt(activeNav.getAttribute('data-page'));
+                    showPage(pageId);
+                }
+            });
+        
+            // 搜索功能
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                if (searchTerm.length < 1) {
+                    // 搜索词为空时显示当前页面
+                    const activeNav = document.querySelector('.nav-item-active');
+                    if (activeNav) {
+                        const pageId = parseInt(activeNav.getAttribute('data-page'));
+                        showPage(pageId);
+                    }
+                    return;
+                }
+        
+                // 搜索所有网站
+                const results = [];
+                websiteData.forEach(page => {
+                    page.websites.forEach(website => {
+                        if (website.name.toLowerCase().includes(searchTerm) || 
+                            website.desc.toLowerCase().includes(searchTerm) ||
+                            website.url.toLowerCase().includes(searchTerm)) {
+                            results.push({
+                                ...website,
+                                pageTitle: page.title,
+                                pageIcon: page.icon
+                            });
+                        }
+                    });
+                });
+        
+                // 显示搜索结果 - 同样使用网格布局
+                let resultsHTML = `
+                    <div class="mb-4">
+                        <h3 class="text-xs text-wechat-textLight uppercase font-medium tracking-wider px-2">
+                            搜索结果: "${searchTerm}"
+                        </h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                `;
+        
+                if (results.length === 0) {
+                    resultsHTML += `
+                        <div class="col-span-full p-8 text-center">
+                            <i class="fa fa-search text-3xl text-wechat-grayDark mb-3"></i>
+                            <p class="text-wechat-textLight text-sm">没有找到匹配的网站</p>
+                        </div>
+                    `;
+                } else {
+                    results.forEach(website => {
+                        let domain = '';
+                        try {
+                            const urlObj = new URL(website.url);
+                            domain = urlObj.hostname.replace('www.', '');
+                        } catch (e) {
+                            domain = website.url;
+                        }
+        
+                        resultsHTML += `
+                            <a href="${website.url}" target="_blank" rel="noopener noreferrer">
+                                <div class="wechat-card wechat-card-hover h-full">
+                                    <div class="p-3">
+                                        <div class="flex items-start mb-2">
+                                            <div class="w-8 h-8 rounded-md bg-wechat-green/10 flex items-center justify-center mr-2 flex-shrink-0">
+                                                <i class="fa ${website.pageIcon} text-wechat-green"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-medium text-sm text-wechat-text truncate">${website.name}</h4>
+                                                <span class="text-xs text-wechat-textLight">${website.pageTitle}</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-wechat-textLight mb-2 line-clamp-2">${website.desc}</p>
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs text-wechat-textLight bg-wechat-gray px-1.5 py-0.5 rounded">${domain}</span>
+                                            <i class="fa fa-angle-right text-wechat-textLight"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    });
+                }
+        
+                resultsHTML += `</div>`;
+                pagesContainer.innerHTML = resultsHTML;
+            });
+        }
+        
+        // 移动端菜单切换 - 类似微信侧边栏切换
+        function initMobileMenu() {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                overlay.classList.toggle('hidden');
+            });
+        
+            overlay.addEventListener('click', () => {
+                sidebar.classList.add('hidden');
+                overlay.classList.add('hidden');
+            });
+        
+            // 窗口大小变化时处理
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('hidden');
+                    overlay.classList.add('hidden');
+                } else {
+                    sidebar.classList.add('hidden');
+                }
+            });
+        }
+        
+        // 初始化应用
+        function initApp() {
+            initNavigation();
+            initMobileMenu();
+            initSearch();
+        }
+        
+        // 启动应用
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 
