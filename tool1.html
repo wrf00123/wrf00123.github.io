@@ -4,162 +4,447 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>专业网站导航</title>
+    <title>专业导航系统</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
-    <!-- 配置Tailwind自定义主题 - 微信风格 -->
     <script>
+        // 配置Tailwind自定义主题
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        wechat: {
-                            green: '#07C160',
-                            greenDark: '#00B42A',
-                            greenLight: '#E7F8E0',
-                            gray: '#F5F5F5',
-                            grayDark: '#E5E5E5',
-                            text: '#333333',
-                            textLight: '#888888',
-                            border: '#EEEEEE'
+                        // 主色调保持不变
+                        primary: '#3A4895',
+                        
+                        // 浅色模式
+                        light: {
+                            bg: '#F5F7FA',
+                            card: '#FFFFFF',
+                            border: '#D1D5DB',
+                            text: {
+                                primary: '#111827',
+                                secondary: '#4B5563',
+                                tertiary: '#6B7280'
+                            }
+                        },
+                        
+                        // 深色模式
+                        dark: {
+                            bg: '#111827',
+                            card: '#1F2937',
+                            border: '#374151',
+                            text: {
+                                primary: '#F9FAFB',
+                                secondary: '#E5E7EB',
+                                tertiary: '#9CA3AF'
+                            }
                         }
                     },
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
                     },
                 }
             }
         }
     </script>
-
     <style type="text/tailwindcss">
         @layer utilities {
             .content-auto {
                 content-visibility: auto;
             }
-            .wechat-card {
-                @apply bg-white rounded-lg border border-wechat-border overflow-hidden transition-all duration-200;
+            .scrollbar-thin {
+                scrollbar-width: thin;
             }
-            .wechat-card-hover {
-                @apply hover:shadow-md hover:bg-wechat-gray/50;
+            .scrollbar-thumb-rounded {
+                scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
             }
-            .nav-item-active {
-                @apply bg-wechat-greenLight text-wechat-green border-l-4 border-wechat-green;
+            
+            /* 优化的卡片悬停效果 */
+            .card-hover {
+                transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                will-change: transform, box-shadow;
             }
-            .wechat-input {
-                @apply bg-wechat-gray rounded-full px-4 py-2 text-wechat-text focus:outline-none focus:ring-2 focus:ring-wechat-green/30 w-full;
+            .card-hover:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            }
+            
+            /* 主题过渡动画 */
+            .theme-transition {
+                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            }
+            
+            /* 文字和链接过渡效果 */
+            .text-transition {
+                transition: color 0.3s ease, transform 0.3s ease;
             }
         }
     </style>
-
-    <!-- 全局字体大小调整，解决GitHub Pages显示过小问题 -->
     <style>
-        html {
-            font-size: 16px !important;
+        /* 基础样式 - 浅色模式为默认 */
+        :root {
+            --bg-main: #F5F7FA;
+            --bg-card: #FFFFFF;
+            --border-color: #D1D5DB;
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --text-tertiary: #6B7280;
+            --hover-color: #E5E7EB;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+        
+        /* 深色模式变量 */
+        [data-theme="dark"] {
+            --bg-main: #111827;
+            --bg-card: #1F2937;
+            --border-color: #374151;
+            --text-primary: #F9FAFB;
+            --text-secondary: #E5E7EB;
+            --text-tertiary: #9CA3AF;
+            --hover-color: #374151;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 导航项样式 */
+        .nav-item {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.375rem;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: background-color;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.125rem;
+            background-color: #3A4895;
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .nav-item:hover::after {
+            width: 100%;
+        }
+        
+        .nav-item-active {
+            background-color: rgba(58, 72, 149, 0.15);
+            color: #3A4895;
+            font-weight: 500;
+        }
+        
+        .nav-item-active::after {
+            width: 100%;
+        }
+        
+        .nav-item-inactive {
+            color: var(--text-primary);
+        }
+        
+        .nav-item-inactive:hover {
+            background-color: var(--hover-color);
+        }
+        
+        /* 网站卡片悬停横杠 */
+        .website-card {
+            position: relative;
+        }
+        
+        .website-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.125rem;
+            background-color: #3A4895;
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .website-card:hover::after {
+            width: 100%;
+        }
+        
+        /* 搜索结果分类标签 */
+        .category-tag {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            background-color: rgba(58, 72, 149, 0.15);
+            color: #3A4895;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+        }
+        
+        .website-card:hover .category-tag {
+            transform: translateX(4px);
+        }
+        
+        /* 圆形链接按钮样式 - 同心圆圈设计 */
+        .circle-link {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: background-color, color;
+        }
+        
+        .circle-link:hover {
+            background-color: rgba(58, 72, 149, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .circle-link.clicked {
+            background-color: #3A4895;
+            color: white;
+        }
+        
+        /* 同心圆圈图标样式 */
+        .concentric-circles {
+            position: relative;
+            width: 1rem;
+            height: 1rem;
+        }
+        
+        .concentric-circles::before,
+        .concentric-circles::after {
+            content: '';
+            position: absolute;
+            border-radius: 9999px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* 外圆 */
+        .concentric-circles::before {
+            width: 1rem;
+            height: 1rem;
+            border: 0.125rem solid currentColor;
+        }
+        
+        /* 内圆 */
+        .concentric-circles::after {
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: currentColor;
+            top: 0.25rem;
+            left: 0.25rem;
+        }
+        
+        /* 悬停动画效果 */
+        .circle-link:hover .concentric-circles::before {
+            transform: scale(1.1);
+        }
+        
+        .circle-link.clicked .concentric-circles::after {
+            transform: scale(1.25);
+        }
+        
+        /* 主题切换按钮动画 */
+        .theme-toggle {
+            transition: transform 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* 卡片内部元素的延迟动画 */
+        .website-card h3 {
+            transition: color 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+        }
+        
+        .website-card:hover h3 {
+            transform: translateX(2px);
+        }
+        
+        .website-card p {
+            transition: color 0.3s ease 0.2s;
+        }
+        
+        .website-card .domain-wrapper {
+            transition: opacity 0.3s ease 0.2s, transform 0.3s ease 0.2s;
+            transform: translateY(0);
+        }
+        
+        .website-card:hover .domain-wrapper {
+            transform: translateY(2px);
         }
     </style>
 </head>
 
-<body class="bg-wechat-gray font-sans text-wechat-text h-screen overflow-hidden">
-    <div class="flex h-screen max-h-screen">
-        <!-- 侧边导航栏 - 类似微信通讯录 -->
-        <aside id="sidebar" class="w-64 bg-white border-r border-wechat-border hidden md:block transition-all duration-300 z-20 overflow-y-auto">
-            <div class="p-4 border-b border-wechat-border">
-                <h1 class="text-lg font-semibold text-wechat-text flex items-center">
-                    <i class="fa fa-link mr-2 text-wechat-green"></i>
-                    <span>专业网站导航</span>
-                </h1>
+<body class="bg-main text-textPrimary font-sans overflow-hidden h-screen flex flex-col theme-transition" style="background-color: var(--bg-main); color: var(--text-primary);">
+    <!-- 顶部导航栏 -->
+    <header class="bg-card border-b border-borderColor py-3 px-4 md:px-6 flex items-center justify-between z-10 transition-all duration-200 theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+        <div class="flex items-center space-x-3">
+            <button id="menuToggle" class="md:hidden text-textPrimary p-2 rounded-md hover:bg-hover transition-colors duration-200 theme-transition" style="color: var(--text-primary); background-color: var(--hover-color);">
+                <i class="fa fa-bars text-lg"></i>
+            </button>
+            <div class="flex items-center">
+                <i class="fa fa-compass text-primary text-2xl mr-2"></i>
+                <h1 class="text-xl font-semibold">专业导航系统</h1>
             </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <!-- 仅保留主题切换按钮 -->
+            <button id="themeToggle" class="text-textPrimary hover:text-primary transition-colors duration-200 theme-toggle theme-transition" style="color: var(--text-primary);">
+                <i class="fa fa-moon-o text-lg"></i>
+            </button>
+        </div>
+    </header>
 
-            <!-- 搜索框区域 - 移除搜索图标 -->
-            <div class="p-3 border-b border-wechat-border">
-                <!-- 搜索按钮 -->
-                <button id="search-button" class="w-full flex items-center justify-center bg-wechat-gray rounded-full px-4 py-2.5 text-wechat-text hover:bg-wechat-grayDark transition-colors">
-                    <i class="fa fa-search mr-2 text-wechat-textLight"></i>
-                    <span>点击搜索</span>
-                </button>
-
-                <!-- 搜索框容器 - 默认隐藏，已移除搜索图标 -->
-                <div id="search-box-container" class="relative hidden mt-2">
-                    <input type="text" id="sidebar-search" placeholder="" class="wechat-input pl-4 pr-10 text-base py-2.5">
-                    <!-- 清空按钮 -->
-                    <button id="clear-search" class="absolute right-3 top-1/2 -translate-y-1/2 text-wechat-textLight hidden">
-                        <i class="fa fa-times"></i>
-                    </button>
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧导航栏 -->
+        <aside id="sidebar" class="w-64 bg-card border-r border-borderColor flex-shrink-0 hidden md:block transition-all duration-300 ease-in-out overflow-hidden theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <!-- 搜索框 -->
+            <div class="p-4 border-b border-borderColor theme-transition" style="border-color: var(--border-color);">
+                <div class="relative group">
+                    <input type="text" id="navSearch" placeholder="搜索导航分类..." class="w-full pl-10 pr-4 py-2 rounded-md bg-main focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all duration-200 group-hover:ring-1 group-hover:ring-primary/20 theme-transition" style="background-color: var(--bg-main);">
+                    <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textSecondary transition-colors duration-200 group-hover:text-primary theme-transition" style="color: var(--text-secondary);"></i>
                 </div>
             </div>
 
-            <nav class="p-1">
-                <ul class="space-y-1">
-                    <!-- 动态生成10个导航项 -->
+            <!-- 导航列表 -->
+            <nav class="overflow-y-auto scrollbar-thin scrollbar-thumb-rounded h-[calc(100%-64px)]">
+                <ul id="navList" class="p-2">
+                    <!-- 导航项将通过JavaScript动态生成 -->
                 </ul>
             </nav>
-
-            <div class="p-3 border-t border-wechat-border text-xs text-wechat-textLight">
-                <div class="flex items-center">
-                    <i class="fa fa-info-circle mr-2"></i>
-                    <span>共11个分类，上百个网址</span>
-                </div>
-            </div>
         </aside>
 
         <!-- 主内容区 -->
-        <main class="flex-1 flex flex-col overflow-hidden max-h-screen">
-            <!-- 顶部导航 -->
-            <header class="bg-white border-b border-wechat-border p-3 flex justify-between items-center z-10">
-                <button id="menu-toggle" class="md:hidden p-2 rounded-full hover:bg-wechat-gray">
-                    <i class="fa fa-bars text-wechat-text"></i>
-                </button>
-                <h2 id="page-title" class="text-lg font-medium">技术资源</h2>
-                <div class="flex items-center">
-                    <button id="search-toggle" class="p-2 rounded-full hover:bg-wechat-gray">
-                        <i class="fa fa-search text-wechat-text"></i>
-                    </button>
-                    <button class="ml-2 p-2 rounded-full hover:bg-wechat-gray md:hidden">
-                        <i class="fa fa-ellipsis-v text-wechat-text"></i>
-                    </button>
-                </div>
-            </header>
-
-            <!-- 搜索栏 -->
-            <div id="search-container" class="bg-white border-b border-wechat-border p-3 hidden">
-                <div class="relative">
-                    <input type="text" id="search-input" placeholder="搜索网站..." class="wechat-input text-base">
-                    <button id="search-close" class="absolute right-3 top-1/2 -translate-y-1/2 text-wechat-textLight">
-                        <i class="fa fa-times"></i>
-                    </button>
+        <main class="flex-1 overflow-hidden flex flex-col bg-main theme-transition" style="background-color: var(--bg-main);">
+            <!-- 内容区搜索框 -->
+            <div class="p-4 border-b border-borderColor bg-card theme-transition" style="border-color: var(--border-color); background-color: var(--bg-card);">
+                <div class="relative max-w-2xl group">
+                    <input type="text" id="contentSearch" placeholder="搜索所有网站..." class="w-full pl-10 pr-4 py-2 rounded-md bg-main focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all duration-200 group-hover:ring-1 group-hover:ring-primary/20 theme-transition" style="background-color: var(--bg-main);">
+                    <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textSecondary transition-colors duration-200 group-hover:text-primary theme-transition" style="color: var(--text-secondary);"></i>
                 </div>
             </div>
 
-            <!-- 页面内容 -->
-            <div id="pages-container" class="flex-1 overflow-y-auto bg-wechat-gray p-4">
-                <!-- 页面内容将动态生成 -->
-            </div>
+            <!-- 内容显示区 -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin scrollbar-thumb-rounded">
+                <div id="contentTitle" class="text-xl font-semibold mb-4 text-textPrimary theme-transition" style="color: var(--text-primary);">
+                    标准查询
+                </div>
 
-            <!-- 底部导航栏 -->
-            <div class="md:hidden bg-white border-t border-wechat-border flex justify-around py-2">
-                <button class="flex flex-col items-center text-wechat-green">
-                    <i class="fa fa-th-large text-lg"></i>
-                    <span class="text-sm mt-1">导航</span>
-                </button>
-                <button class="flex flex-col items-center text-wechat-textLight">
-                    <i class="fa fa-star-o text-lg"></i>
-                    <span class="text-sm mt-1">收藏</span>
-                </button>
-                <button class="flex flex-col items-center text-wechat-textLight">
-                    <i class="fa fa-user-o text-lg"></i>
-                    <span class="text-sm mt-1">我的</span>
-                </button>
+                <div id="websiteGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
+                    <!-- 网站卡片将通过JavaScript动态生成 -->
+                </div>
+
+                <div id="noResults" class="hidden flex flex-col items-center justify-center h-64 text-textSecondary theme-transition" style="color: var(--text-secondary);">
+                    <i class="fa fa-search text-4xl mb-3 opacity-30"></i>
+                    <p>未找到相关网站</p>
+                </div>
             </div>
         </main>
     </div>
 
-    <!-- 移动端遮罩 -->
-    <div id="overlay" class="fixed inset-0 bg-black/30 z-10 hidden md:hidden"></div>
-
     <script>
-        // 网站数据 - 10个页面
+        // 预定义关键DOM元素引用
+        const doc = document;
+        const html = document.documentElement;
+        const navList = doc.getElementById('navList');
+        const websiteGrid = doc.getElementById('websiteGrid');
+        const contentTitle = doc.getElementById('contentTitle');
+        const navSearch = doc.getElementById('navSearch');
+        const contentSearch = doc.getElementById('contentSearch');
+        const noResults = doc.getElementById('noResults');
+        const menuToggle = doc.getElementById('menuToggle');
+        const sidebar = doc.getElementById('sidebar');
+        const themeToggle = doc.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // 初始化主题
+        function initTheme() {
+            // 检查本地存储或系统偏好
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            let initialTheme;
+            if (savedTheme) {
+                initialTheme = savedTheme;
+            } else {
+                initialTheme = prefersDark ? 'dark' : 'light';
+            }
+            
+            setTheme(initialTheme);
+        }
+        
+        // 设置主题
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            // 更新图标
+            if (theme === 'dark') {
+                themeIcon.classList.remove('fa-moon-o');
+                themeIcon.classList.add('fa-sun-o');
+            } else {
+                themeIcon.classList.remove('fa-sun-o');
+                themeIcon.classList.add('fa-moon-o');
+            }
+        }
+        
+        // 切换主题
+        function toggleTheme() {
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        }
+        
+        // 提取网址核心域名的函数
+        function extractDomain(url) {
+            try {
+                // 处理没有协议的URL
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'http://' + url;
+                }
+                
+                const domain = new URL(url).hostname;
+                
+                // 移除www.前缀
+                if (domain.startsWith('www.')) {
+                    return domain.slice(4);
+                }
+                
+                return domain;
+            } catch (e) {
+                // 处理解析错误，返回原始URL的前半部分
+                return url.split('/')[0];
+            }
+        }
+        
+        // 处理圆形按钮点击事件
+        function handleCircleClick(event, url) {
+            // 防止事件冒泡影响链接跳转
+            event.preventDefault();
+            
+            // 切换按钮状态
+            const circle = event.currentTarget;
+            circle.classList.add('clicked');
+            
+            // 短暂延迟后打开链接并恢复按钮状态
+            setTimeout(() => {
+                window.open(url, '_blank', 'noopener noreferrer');
+                setTimeout(() => {
+                    circle.classList.remove('clicked');
+                }, 300);
+            }, 150);
+        }
+        
+        // 网站数据
         const websiteData = [
             {
                 id: 1,
@@ -475,328 +760,211 @@
             }
         ];
         
-        // DOM元素
-        const sidebar = document.getElementById('sidebar');
-        const navList = sidebar.querySelector('ul');
-        const pagesContainer = document.getElementById('pages-container');
-        const pageTitle = document.getElementById('page-title');
-        const menuToggle = document.getElementById('menu-toggle');
-        const overlay = document.getElementById('overlay');
-        const searchToggle = document.getElementById('search-toggle');
-        const searchContainer = document.getElementById('search-container');
-        const searchInput = document.getElementById('search-input');
-        const searchClose = document.getElementById('search-close');
-        const sidebarSearch = document.getElementById('sidebar-search');
-        
-        // 左侧搜索框元素
-        const searchButton = document.getElementById('search-button');
-        const searchBoxContainer = document.getElementById('search-box-container');
-        const clearSearch = document.getElementById('clear-search');
-        
-        // 初始化导航菜单
-        function initNavigation() {
-            // 保存所有导航项以便搜索
-            const allNavItems = [];
-            
-            websiteData.forEach(page => {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    <a href="#" class="nav-item block px-3 py-2.5 rounded text-wechat-text hover:bg-wechat-gray transition-colors flex items-center" 
-                       data-page="${page.id}">
-                        <div class="w-8 h-8 rounded-md bg-wechat-green/10 flex items-center justify-center mr-3 flex-shrink-0">
-                            <i class="fa ${page.icon} text-wechat-green"></i>
-                        </div>
-                        <span class="truncate text-base">${page.title}</span>
-                    </a>
+        // 初始化导航列表
+        function initNavList() {
+            let html = '';
+            websiteData.forEach(category => {
+                const isActive = category.id === 1;
+                html += `
+                    <li class="mb-1">
+                        <button class="nav-item ${isActive ? 'nav-item-active' : 'nav-item-inactive'}" 
+                                data-id="${category.id}">
+                            <i class="fa ${category.icon} w-5 text-center mr-3"></i>
+                            <span>${category.title}</span>
+                        </button>
+                    </li>
                 `;
-                navList.appendChild(li);
-                allNavItems.push({
-                    element: li,
-                    title: page.title,
-                    id: page.id
-                });
             });
+            
+            navList.innerHTML = html;
         
-            // 侧边栏搜索功能
-            sidebarSearch.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                allNavItems.forEach(item => {
-                    if (searchTerm === '' || item.title.toLowerCase().includes(searchTerm)) {
-                        item.element.classList.remove('hidden');
-                    } else {
-                        item.element.classList.add('hidden');
-                    }
-                });
-            });
-        
-            // 添加导航点击事件
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const pageId = parseInt(this.getAttribute('data-page'));
-                    showPage(pageId);
+            doc.querySelectorAll('.nav-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    contentSearch.blur();
                     
-                    // 在移动设备上点击导航后关闭侧边栏
+                    doc.querySelectorAll('.nav-item').forEach(b => {
+                        b.classList.remove('nav-item-active');
+                        b.classList.add('nav-item-inactive');
+                    });
+                    
+                    e.currentTarget.classList.add('nav-item-active');
+                    e.currentTarget.classList.remove('nav-item-inactive');
+                    
+                    const categoryId = parseInt(e.currentTarget.dataset.id);
+                    showCategoryContent(categoryId);
+                    
                     if (window.innerWidth < 768) {
                         sidebar.classList.add('hidden');
-                        overlay.classList.add('hidden');
                     }
                 });
             });
         
-            // 默认显示第一个页面
-            showPage(1);
+            showCategoryContent(1);
         }
         
-        // 显示指定页面
-        function showPage(pageId) {
-            // 更新导航激活状态
-            document.querySelectorAll('.nav-item').forEach(item => {
-                if (parseInt(item.getAttribute('data-page')) === pageId) {
-                    item.classList.add('nav-item-active');
-                } else {
-                    item.classList.remove('nav-item-active');
-                }
-            });
+        // 显示分类内容
+        function showCategoryContent(categoryId) {
+            const category = websiteData.find(item => item.id === categoryId);
+            if (!category) return;
+            
+            contentTitle.textContent = category.title;
+            renderWebsites(category.websites, false);
+        }
         
-            // 找到对应的页面数据
-            const pageData = websiteData.find(page => page.id === pageId);
-            if (!pageData) return;
-        
-            // 更新页面标题
-            pageTitle.textContent = pageData.title;
-        
-            // 生成页面内容
-            let pageContent = `
-                <div class="mb-4">
-                    <h3 class="text-sm text-wechat-textLight uppercase font-medium tracking-wider px-2">
-                        ${pageData.title}
-                    </h3>
-                </div>
+        // 渲染网站卡片 - 优化动态效果
+        function renderWebsites(websites, isSearchResult = false) {
+            if (websites.length === 0) {
+                websiteGrid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+            
+            noResults.classList.add('hidden');
+            
+            let html = '';
+            websites.forEach(website => {
+                const domain = extractDomain(website.url);
                 
-                <!-- 网格布局：移动端1列，平板2列，桌面3列 -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            `;
-        
-            // 生成网站卡片
-            pageData.websites.forEach((website, index) => {
-                // 提取域名作为辅助信息
-                let domain = '';
-                try {
-                    const urlObj = new URL(website.url);
-                    domain = urlObj.hostname.replace('www.', '');
-                } catch (e) {
-                    domain = website.url;
-                }
-        
-                pageContent += `
-                    <a href="${website.url}" target="_blank" rel="noopener noreferrer">
-                        <div class="wechat-card wechat-card-hover h-full">
-                            <div class="p-3">
-                                <div class="flex items-start mb-2">
-                                    <div class="w-8 h-8 rounded-md bg-wechat-green/10 flex items-center justify-center mr-2 flex-shrink-0">
-                                        <i class="fa fa-globe text-wechat-green"></i>
-                                    </div>
-                                    <h4 class="font-medium text-lg text-wechat-text truncate">${website.name}</h4>
+                const categoryTag = isSearchResult && website.category 
+                    ? `<span class="category-tag">${website.category}</span>` 
+                    : '';
+                    
+                html += `
+                    <a href="${website.url}" target="_blank" rel="noopener noreferrer" class="block">
+                        <div class="bg-card rounded-lg border border-borderColor p-4 card-hover h-full website-card theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                            ${categoryTag}
+                            <div class="flex items-start justify-between mb-3">
+                                <h3 class="font-medium text-textPrimary hover:text-primary line-clamp-1 text-base theme-transition text-transition" style="color: var(--text-primary);">
+                                    ${website.name}
+                                </h3>
+                                <div class="circle-link" onclick="handleCircleClick(event, '${website.url}')">
+                                    <div class="concentric-circles"></div>
                                 </div>
-                                <p class="text-base text-wechat-textLight mb-2 line-clamp-2">${website.desc}</p>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-base text-wechat-textLight bg-wechat-gray px-1.5 py-0.5 rounded">${domain}</span>
-                                    <i class="fa fa-angle-right text-wechat-textLight"></i>
-                                </div>
+                            </div>
+                            <p class="text-sm text-textSecondary line-clamp-2 mb-4 theme-transition text-transition" style="color: var(--text-secondary);">${website.desc}</p>
+                            <div class="domain-wrapper flex items-center text-xs text-textTertiary pt-1 border-t border-gray-100 theme-transition" style="color: var(--text-tertiary); border-color: var(--border-color);">
+                                <i class="fa fa-link mr-1.5 opacity-70"></i>
+                                <span>${domain}</span>
                             </div>
                         </div>
                     </a>
                 `;
             });
-        
-            pageContent += `</div>`;
-            pagesContainer.innerHTML = pageContent;
-        
-            // 平滑滚动到顶部
-            pagesContainer.scrollTop = 0;
+            websiteGrid.innerHTML = html;
         }
         
-        // 初始化搜索功能
-        function initSearch() {
-            // 搜索框显示/隐藏
-            searchToggle.addEventListener('click', () => {
-                searchContainer.classList.toggle('hidden');
-                if (!searchContainer.classList.contains('hidden')) {
-                    searchInput.focus();
-                }
+        // 导航搜索功能
+        function setupNavSearch() {
+            navSearch.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                
+                doc.querySelectorAll('.nav-item').forEach(btn => {
+                    const title = btn.querySelector('span').textContent.toLowerCase();
+                    const parentLi = btn.parentElement;
+                    
+                    if (searchTerm === '' || title.includes(searchTerm)) {
+                        parentLi.classList.remove('hidden');
+                    } else {
+                        parentLi.classList.add('hidden');
+                    }
+                });
             });
+        }
         
-            searchClose.addEventListener('click', () => {
-                searchContainer.classList.add('hidden');
-                searchInput.value = '';
-                // 恢复当前页面显示
-                const activeNav = document.querySelector('.nav-item-active');
-                if (activeNav) {
-                    const pageId = parseInt(activeNav.getAttribute('data-page'));
-                    showPage(pageId);
-                }
-            });
-        
-            // 搜索功能
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase().trim();
-                if (searchTerm.length < 1) {
-                    // 搜索词为空时显示当前页面
-                    const activeNav = document.querySelector('.nav-item-active');
-                    if (activeNav) {
-                        const pageId = parseInt(activeNav.getAttribute('data-page'));
-                        showPage(pageId);
+        // 内容搜索功能
+        function setupContentSearch() {
+            contentSearch.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                
+                if (!searchTerm) {
+                    const activeCategoryId = parseInt(doc.querySelector('.nav-item-active').dataset.id);
+                    const category = websiteData.find(item => item.id === activeCategoryId);
+                    if (category) {
+                        contentTitle.textContent = category.title;
+                        renderWebsites(category.websites, false);
                     }
                     return;
                 }
-        
-                // 搜索所有网站
-                const results = [];
-                websiteData.forEach(page => {
-                    page.websites.forEach(website => {
-                        if (website.name.toLowerCase().includes(searchTerm) || 
-                            website.desc.toLowerCase().includes(searchTerm) ||
-                            website.url.toLowerCase().includes(searchTerm)) {
-                            results.push({
-                                ...website,
-                                pageTitle: page.title,
-                                pageIcon: page.icon
-                            });
-                        }
-                    });
+                
+                let allWebsites = [];
+                websiteData.forEach(category => {
+                    const websitesWithCategory = category.websites.map(website => ({
+                        ...website,
+                        category: category.title
+                    }));
+                    allWebsites = [...allWebsites, ...websitesWithCategory];
                 });
-        
-                // 显示搜索结果
-                let resultsHTML = `
-                    <div class="mb-4">
-                        <h3 class="text-sm text-wechat-textLight uppercase font-medium tracking-wider px-2">
-                            搜索结果: "${searchTerm}"
-                        </h3>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                `;
-        
-                if (results.length === 0) {
-                    resultsHTML += `
-                        <div class="col-span-full p-8 text-center">
-                            <i class="fa fa-search text-3xl text-wechat-grayDark mb-3"></i>
-                            <p class="text-wechat-textLight text-base">没有找到匹配的网站</p>
-                        </div>
-                    `;
-                } else {
-                    results.forEach(website => {
-                        let domain = '';
-                        try {
-                            const urlObj = new URL(website.url);
-                            domain = urlObj.hostname.replace('www.', '');
-                        } catch (e) {
-                            domain = website.url;
-                        }
-        
-                        resultsHTML += `
-                            <a href="${website.url}" target="_blank" rel="noopener noreferrer">
-                                <div class="wechat-card wechat-card-hover h-full">
-                                    <div class="p-3">
-                                        <div class="flex items-start mb-2">
-                                            <div class="w-8 h-8 rounded-md bg-wechat-green/10 flex items-center justify-center mr-2 flex-shrink-0">
-                                                <i class="fa ${website.pageIcon} text-wechat-green"></i>
-                                            </div>
-                                            <div>
-                                                <h4 class="font-medium text-lg text-wechat-text truncate">${website.name}</h4>
-                                                <span class="text-sm text-wechat-textLight">${website.pageTitle}</span>
-                                            </div>
-                                        </div>
-                                        <p class="text-base text-wechat-textLight mb-2 line-clamp-2">${website.desc}</p>
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-base text-wechat-textLight bg-wechat-gray px-1.5 py-0.5 rounded">${domain}</span>
-                                            <i class="fa fa-angle-right text-wechat-textLight"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        `;
-                    });
-                }
-        
-                resultsHTML += `</div>`;
-                pagesContainer.innerHTML = resultsHTML;
+                
+                const filteredWebsites = allWebsites.filter(website => 
+                    website.name.toLowerCase().includes(searchTerm) || 
+                    website.desc.toLowerCase().includes(searchTerm) ||
+                    website.url.toLowerCase().includes(searchTerm) ||
+                    website.category.toLowerCase().includes(searchTerm)
+                );
+                
+                contentTitle.textContent = `搜索结果: "${searchTerm}" (${filteredWebsites.length})`;
+                renderWebsites(filteredWebsites, true);
             });
         }
         
         // 移动端菜单切换
-        function initMobileMenu() {
+        function setupMenuToggle() {
             menuToggle.addEventListener('click', () => {
                 sidebar.classList.toggle('hidden');
-                overlay.classList.toggle('hidden');
+                sidebar.classList.toggle('absolute');
+                sidebar.classList.toggle('top-16');
+                sidebar.classList.toggle('left-0');
+                sidebar.classList.toggle('h-[calc(100%-4rem)]');
+                sidebar.classList.toggle('z-20');
             });
-        
-            overlay.addEventListener('click', () => {
-                sidebar.classList.add('hidden');
-                overlay.classList.add('hidden');
+            
+            doc.addEventListener('click', (e) => {
+                if (window.innerWidth < 768 && 
+                    !sidebar.classList.contains('hidden') && 
+                    !sidebar.contains(e.target) && 
+                    e.target !== menuToggle &&
+                    !menuToggle.contains(e.target)) {
+                    sidebar.classList.add('hidden');
+                }
             });
-        
-            // 窗口大小变化时处理
+            
             window.addEventListener('resize', () => {
                 if (window.innerWidth >= 768) {
-                    sidebar.classList.remove('hidden');
-                    overlay.classList.add('hidden');
-                } else {
+                    sidebar.classList.remove('hidden', 'absolute', 'top-16', 'left-0', 'h-[calc(100%-4rem)]', 'z-20');
+                    sidebar.classList.add('block');
+                } else if (!sidebar.classList.contains('hidden') && !sidebar.classList.contains('absolute')) {
                     sidebar.classList.add('hidden');
                 }
             });
         }
         
-        // 初始化左侧搜索功能
-        function initSidebarSearch() {
-            // 点击搜索按钮显示/隐藏搜索框
-            searchButton.addEventListener('click', () => {
-                searchBoxContainer.classList.toggle('hidden');
-                if (!searchBoxContainer.classList.contains('hidden')) {
-                    sidebarSearch.focus(); // 自动聚焦
-                }
-            });
-        
-            // 搜索框输入事件 - 控制清空按钮显示
-            sidebarSearch.addEventListener('input', () => {
-                if (sidebarSearch.value.trim() !== '') {
-                    clearSearch.classList.remove('hidden');
-                } else {
-                    clearSearch.classList.add('hidden');
-                }
-            });
-        
-            // 清空搜索内容
-            clearSearch.addEventListener('click', () => {
-                sidebarSearch.value = '';
-                clearSearch.classList.add('hidden');
-                // 触发搜索事件以显示所有项目
-                const event = new Event('input', { bubbles: true });
-                sidebarSearch.dispatchEvent(event);
-            });
-        
-            // 点击页面其他区域关闭搜索框
-            document.addEventListener('click', (e) => {
-                const isClickInside = searchButton.contains(e.target) || 
-                                     searchBoxContainer.contains(e.target);
-                                     
-                if (!isClickInside && window.innerWidth >= 768) {
-                    searchBoxContainer.classList.add('hidden');
+        // 初始化主题切换事件
+        function setupThemeToggle() {
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // 监听系统主题变化
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) {
+                    setTheme(e.matches ? 'dark' : 'light');
                 }
             });
         }
         
-        // 初始化应用
-        function initApp() {
-            initNavigation();
-            initMobileMenu();
-            initSearch();
-            initSidebarSearch();
+        // 初始化函数
+        function init() {
+            initTheme();
+            initNavList();
+            setupNavSearch();
+            setupContentSearch();
+            setupMenuToggle();
+            setupThemeToggle();
         }
         
-        // 启动应用
-        document.addEventListener('DOMContentLoaded', initApp);
+        if (doc.readyState === 'loading') {
+            doc.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 
