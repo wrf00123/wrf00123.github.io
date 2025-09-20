@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="zh-CN">
 
 <head>
@@ -8,12 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script>
-        // 配置Tailwind自定义主题（适配动态主题变量）
+        // 配置Tailwind自定义主题
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        // 主色调通过CSS变量动态绑定
                         primary: 'var(--primary)',
                         accent: 'var(--accent)'
                     },
@@ -35,8 +33,6 @@
             .scrollbar-thumb-rounded {
                 scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
             }
-            
-            /* 优化的卡片悬停效果 */
             .card-hover {
                 transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                 will-change: transform, box-shadow;
@@ -45,27 +41,28 @@
                 transform: translateY(-4px);
                 box-shadow: 0 10px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
             }
-            
-            /* 主题过渡动画 */
             .theme-transition {
                 transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             }
-            
-            /* 文字和链接过渡效果 */
             .text-transition {
                 transition: color 0.3s ease, transform 0.3s ease;
+            }
+            .glass-effect {
+                background: rgba(var(--glass-rgb), var(--glass-opacity));
+                backdrop-filter: blur(var(--glass-blur));
+                -webkit-backdrop-filter: blur(var(--glass-blur));
             }
         }
     </style>
     <style>
-        /* 基础变量（通用属性） */
+        /* 基础变量 */
         :root {
             --transition-base: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             --border-radius: 0.375rem;
         }
         
-        /* 1. 科技风格 - 优化版本 */
+        /* 1. 科技风格 */
         [data-theme="tech"] {
             --bg-main: #0B1120;
             --bg-card: #1E293B;
@@ -74,79 +71,63 @@
             --text-secondary: #94A3B8;
             --text-tertiary: #64748B;
             --hover-color: #334155;
-            --primary: #38BDF8; /* 明亮科技蓝 */
-            --accent: #A855F7; /* 霓虹紫 */
+            --primary: #38BDF8;
+            --accent: #A855F7;
             --shadow-color: rgba(56, 189, 248, 0.2);
             --card-bg-gradient: linear-gradient(145deg, #1E293B 0%, #1A2439 100%);
             --bg-texture: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2338bdf8' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
         
-        /* 2. 水墨风格 - 优化版本 */
+        /* 2. 水墨风格 */
         [data-theme="ink"] {
-            --bg-main: #F5F2EB; /* 宣纸色 */
-            --bg-card: #EFEAE2; /* 浅宣纸色卡片背景 */
-            --border-color: #D4CDC0; /* 淡墨色边框 */
-            --text-primary: #23211F; /* 浓墨色文字 */
-            --text-secondary: #5A5652; /* 中墨色文字 */
-            --text-tertiary: #8A857F; /* 淡墨色文字 */
-            --hover-color: #E2DCD3; /* 悬停背景色 */
-            --primary: #2D2A26; /* 墨黑主色 */
-            --accent: #8B6E4F; /* 赭石色点缀 */
+            --bg-main: #F5F2EB;
+            --bg-card: #EFEAE2;
+            --border-color: #D4CDC0;
+            --text-primary: #23211F;
+            --text-secondary: #5A5652;
+            --text-tertiary: #8A857F;
+            --hover-color: #E2DCD3;
+            --primary: #2D2A26;
+            --accent: #8B6E4F;
             --shadow-color: rgba(45, 42, 38, 0.1);
             --card-border-style: 1px solid #D4CDC0;
             --card-bg-gradient: linear-gradient(180deg, #EFEAE2 0%, #E6DFD5 100%);
             --bg-texture: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23D4CDC0' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
         
-        /* 3. 绿植风格 - 优化版本 */
+        /* 3. 绿植风格 */
         [data-theme="plant"] {
-            --bg-main: #F0F7EF; /* 浅草绿背景 */
-            --bg-card: #E6F2E5; /* 浅绿色卡片背景 */
-            --border-color: #C8E0C6; /* 淡绿边框 */
-            --text-primary: #2A5931; /* 深绿文字 */
-            --text-secondary: #427D4A; /* 中绿文字 */
-            --text-tertiary: #6B9D73; /* 浅绿文字 */
-            --hover-color: #D9EED8; /* 悬停背景色 */
-            --primary: #34A853; /* 主绿 */
-            --accent: #8E6E40; /* 土黄色点缀 */
+            --bg-main: #F0F7EF;
+            --bg-card: #E6F2E5;
+            --border-color: #C8E0C6;
+            --text-primary: #2A5931;
+            --text-secondary: #427D4A;
+            --text-tertiary: #6B9D73;
+            --hover-color: #D9EED8;
+            --primary: #34A853;
+            --accent: #8E6E40;
             --shadow-color: rgba(52, 168, 83, 0.15);
             --card-bg-texture: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23C8E0C6' fill-opacity='0.3' fill-rule='evenodd'/%3E%3C/svg%3E");
             --card-bg-gradient: linear-gradient(180deg, #E6F2E5 0%, #D9EDD8 100%);
         }
         
-        /* 4. 大海风格 - 优化版本 */
-        [data-theme="sea"] {
-            --bg-main: #E8F4F8; /* 浅天蓝背景 */
-            --bg-card: #DFF0F7; /* 浅蓝色卡片背景 */
-            --border-color: #B7D9E6; /* 蓝色边框 */
-            --text-primary: #164A68; /* 深海蓝文字 */
-            --text-secondary: #2A7094; /* 中蓝文字 */
-            --text-tertiary: #4A8FB3; /* 浅蓝文字 */
-            --hover-color: #C9E5F0; /* 悬停背景色 */
-            --primary: #1E88E5; /* 主蓝 */
-            --accent: #F59E0B; /* 暖橙点缀 */
-            --shadow-color: rgba(30, 136, 229, 0.2);
-            --card-bg-gradient: linear-gradient(180deg, #DFF0F7 0%, #C9E5F0 100%);
-            --bg-texture: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231E88E5' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-        
-        /* 5. 简约风格 - 优化版本 */
+        /* 4. 简约风格 */
         [data-theme="simple"] {
-            --bg-main: #FCFCFC; /* 纯白底 */
+            --bg-main: #FCFCFC;
             --bg-card: #FFFFFF;
-            --border-color: #E0E0E0; /* 浅灰边框 */
-            --text-primary: #222222; /* 深灰文字 */
-            --text-secondary: #555555; /* 中灰文字 */
-            --text-tertiary: #888888; /* 浅灰文字 */
+            --border-color: #E0E0E0;
+            --text-primary: #222222;
+            --text-secondary: #555555;
+            --text-tertiary: #888888;
             --hover-color: #F5F5F5;
-            --primary: #444444; /* 深灰主色 */
-            --accent: #3B82F6; /* 亮蓝点缀 */
+            --primary: #444444;
+            --accent: #3B82F6;
             --shadow-color: rgba(0, 0, 0, 0.05);
             --border-width: 0.5px;
             --card-bg-gradient: linear-gradient(180deg, #FFFFFF 0%, #F9F9F9 100%);
         }
         
-        /* 6. 浅色模式（默认主题） */
+        /* 5. 浅色模式（默认主题） */
         [data-theme="light"] {
             --bg-main: #F8F9FA;
             --bg-card: #FFFFFF;
@@ -161,7 +142,7 @@
             --card-bg-gradient: linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%);
         }
         
-        /* 7. 深色模式 */
+        /* 6. 深色模式 */
         [data-theme="dark"] {
             --bg-main: #121212;
             --bg-card: #1E1E1E;
@@ -176,7 +157,30 @@
             --card-bg-gradient: linear-gradient(180deg, #1E1E1E 0%, #141414 100%);
         }
         
-        /* 导航项样式（适配动态主色调） */
+        /* 7. 毛玻璃风格 - 优化版本 */
+        [data-theme="glass"] {
+            /* 毛玻璃核心变量优化 */
+            --glass-rgb: 255, 255, 255;
+            --glass-opacity: 0.85; /* 提高透明度，增强玻璃感 */
+            --glass-blur: 16px;   /* 增加模糊度，更柔和 */
+            
+            /* 基础颜色 */
+            --bg-main: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 50%, #d1ebff 100%);
+            --bg-card: transparent;
+            --border-color: rgba(255, 255, 255, 0.3); /* 更清晰的边框 */
+            --text-primary: #1a365d;
+            --text-secondary: #4a5568;
+            --text-tertiary: #718096;
+            --hover-color: rgba(255, 255, 255, 0.5); /* 更明显的悬停效果 */
+            --primary: #2563eb;
+            --accent: #3b82f6;
+            --shadow-color: rgba(0, 0, 0, 0.15); /* 增强阴影，提升层次感 */
+            
+            /* 背景纹理 */
+            --bg-texture: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        /* 导航项样式 */
         .nav-item {
             position: relative;
             width: 100%;
@@ -196,7 +200,7 @@
             left: 0;
             width: 0;
             height: 0.125rem;
-            background-color: var(--primary); /* 动态主色调 */
+            background-color: var(--primary);
             transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         
@@ -205,7 +209,7 @@
         }
         
         .nav-item-active {
-            background-color: rgba(var(--primary-rgb), 0.15); /* 主色调透明背景 */
+            background-color: rgba(var(--primary-rgb), 0.15);
             color: var(--primary);
             font-weight: 500;
         }
@@ -222,7 +226,7 @@
             background-color: var(--hover-color);
         }
         
-        /* 网站卡片悬停横杠（适配动态主色调） */
+        /* 网站卡片样式 */
         .website-card {
             position: relative;
         }
@@ -234,7 +238,7 @@
             left: 0;
             width: 0;
             height: 0.125rem;
-            background-color: var(--primary); /* 动态主色调 */
+            background-color: var(--primary);
             transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         
@@ -242,12 +246,12 @@
             width: 100%;
         }
         
-        /* 搜索结果分类标签（适配动态主色调） */
+        /* 分类标签 */
         .category-tag {
             font-size: 0.75rem;
             padding: 0.125rem 0.5rem;
             border-radius: 9999px;
-            background-color: rgba(var(--primary-rgb), 0.15); /* 主色调透明背景 */
+            background-color: rgba(var(--primary-rgb), 0.15);
             color: var(--primary);
             display: inline-block;
             margin-bottom: 0.5rem;
@@ -259,7 +263,7 @@
             transform: translateX(4px);
         }
         
-        /* 圆形链接按钮样式 - 同心圆圈设计 */
+        /* 圆形链接按钮 */
         .circle-link {
             width: 2rem;
             height: 2rem;
@@ -273,7 +277,7 @@
         }
         
         .circle-link:hover {
-            background-color: rgba(var(--primary-rgb), 0.1); /* 主色调透明背景 */
+            background-color: rgba(var(--primary-rgb), 0.1);
             transform: scale(1.05);
         }
         
@@ -282,7 +286,7 @@
             color: white;
         }
         
-        /* 同心圆圈图标样式 */
+        /* 同心圆圈图标 */
         .concentric-circles {
             position: relative;
             width: 1rem;
@@ -297,14 +301,12 @@
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         
-        /* 外圆 */
         .concentric-circles::before {
             width: 1rem;
             height: 1rem;
             border: 0.125rem solid currentColor;
         }
         
-        /* 内圆 */
         .concentric-circles::after {
             width: 0.5rem;
             height: 0.5rem;
@@ -313,7 +315,6 @@
             left: 0.25rem;
         }
         
-        /* 悬停动画效果 */
         .circle-link:hover .concentric-circles::before {
             transform: scale(1.1);
         }
@@ -322,7 +323,7 @@
             transform: scale(1.25);
         }
         
-        /* 主题切换按钮动画 */
+        /* 主题切换按钮 */
         .theme-toggle {
             transition: transform 0.3s ease;
         }
@@ -331,7 +332,7 @@
             transform: rotate(90deg);
         }
         
-        /* 卡片内部元素的延迟动画 */
+        /* 卡片内部元素动画 */
         .website-card h3 {
             transition: color 0.3s ease 0.1s, transform 0.3s ease 0.1s;
         }
@@ -353,8 +354,7 @@
             transform: translateY(2px);
         }
         
-        /* 主题专属样式强化 */
-        /* 科技风格：发光边框与渐变 */
+        /* 主题专属样式 */
         [data-theme="tech"] {
             background-image: var(--bg-texture);
         }
@@ -370,7 +370,6 @@
             box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
         }
         
-        /* 水墨风格：笔触感边框与纹理 */
         [data-theme="ink"] {
             background-image: var(--bg-texture);
         }
@@ -397,7 +396,6 @@
             border: 1px solid var(--border-color);
         }
         
-        /* 绿植风格：纹理背景与圆角 */
         [data-theme="plant"] {
             background-image: var(--card-bg-texture);
         }
@@ -423,29 +421,6 @@
             border: 1px solid var(--border-color);
         }
         
-        /* 大海风格：强化海洋风格特性 */
-        [data-theme="sea"] {
-            background-image: var(--bg-texture); /* 添加波浪纹理 */
-        }
-        [data-theme="sea"] .website-card {
-            background: var(--card-bg-gradient);
-            border-radius: 0.5rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px var(--shadow-color);
-        }
-        [data-theme="sea"] header,
-        [data-theme="sea"] aside {
-            background-color: var(--bg-card);
-            border-color: var(--border-color);
-        }
-        [data-theme="sea"] .nav-item-active {
-            background-color: rgba(30, 136, 229, 0.1);
-        }
-        [data-theme="sea"] .circle-link {
-            border: 1px solid rgba(30, 136, 229, 0.2);
-        }
-        
-        /* 简约风格：细边框与轻阴影 */
         [data-theme="simple"] .website-card,
         [data-theme="simple"] header,
         [data-theme="simple"] aside {
@@ -461,7 +436,51 @@
             height: 1.8rem;
         }
         
-        /* 下拉菜单基础样式 */
+        /* 毛玻璃风格优化 - 更精致的效果 */
+        [data-theme="glass"] {
+            background-image: var(--bg-texture);
+            background-attachment: fixed;
+        }
+        [data-theme="glass"] body {
+            background: var(--bg-main);
+            background-attachment: fixed;
+        }
+        [data-theme="glass"] header,
+        [data-theme="glass"] aside,
+        [data-theme="glass"] .website-card,
+        [data-theme="glass"] #navSearch,
+        [data-theme="glass"] #contentSearch,
+        [data-theme="glass"] .theme-menu {
+            @apply glass-effect;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+        }
+        [data-theme="glass"] .website-card {
+            border-radius: 1rem;
+            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        [data-theme="glass"] .website-card:hover {
+            box-shadow: 0 12px 40px var(--shadow-color);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        [data-theme="glass"] #navSearch,
+        [data-theme="glass"] #contentSearch {
+            background: rgba(255, 255, 255, 0.6);
+        }
+        [data-theme="glass"] .nav-item-active {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        [data-theme="glass"] .circle-link {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        [data-theme="glass"] .circle-link:hover {
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        /* 下拉菜单样式 */
         .theme-menu {
             background-color: var(--bg-card);
             border-color: var(--border-color);
@@ -505,11 +524,11 @@
                     <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="plant">
                         <i class="fa fa-leaf w-5 mr-2"></i>绿植风格
                     </button>
-                    <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="sea">
-                        <i class="fa fa-tint w-5 mr-2"></i>大海风格
-                    </button>
                     <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="simple">
                         <i class="fa fa-square-o w-5 mr-2"></i>简约风格
+                    </button>
+                    <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="glass">
+                        <i class="fa fa-window-maximize w-5 mr-2"></i>毛玻璃风格
                     </button>
                     <div class="border-t border-borderColor my-1 theme-transition" style="border-color: var(--border-color);"></div>
                     <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="light">
@@ -588,33 +607,25 @@
         const themeChevron = doc.getElementById('themeChevron');
         const themeDropdown = doc.getElementById('themeDropdown');
         
-        // 主题图标映射（不同主题对应专属图标）
+        // 主题图标映射
         const themeIconMap = {
             tech: 'fa-microchip',
             ink: 'fa-paint-brush',
             plant: 'fa-leaf',
-            sea: 'fa-tint',
             simple: 'fa-square-o',
             light: 'fa-sun-o',
-            dark: 'fa-moon-o'
+            dark: 'fa-moon-o',
+            glass: 'fa-window-maximize'
         };
         
-        // 初始化主题 - 默认设置为浅色模式
+        // 初始化主题
         function initTheme() {
-            // 优先读取本地存储，无则默认浅色模式
             const savedTheme = localStorage.getItem('theme');
-            
-            let initialTheme;
-            if (savedTheme) {
-                initialTheme = savedTheme;
-            } else {
-                initialTheme = 'light'; // 默认主题设置为浅色模式
-            }
-            
+            const initialTheme = savedTheme || 'light';
             setTheme(initialTheme);
         }
         
-        // 设置主题（核心函数）
+        // 设置主题
         function setTheme(theme) {
             html.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
@@ -622,7 +633,6 @@
             // 更新主题图标
             const newIcon = themeIconMap[theme];
             if (newIcon) {
-                // 移除所有图标类，添加当前主题图标
                 Object.values(themeIconMap).forEach(icon => themeIcon.classList.remove(icon));
                 themeIcon.classList.add(newIcon);
             }
@@ -637,19 +647,6 @@
             
             // 关闭主题菜单
             toggleThemeMenu(false);
-            
-            // 强制重绘所有元素以确保主题完全应用
-            forceRedraw();
-        }
-        
-        // 强制重绘以确保主题变化生效
-        function forceRedraw() {
-            const body = document.body;
-            const display = body.style.display;
-            body.style.display = 'none';
-            // 触发重绘
-            void body.offsetWidth;
-            body.style.display = display;
         }
         
         // 切换主题菜单显示状态
@@ -663,7 +660,6 @@
                     themeMenu.classList.add('opacity-0', 'scale-95');
                     themeMenu.classList.remove('opacity-100', 'scale-100');
                     themeChevron.classList.remove('rotate-180');
-                    // 延迟隐藏以允许动画完成
                     setTimeout(() => {
                         if (!themeMenu.classList.contains('opacity-100')) {
                             themeMenu.classList.add('hidden');
@@ -671,44 +667,37 @@
                     }, 200);
                 }
             } else {
-                // 切换状态
                 const isHidden = themeMenu.classList.contains('hidden') || themeMenu.classList.contains('opacity-0');
                 toggleThemeMenu(isHidden);
             }
         }
         
-        // 提取网址核心域名的函数
+        // 提取网址核心域名
         function extractDomain(url) {
             try {
-                // 处理没有协议的URL
                 if (!url.startsWith('http://') && !url.startsWith('https://')) {
                     url = 'http://' + url;
                 }
                 
                 const domain = new URL(url).hostname;
                 
-                // 移除www.前缀
                 if (domain.startsWith('www.')) {
                     return domain.slice(4);
                 }
                 
                 return domain;
             } catch (e) {
-                // 处理解析错误，返回原始URL的前半部分
                 return url.split('/')[0];
             }
         }
         
         // 处理圆形按钮点击事件
         function handleCircleClick(event, url) {
-            // 防止事件冒泡影响链接跳转
             event.preventDefault();
             
-            // 切换按钮状态
             const circle = event.currentTarget;
             circle.classList.add('clicked');
             
-            // 短暂延迟后打开链接并恢复按钮状态
             setTimeout(() => {
                 window.open(url, '_blank', 'noopener noreferrer');
                 setTimeout(() => {
@@ -717,7 +706,7 @@
             }, 150);
         }
         
-        // 网站数据
+        // 网站数据 - 保持在顶部，优先加载
         const websiteData = [
             {
                 id: 1,
@@ -1206,7 +1195,7 @@
             renderWebsites(category.websites, false);
         }
         
-        // 渲染网站卡片 - 优化动态效果
+        // 渲染网站卡片
         function renderWebsites(websites, isSearchResult = false) {
             if (websites.length === 0) {
                 websiteGrid.innerHTML = '';
@@ -1335,13 +1324,11 @@
         
         // 初始化主题切换事件
         function setupThemeToggle() {
-            // 主题按钮点击事件
             themeMenuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 toggleThemeMenu();
             });
             
-            // 主题选项点击事件
             doc.querySelectorAll('.theme-option').forEach(option => {
                 option.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -1350,7 +1337,6 @@
                 });
             });
             
-            // 点击菜单外区域关闭下拉菜单
             doc.addEventListener('click', (e) => {
                 if (!themeDropdown.contains(e.target)) {
                     toggleThemeMenu(false);
@@ -1358,16 +1344,20 @@
             });
         }
         
-        // 初始化函数
+        // 初始化函数 - 精简并优化执行顺序
         function init() {
+            // 优先初始化主题和核心数据结构
             initTheme();
             initNavList();
+            
+            // 其次初始化交互功能
             setupNavSearch();
             setupContentSearch();
             setupMenuToggle();
             setupThemeToggle();
         }
         
+        // 优化加载时机
         if (doc.readyState === 'loading') {
             doc.addEventListener('DOMContentLoaded', init);
         } else {
