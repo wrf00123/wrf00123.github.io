@@ -1,0 +1,820 @@
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专业导航系统 - 主页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        // 配置Tailwind自定义主题
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)',
+                        accent: 'var(--accent)'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-thin {
+                scrollbar-width: thin;
+            }
+            .scrollbar-thumb-rounded {
+                scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+            }
+            .card-hover {
+                transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                will-change: transform, box-shadow;
+            }
+            .card-hover:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 25px -5px var(--shadow-color), 0 8px 10px -6px var(--shadow-color);
+            }
+            .theme-transition {
+                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            }
+            .text-transition {
+                transition: color 0.3s ease, transform 0.3s ease;
+            }
+            .glass-effect {
+                background: rgba(var(--glass-rgb), var(--glass-opacity));
+                backdrop-filter: blur(var(--glass-blur));
+                -webkit-backdrop-filter: blur(var(--glass-blur));
+            }
+        }
+    </style>
+    <style>
+        /* 基础变量 */
+        :root {
+            --transition-base: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --border-radius: 0.375rem;
+        }
+        
+        /* 主题样式保持与原文件一致 */
+        [data-theme="tech"] {
+            --bg-main: #0B1120;
+            --bg-card: #1E293B;
+            --border-color: #334155;
+            --text-primary: #E2E8F0;
+            --text-secondary: #94A3B8;
+            --text-tertiary: #64748B;
+            --hover-color: #334155;
+            --primary: #38BDF8;
+            --accent: #A855F7;
+            --shadow-color: rgba(56, 189, 248, 0.2);
+            --card-bg-gradient: linear-gradient(145deg, #1E293B 0%, #1A2439 100%);
+            --bg-texture: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2338bdf8' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        [data-theme="ink"] {
+            --bg-main: #F5F2EB;
+            --bg-card: #EFEAE2;
+            --border-color: #D4CDC0;
+            --text-primary: #23211F;
+            --text-secondary: #5A5652;
+            --text-tertiary: #8A857F;
+            --hover-color: #E2DCD3;
+            --primary: #2D2A26;
+            --accent: #8B6E4F;
+            --shadow-color: rgba(45, 42, 38, 0.1);
+            --card-border-style: 1px solid #D4CDC0;
+            --card-bg-gradient: linear-gradient(180deg, #EFEAE2 0%, #E6DFD5 100%);
+            --bg-texture: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23D4CDC0' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        
+        [data-theme="plant"] {
+            --bg-main: #F0F7EF;
+            --bg-card: #E6F2E5;
+            --border-color: #C8E0C6;
+            --text-primary: #2A5931;
+            --text-secondary: #427D4A;
+            --text-tertiary: #6B9D73;
+            --hover-color: #D9EED8;
+            --primary: #34A853;
+            --accent: #8E6E40;
+            --shadow-color: rgba(52, 168, 83, 0.15);
+            --card-bg-texture: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23C8E0C6' fill-opacity='0.3' fill-rule='evenodd'/%3E%3C/svg%3E");
+            --card-bg-gradient: linear-gradient(180deg, #E6F2E5 0%, #D9EDD8 100%);
+        }
+        
+        [data-theme="simple"] {
+            --bg-main: #FCFCFC;
+            --bg-card: #FFFFFF;
+            --border-color: #E0E0E0;
+            --text-primary: #222222;
+            --text-secondary: #555555;
+            --text-tertiary: #888888;
+            --hover-color: #F5F5F5;
+            --primary: #444444;
+            --accent: #3B82F6;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --border-width: 0.5px;
+            --card-bg-gradient: linear-gradient(180deg, #FFFFFF 0%, #F9F9F9 100%);
+        }
+        
+        [data-theme="light"] {
+            --bg-main: #F8F9FA;
+            --bg-card: #FFFFFF;
+            --border-color: #DEE2E6;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-tertiary: #6C757D;
+            --hover-color: #E9ECEF;
+            --primary: #0D6EFD;
+            --accent: #0D6EFD;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --card-bg-gradient: linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%);
+        }
+        
+        [data-theme="dark"] {
+            --bg-main: #121212;
+            --bg-card: #1E1E1E;
+            --border-color: #343A40;
+            --text-primary: #F8F9FA;
+            --text-secondary: #E9ECEF;
+            --text-tertiary: #CED4DA;
+            --hover-color: #343A40;
+            --primary: #38BDF8;
+            --accent: #38BDF8;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --card-bg-gradient: linear-gradient(180deg, #1E1E1E 0%, #141414 100%);
+        }
+        
+        [data-theme="glass"] {
+            --glass-rgb: 255, 255, 255;
+            --glass-opacity: 0.85;
+            --glass-blur: 16px;
+            --bg-main: linear-gradient(135deg, #f0f9ff 0%, #e6f7ff 50%, #d1ebff 100%);
+            --bg-card: transparent;
+            --border-color: rgba(255, 255, 255, 0.3);
+            --text-primary: #1a365d;
+            --text-secondary: #4a5568;
+            --text-tertiary: #718096;
+            --hover-color: rgba(255, 255, 255, 0.5);
+            --primary: #2563eb;
+            --accent: #3b82f6;
+            --shadow-color: rgba(0, 0, 0, 0.15);
+            --bg-texture: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        /* 导航项样式 */
+        .nav-item {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.375rem;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: background-color;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.125rem;
+            background-color: var(--primary);
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .nav-item:hover::after {
+            width: 100%;
+        }
+        
+        .nav-item-active {
+            background-color: rgba(var(--primary-rgb), 0.15);
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .nav-item-active::after {
+            width: 100%;
+        }
+        
+        .nav-item-inactive {
+            color: var(--text-primary);
+        }
+        
+        .nav-item-inactive:hover {
+            background-color: var(--hover-color);
+        }
+        
+        /* 导航卡片样式 */
+        .nav-card {
+            position: relative;
+            display: block;
+            height: 100%;
+            width: 100%;
+            text-decoration: none;
+        }
+        
+        .nav-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.125rem;
+            background-color: var(--primary);
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .nav-card:hover::after {
+            width: 100%;
+        }
+        
+        /* 分类标签 */
+        .category-tag {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            background-color: rgba(var(--primary-rgb), 0.15);
+            color: var(--primary);
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-card:hover .category-tag {
+            transform: translateX(4px);
+        }
+        
+        /* 圆形链接按钮 */
+        .circle-link {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: background-color, color;
+        }
+        
+        .circle-link:hover {
+            background-color: rgba(var(--primary-rgb), 0.1);
+            transform: scale(1.05);
+        }
+        
+        .circle-link.clicked {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* 同心圆圈图标 */
+        .concentric-circles {
+            position: relative;
+            width: 1rem;
+            height: 1rem;
+        }
+        
+        .concentric-circles::before,
+        .concentric-circles::after {
+            content: '';
+            position: absolute;
+            border-radius: 9999px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .concentric-circles::before {
+            width: 1rem;
+            height: 1rem;
+            border: 0.125rem solid currentColor;
+        }
+        
+        .concentric-circles::after {
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: currentColor;
+            top: 0.25rem;
+            left: 0.25rem;
+        }
+        
+        .circle-link:hover .concentric-circles::before {
+            transform: scale(1.1);
+        }
+        
+        .circle-link.clicked .concentric-circles::after {
+            transform: scale(1.25);
+        }
+        
+        /* 主题切换按钮 */
+        .theme-toggle {
+            transition: transform 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* 卡片内部元素动画 */
+        .nav-card h3 {
+            transition: color 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+        }
+        
+        .nav-card:hover h3 {
+            transform: translateX(2px);
+        }
+        
+        .nav-card p {
+            transition: color 0.3s ease 0.2s;
+        }
+        
+        /* 主题专属样式 */
+        [data-theme="tech"] {
+            background-image: var(--bg-texture);
+        }
+        [data-theme="tech"] .website-card {
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 15px var(--shadow-color);
+            background: var(--card-bg-gradient);
+        }
+        [data-theme="tech"] .nav-item-active {
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+        [data-theme="tech"] .circle-link:hover {
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+        }
+        
+        [data-theme="ink"] {
+            background-image: var(--bg-texture);
+        }
+        [data-theme="ink"] .website-card {
+            border: var(--card-border-style);
+            border-radius: 0.25rem;
+            background: var(--card-bg-gradient);
+        }
+        [data-theme="ink"] .category-tag {
+            background-color: rgba(139, 110, 79, 0.1);
+            color: var(--accent);
+        }
+        [data-theme="ink"] header,
+        [data-theme="ink"] aside {
+            background-color: var(--bg-card);
+            border-color: var(--border-color);
+        }
+        [data-theme="ink"] .nav-item-active {
+            background-color: rgba(45, 42, 38, 0.1);
+        }
+        [data-theme="ink"] #navSearch,
+        [data-theme="ink"] #contentSearch {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+        }
+        
+        [data-theme="plant"] {
+            background-image: var(--card-bg-texture);
+        }
+        [data-theme="plant"] .website-card {
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg-gradient);
+        }
+        [data-theme="plant"] .circle-link {
+            border: 1px solid var(--border-color);
+        }
+        [data-theme="plant"] header,
+        [data-theme="plant"] aside {
+            background-color: var(--bg-card);
+            border-color: var(--border-color);
+        }
+        [data-theme="plant"] .nav-item-active {
+            background-color: rgba(52, 168, 83, 0.1);
+        }
+        [data-theme="plant"] #navSearch,
+        [data-theme="plant"] #contentSearch {
+            background-color: var(--bg-main);
+            border: 1px solid var(--border-color);
+        }
+        
+        [data-theme="simple"] .website-card,
+        [data-theme="simple"] header,
+        [data-theme="simple"] aside {
+            border-width: var(--border-width);
+            box-shadow: var(--shadow-base);
+            background: var(--card-bg-gradient);
+        }
+        [data-theme="simple"] .nav-item::after {
+            height: 0.05rem;
+        }
+        [data-theme="simple"] .circle-link {
+            width: 1.8rem;
+            height: 1.8rem;
+        }
+        
+        [data-theme="glass"] {
+            background-image: var(--bg-texture);
+            background-attachment: fixed;
+        }
+        [data-theme="glass"] body {
+            background: var(--bg-main);
+            background-attachment: fixed;
+        }
+        [data-theme="glass"] header,
+        [data-theme="glass"] aside,
+        [data-theme="glass"] .website-card,
+        [data-theme="glass"] #navSearch,
+        [data-theme="glass"] #contentSearch,
+        [data-theme="glass"] .theme-menu {
+            @apply glass-effect;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+        }
+        [data-theme="glass"] .website-card {
+            border-radius: 1rem;
+            transition: all 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        [data-theme="glass"] .website-card:hover {
+            box-shadow: 0 12px 40px var(--shadow-color);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        [data-theme="glass"] #navSearch,
+        [data-theme="glass"] #contentSearch {
+            background: rgba(255, 255, 255, 0.6);
+        }
+        [data-theme="glass"] .nav-item-active {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        [data-theme="glass"] .circle-link {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+        [data-theme="glass"] .circle-link:hover {
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        /* 下拉菜单样式 */
+        .theme-menu {
+            background-color: var(--bg-card);
+            border-color: var(--border-color);
+            box-shadow: 0 10px 15px -3px var(--shadow-color);
+        }
+        .theme-option:hover {
+            background-color: var(--hover-color);
+            color: var(--primary);
+        }
+        
+        /* 主页特有样式 */
+        .welcome-section {
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        
+        .welcome-section h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .welcome-section p {
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body class="bg-main text-textPrimary font-sans overflow-hidden h-screen flex flex-col theme-transition" style="background-color: var(--bg-main); color: var(--text-primary);">
+    <!-- 顶部导航栏 -->
+    <header class="bg-card border-b border-borderColor py-3 px-4 md:px-6 flex items-center justify-between z-10 transition-all duration-200 theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+        <div class="flex items-center space-x-3">
+            <button id="menuToggle" class="md:hidden text-textPrimary p-2 rounded-md hover:bg-hover transition-colors duration-200 theme-transition" style="color: var(--text-primary); background-color: var(--hover-color);">
+                <i class="fa fa-bars text-lg"></i>
+            </button>
+            <div class="flex items-center">
+                <i class="fa fa-compass text-primary text-2xl mr-2"></i>
+                <h1 class="text-xl font-semibold">专业导航系统</h1>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <!-- 主题切换下拉菜单 -->
+            <div class="relative" id="themeDropdown">
+                <button id="themeMenuBtn" class="flex items-center space-x-1 text-textPrimary hover:text-primary transition-colors duration-200 theme-transition">
+                    <i id="themeIcon" class="fa fa-sun-o text-lg"></i>
+                    <span class="hidden sm:inline">主题</span>
+                    <i class="fa fa-chevron-down text-xs transition-transform duration-200" id="themeChevron"></i>
+                </button>
+                <!-- 主题选项菜单 -->
+                <div id="themeMenu" class="absolute right-0 mt-2 w-48 bg-card border border-borderColor rounded-md shadow-lg py-1 hidden z-50 theme-transition theme-menu transform origin-top-right transition-all duration-200 opacity-0 scale-95">
+                    <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="tech">
+                        <i class="fa fa-microchip w-5 mr-2"></i>科技风格
+                    </button>
+                    <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="ink">
+                        <i class="fa fa-paint-brush w-5 mr-2"></i>水墨风格
+                    </button>
+                    <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="plant">
+                        <i class="fa fa-leaf w-5 mr-2"></i>绿植风格
+                    </button>
+                    <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="simple">
+                        <i class="fa fa-square-o w-5 mr-2"></i>简约风格
+                    </button>
+                    <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="glass">
+                        <i class="fa fa-window-maximize w-5 mr-2"></i>毛玻璃风格
+                    </button>
+                    <div class="border-t border-borderColor my-1 theme-transition" style="border-color: var(--border-color);"></div>
+                    <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="light">
+                        <i class="fa fa-sun-o w-5 mr-2"></i>浅色模式
+                    </button>
+                    <button class="theme-option w-full text-left px-4 py-2 text-sm hover:bg-hover transition-colors" data-theme="dark">
+                        <i class="fa fa-moon-o w-5 mr-2"></i>深色模式
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧导航栏 -->
+        <aside id="sidebar" class="w-64 bg-card border-r border-borderColor flex-shrink-0 hidden md:block transition-all duration-300 ease-in-out overflow-hidden theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <!-- 搜索框 -->
+            <div class="p-4 border-b border-borderColor theme-transition" style="border-color: var(--border-color);">
+                <div class="relative group">
+                    <input type="text" id="navSearch" placeholder="搜索导航分类..." class="w-full pl-10 pr-4 py-2 rounded-md bg-main focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all duration-200 group-hover:ring-1 group-hover:ring-primary/20 theme-transition" style="background-color: var(--bg-main);">
+                    <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textSecondary transition-colors duration-200 group-hover:text:text-primary theme-transition" style="color: var(--text-secondary);"></i>
+                </div>
+            </div>
+
+            <!-- 导航列表 -->
+            <nav class="overflow-y-auto scrollbar-thin scrollbar-thumb-rounded h-[calc(100%-64px)]">
+                <ul id="navList" class="p-2">
+                    <li>
+                        <a href="index.html" class="nav-item nav-item-active flex items-center">
+                            <i class="fa fa-home w-5 mr-3"></i>
+                            <span>主页</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="standard.html" class="nav-item nav-item-inactive flex items-center">
+                            <i class="fa fa-search w-5 mr-3"></i>
+                            <span>国家/全球标准</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="industry.html" class="nav-item nav-item-inactive flex items-center">
+                            <i class="fa fa-search w-5 mr-3"></i>
+                            <span>行业标准查询</span>
+                        </a>
+                    </li>
+                    <!-- 可以根据需要添加更多导航项 -->
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-hidden flex flex-col bg-main theme-transition" style="background-color: var(--bg-main);">
+            <!-- 内容区搜索框 -->
+            <div class="p-4 border-b border-borderColor bg-card theme-transition" style="border-color: var(--border-color); background-color: var(--bg-card);">
+                <div class="relative max-w-2xl group">
+                    <input type="text" id="contentSearch" placeholder="搜索所有导航..." class="w-full pl-10 pr-4 py-2 rounded-md bg-main focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all duration-200 group-hover:ring-1 group-hover:ring-primary/20 theme-transition" style="background-color: var(--bg-main);">
+                    <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textSecondary transition-colors duration-200 group-hover:text-primary theme-transition" style="color: var(--text-secondary);"></i>
+                </div>
+            </div>
+
+            <!-- 内容显示区 -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin scrollbar-thumb-rounded">
+                <!-- 欢迎区域 -->
+                <div class="welcome-section mb-8">
+                    <h2>欢迎使用专业导航系统</h2>
+                    <p>
+                        这是一个专业的标准与行业资源导航平台，汇集了各类国家标准、行业标准及相关资源网站。
+                        通过左侧导航或下方卡片，您可以快速访问不同类别的专业资源。
+                        您还可以使用页面上方的搜索功能，快速找到所需的标准或资源。
+                    </p>
+                </div>
+
+                <div id="contentTitle" class="text-xl font-semibold mb-4 text-textPrimary theme-transition" style="color: var(--text-primary);">
+                    导航分类
+                </div>
+
+                <!-- 导航分类卡片 -->
+                <div id="navGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
+                    <!-- 国家/全球标准导航卡片 -->
+                    <div class="website-card bg-card border border-borderColor rounded-lg p-5 card-hover theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                        <a href="standard.html" class="nav-card h-full flex flex-col">
+                            <span class="category-tag">标准查询</span>
+                            <h3 class="text-lg font-medium mb-2 text-textPrimary theme-transition" style="color: var(--text-primary);">国家/全球标准</h3>
+                            <p class="text-textSecondary text-sm mb-4 flex-grow theme-transition" style="color: var(--text-secondary);">
+                                包含全国认证认可信息公共服务平台、国家标准全文公开系统等国家及国际标准查询资源。
+                            </p>
+                            <div class="flex items-center text-primary">
+                                <span>查看详情</span>
+                                <i class="fa fa-arrow-right ml-2 text-sm transition-transform duration-200 group-hover:translate-x-1"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- 行业标准查询导航卡片 -->
+                    <div class="website-card bg-card border border-borderColor rounded-lg p-5 card-hover theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                        <a href="industry.html" class="nav-card h-full flex flex-col">
+                            <span class="category-tag">行业资源</span>
+                            <h3 class="text-lg font-medium mb-2 text-textPrimary theme-transition" style="color: var(--text-primary);">行业标准查询</h3>
+                            <p class="text-textSecondary text-sm mb-4 flex-grow theme-transition" style="color: var(--text-secondary);">
+                                包含行业标准信息服务平台、各行业主管部门发布的行业标准查询资源。
+                            </p>
+                            <div class="flex items-center text-primary">
+                                <span>查看详情</span>
+                                <i class="fa fa-arrow-right ml-2 text-sm transition-transform duration-200 group-hover:translate-x-1"></i>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- 可以根据需要添加更多导航分类卡片 -->
+                </div>
+
+                <div id="noResults" class="hidden flex flex-col items-center justify-center h-64 text-textSecondary theme-transition" style="color: var(--text-secondary);">
+                    <i class="fa fa-search text-4xl mb-3 opacity-30"></i>
+                    <p>未找到相关导航</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 预定义关键DOM元素引用
+        const doc = document;
+        const html = document.documentElement;
+        const navList = doc.getElementById('navList');
+        const navGrid = doc.getElementById('navGrid');
+        const contentTitle = doc.getElementById('contentTitle');
+        const navSearch = doc.getElementById('navSearch');
+        const contentSearch = doc.getElementById('contentSearch');
+        const noResults = doc.getElementById('noResults');
+        const menuToggle = doc.getElementById('menuToggle');
+        const sidebar = doc.getElementById('sidebar');
+        const themeMenuBtn = doc.getElementById('themeMenuBtn');
+        const themeMenu = doc.getElementById('themeMenu');
+        const themeIcon = doc.getElementById('themeIcon');
+        const themeChevron = doc.getElementById('themeChevron');
+        const themeDropdown = doc.getElementById('themeDropdown');
+        
+        // 主题图标映射
+        const themeIconMap = {
+            tech: 'fa-microchip',
+            ink: 'fa-paint-brush',
+            plant: 'fa-leaf',
+            simple: 'fa-square-o',
+            light: 'fa-sun-o',
+            dark: 'fa-moon-o',
+            glass: 'fa-window-maximize'
+        };
+        
+        // 初始化主题
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const initialTheme = savedTheme || 'light';
+            setTheme(initialTheme);
+        }
+        
+        // 设置主题
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            // 更新主题图标
+            const newIcon = themeIconMap[theme];
+            if (newIcon) {
+                Object.values(themeIconMap).forEach(icon => themeIcon.classList.remove(icon));
+                themeIcon.classList.add(newIcon);
+            }
+            
+            // 高亮当前选中的主题选项
+            doc.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('bg-hover');
+                if (option.dataset.theme === theme) {
+                    option.classList.add('bg-hover');
+                }
+            });
+            
+            // 关闭主题菜单
+            toggleThemeMenu(false);
+        }
+        
+        // 切换主题菜单显示状态
+        function toggleThemeMenu(show) {
+            if (typeof show === 'boolean') {
+                if (show) {
+                    themeMenu.classList.remove('hidden', 'opacity-0', 'scale-95');
+                    themeMenu.classList.add('opacity-100', 'scale-100');
+                    themeChevron.classList.add('rotate-180');
+                } else {
+                    themeMenu.classList.add('opacity-0', 'scale-95');
+                    themeMenu.classList.remove('opacity-100', 'scale-100');
+                    themeChevron.classList.remove('rotate-180');
+                    setTimeout(() => {
+                        if (!themeMenu.classList.contains('opacity-100')) {
+                            themeMenu.classList.add('hidden');
+                        }
+                    }, 200);
+                }
+            } else {
+                const isHidden = themeMenu.classList.contains('hidden') || themeMenu.classList.contains('opacity-0');
+                toggleThemeMenu(isHidden);
+            }
+        }
+        
+        // 移动端菜单切换
+        function toggleSidebar() {
+            sidebar.classList.toggle('hidden');
+        }
+        
+        // 搜索功能
+        function initSearch() {
+            // 导航搜索
+            navSearch.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const navItems = doc.querySelectorAll('#navList .nav-item');
+                
+                navItems.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+            
+            // 内容搜索
+            contentSearch.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const navCards = doc.querySelectorAll('.nav-card');
+                let hasResults = false;
+                
+                navCards.forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        card.closest('.website-card').style.display = '';
+                        hasResults = true;
+                    } else {
+                        card.closest('.website-card').style.display = 'none';
+                    }
+                });
+                
+                // 显示或隐藏无结果提示
+                noResults.classList.toggle('hidden', hasResults);
+                navGrid.classList.toggle('hidden', !hasResults);
+            });
+        }
+        
+        // 初始化事件监听
+        function initEventListeners() {
+            // 主题菜单切换
+            themeMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleThemeMenu();
+            });
+            
+            // 点击其他区域关闭主题菜单
+            doc.addEventListener('click', (e) => {
+                if (!themeDropdown.contains(e.target)) {
+                    toggleThemeMenu(false);
+                }
+            });
+            
+            // 主题选择
+            doc.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    setTheme(option.dataset.theme);
+                });
+            });
+            
+            // 移动端菜单切换
+            menuToggle.addEventListener('click', toggleSidebar);
+            
+            // 初始化搜索功能
+            initSearch();
+        }
+        
+        // 页面初始化
+        function init() {
+            initTheme();
+            initEventListeners();
+        }
+        
+        // 页面加载完成后初始化
+        doc.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
