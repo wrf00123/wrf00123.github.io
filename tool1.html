@@ -622,7 +622,7 @@
         // 初始化主题
         function initTheme() {
             const savedTheme = localStorage.getItem('theme');
-            const initialTheme = savedTheme || 'light';
+            const initialTheme = savedTheme || 'light'; // 默认主题已设置为浅色模式
             setTheme(initialTheme);
         }
         
@@ -1442,6 +1442,7 @@
                     { name: "影视", url: "https://yinghezhinan.com/sites/zaixian/", desc: "影视" }
                 ]
             }
+         
         ];
         
         // 初始化导航列表
