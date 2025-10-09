@@ -1,0 +1,663 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>资源下载中心</title>
+  <!-- 引入外部资源 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- Tailwind 配置 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#165DFF',
+            secondary: '#36CFC9',
+            dark: '#1D2129',
+            light: '#F2F3F5',
+            success: '#52C41A',
+            warning: '#FAAD14',
+            danger: '#FF4D4F',
+          },
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .text-shadow {
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .card-hover {
+        @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+      }
+      .btn-primary {
+        @apply bg-primary text-white px-4 py-2 rounded-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-md active:scale-95;
+      }
+      .btn-outline {
+        @apply border border-primary text-primary px-4 py-2 rounded-lg transition-all duration-300 hover:bg-primary/10 active:scale-95;
+      }
+      .page-active {
+        @apply bg-primary text-white;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-inter bg-gray-50 text-dark">
+  <!-- 导航栏 -->
+  <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300 bg-white/95 backdrop-blur-sm shadow-sm">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <a href="#" class="flex items-center space-x-2">
+            <i class="fa fa-cloud-download text-primary text-2xl"></i>
+            <span class="text-xl font-bold text-primary">资源下载中心</span>
+          </a>
+        </div>
+        
+        <!-- 搜索框 - 中等屏幕以上显示 -->
+        <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+          <div class="relative w-full">
+            <input 
+              type="text" 
+              id="search-input"
+              placeholder="搜索文件名称或关键词..." 
+              class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+            >
+            <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </div>
+        
+        <!-- 导航链接 -->
+        <div class="flex items-center space-x-4">
+          <button class="md:hidden btn-outline" id="mobile-search-btn">
+            <i class="fa fa-search mr-1"></i> 搜索
+          </button>
+          <button class="sm:hidden text-gray-600 hover:text-primary transition-colors">
+            <i class="fa fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 移动端搜索框 -->
+    <div id="mobile-search" class="md:hidden hidden px-4 pb-4">
+      <div class="relative w-full">
+        <input 
+          type="text" 
+          placeholder="搜索文件名称或关键词..." 
+          class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+        >
+        <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- 英雄区域 -->
+  <section class="pt-28 pb-16 bg-gradient-to-br from-primary/5 to-secondary/5">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mx-auto text-center">
+        <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark mb-4 leading-tight text-shadow">
+          发现并下载所需资源
+        </h1>
+        <p class="text-gray-600 text-lg mb-8">
+          提供各类优质资源文件，一键下载，满足您的工作与学习需求
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="#files" class="btn-primary">
+            <i class="fa fa-file-text-o mr-2"></i>浏览所有文件
+          </a>
+          <a href="#" class="btn-outline">
+            <i class="fa fa-info-circle mr-2"></i>了解更多
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 主内容区 -->
+  <main id="files" class="py-12">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- 分类筛选 -->
+      <div class="mb-10">
+        <h2 class="text-2xl font-bold mb-6">文件分类</h2>
+        <div class="flex flex-wrap gap-3">
+          <button class="category-btn bg-primary text-white px-4 py-2 rounded-full text-sm" data-category="all">
+            全部文件
+          </button>
+          <button class="category-btn bg-white border border-gray-200 px-4 py-2 rounded-full text-sm hover:border-primary hover:text-primary transition-colors" data-category="pdf">
+            <i class="fa fa-file-pdf-o mr-1"></i>PDF文档
+          </button>
+          <button class="category-btn bg-white border border-gray-200 px-4 py-2 rounded-full text-sm hover:border-primary hover:text-primary transition-colors" data-category="doc">
+            <i class="fa fa-file-word-o mr-1"></i>Word文档
+          </button>
+          <button class="category-btn bg-white border border-gray-200 px-4 py-2 rounded-full text-sm hover:border-primary hover:text-primary transition-colors" data-category="xls">
+            <i class="fa fa-file-excel-o mr-1"></i>Excel表格
+          </button>
+          <button class="category-btn bg-white border border-gray-200 px-4 py-2 rounded-full text-sm hover:border-primary hover:text-primary transition-colors" data-category="ppt">
+            <i class="fa fa-file-powerpoint-o mr-1"></i>PPT演示
+          </button>
+          <button class="category-btn bg-white border border-gray-200 px-4 py-2 rounded-full text-sm hover:border-primary hover:text-primary transition-colors" data-category="zip">
+            <i class="fa fa-file-zip-o mr-1"></i>压缩包
+          </button>
+          <button class="category-btn bg-white border border-gray-200 px-4 py-2 rounded-full text-sm hover:border-primary hover:text-primary transition-colors" data-category="image">
+            <i class="fa fa-image mr-1"></i>图片资源
+          </button>
+        </div>
+      </div>
+      
+      <!-- 文件列表 -->
+      <div class="mb-8">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">最新文件</h2>
+        </div>
+        
+        <!-- 空页面提示 -->
+        <div id="empty-state" class="hidden py-20 text-center">
+          <div class="w-24 h-24 mx-auto mb-6 text-gray-300">
+            <i class="fa fa-folder-open-o text-6xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">当前页面没有文件</h3>
+          <p class="text-gray-500">本月该分类下暂无文件，请尝试其他分类或页码</p>
+        </div>
+        
+        <!-- 文件网格 - 设计为每页30个卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6" id="file-grid">
+          <!-- 文件卡片 1 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover" data-category="pdf">
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-lg bg-danger/10 flex items-center justify-center text-danger">
+                  <i class="fa fa-file-pdf-o text-2xl"></i>
+                </div>
+                <span class="text-xs bg-danger/10 text-danger px-2 py-1 rounded-full">PDF</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2 line-clamp-1">产品设计规范文档.pdf</h3>
+              <p class="text-gray-500 text-sm mb-4 line-clamp-2">详细的产品设计规范，包含UI组件、交互模式和设计原则。</p>
+              <div class="flex justify-between items-center text-xs text-gray-400 mb-4">
+                <span><i class="fa fa-calendar-o mr-1"></i>2023-06-15</span>
+                <span><i class="fa fa-download mr-1"></i>1.2k</span>
+                <span><i class="fa fa-file-o mr-1"></i>2.4MB</span>
+              </div>
+              <a href="#" class="btn-primary w-full flex items-center justify-center">
+                <i class="fa fa-download mr-2"></i>立即下载
+              </a>
+            </div>
+          </div>
+          
+          <!-- 文件卡片 2 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover" data-category="doc">
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                  <i class="fa fa-file-word-o text-2xl"></i>
+                </div>
+                <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">DOC</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2 line-clamp-1">项目计划书模板.docx</h3>
+              <p class="text-gray-500 text-sm mb-4 line-clamp-2">通用项目计划书模板，包含完整的章节结构和内容示例。</p>
+              <div class="flex justify-between items-center text-xs text-gray-400 mb-4">
+                <span><i class="fa fa-calendar-o mr-1"></i>2023-06-10</span>
+                <span><i class="fa fa-download mr-1"></i>3.5k</span>
+                <span><i class="fa fa-file-o mr-1"></i>845KB</span>
+              </div>
+              <a href="#" class="btn-primary w-full flex items-center justify-center">
+                <i class="fa fa-download mr-2"></i>立即下载
+              </a>
+            </div>
+          </div>
+          
+          <!-- 文件卡片 3 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover" data-category="xls">
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-lg bg-success/10 flex items-center justify-center text-success">
+                  <i class="fa fa-file-excel-o text-2xl"></i>
+                </div>
+                <span class="text-xs bg-success/10 text-success px-2 py-1 rounded-full">XLS</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2 line-clamp-1">财务报表分析模板.xlsx</h3>
+              <p class="text-gray-500 text-sm mb-4 line-clamp-2">专业的财务报表分析模板，包含数据可视化和自动计算功能。</p>
+              <div class="flex justify-between items-center text-xs text-gray-400 mb-4">
+                <span><i class="fa fa-calendar-o mr-1"></i>2023-06-05</span>
+                <span><i class="fa fa-download mr-1"></i>2.1k</span>
+                <span><i class="fa fa-file-o mr-1"></i>1.2MB</span>
+              </div>
+              <a href="#" class="btn-primary w-full flex items-center justify-center">
+                <i class="fa fa-download mr-2"></i>立即下载
+              </a>
+            </div>
+          </div>
+          
+          <!-- 文件卡片 4 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover" data-category="ppt">
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-lg bg-warning/10 flex items-center justify-center text-warning">
+                  <i class="fa fa-file-powerpoint-o text-2xl"></i>
+                </div>
+                <span class="text-xs bg-warning/10 text-warning px-2 py-1 rounded-full">PPT</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2 line-clamp-1">市场分析报告演示.pptx</h3>
+              <p class="text-gray-500 text-sm mb-4 line-clamp-2">市场分析报告演示模板，包含精美的图表和版式设计。</p>
+              <div class="flex justify-between items-center text-xs text-gray-400 mb-4">
+                <span><i class="fa fa-calendar-o mr-1"></i>2023-05-28</span>
+                <span><i class="fa fa-download mr-1"></i>1.8k</span>
+                <span><i class="fa fa-file-o mr-1"></i>5.6MB</span>
+              </div>
+              <a href="#" class="btn-primary w-full flex items-center justify-center">
+                <i class="fa fa-download mr-2"></i>立即下载
+              </a>
+            </div>
+          </div>
+          
+          <!-- 文件卡片 5 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover" data-category="zip">
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600">
+                  <i class="fa fa-file-zip-o text-2xl"></i>
+                </div>
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">ZIP</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2 line-clamp-1">UI设计素材包.zip</h3>
+              <p class="text-gray-500 text-sm mb-4 line-clamp-2">高品质UI设计素材包，包含图标、背景和组件设计源文件。</p>
+              <div class="flex justify-between items-center text-xs text-gray-400 mb-4">
+                <span><i class="fa fa-calendar-o mr-1"></i>2023-05-20</span>
+                <span><i class="fa fa-download mr-1"></i>4.3k</span>
+                <span><i class="fa fa-file-o mr-1"></i>28MB</span>
+              </div>
+              <a href="#" class="btn-primary w-full flex items-center justify-center">
+                <i class="fa fa-download mr-2"></i>立即下载
+              </a>
+            </div>
+          </div>
+          
+          <!-- 文件卡片 6 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover" data-category="image">
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+                  <i class="fa fa-image text-2xl"></i>
+                </div>
+                <span class="text-xs bg-secondary/10 text-secondary px-2 py-1 rounded-full">PNG</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2 line-clamp-1">品牌LOGO设计集.png</h3>
+              <p class="text-gray-500 text-sm mb-4 line-clamp-2">品牌LOGO设计集合，包含多种格式和应用场景的版本。</p>
+              <div class="flex justify-between items-center text-xs text-gray-400 mb-4">
+                <span><i class="fa fa-calendar-o mr-1"></i>2023-05-15</span>
+                <span><i class="fa fa-download mr-1"></i>2.7k</span>
+                <span><i class="fa fa-file-o mr-1"></i>4.2MB</span>
+              </div>
+              <a href="#" class="btn-primary w-full flex items-center justify-center">
+                <i class="fa fa-download mr-2"></i>立即下载
+              </a>
+            </div>
+          </div>
+          
+          <!-- 文件卡片 7 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover" data-category="pdf">
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-lg bg-danger/10 flex items-center justify-center text-danger">
+                  <i class="fa fa-file-pdf-o text-2xl"></i>
+                </div>
+                <span class="text-xs bg-danger/10 text-danger px-2 py-1 rounded-full">PDF</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2 line-clamp-1">用户研究报告.pdf</h3>
+              <p class="text-gray-500 text-sm mb-4 line-clamp-2">详细的用户研究报告，包含用户画像、使用场景和需求分析。</p>
+              <div class="flex justify-between items-center text-xs text-gray-400 mb-4">
+                <span><i class="fa fa-calendar-o mr-1"></i>2023-05-10</span>
+                <span><i class="fa fa-download mr-1"></i>1.5k</span>
+                <span><i class="fa fa-file-o mr-1"></i>3.7MB</span>
+              </div>
+              <a href="#" class="btn-primary w-full flex items-center justify-center">
+                <i class="fa fa-download mr-2"></i>立即下载
+              </a>
+            </div>
+          </div>
+          
+          <!-- 文件卡片 8 -->
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover" data-category="doc">
+            <div class="p-5">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                  <i class="fa fa-file-word-o text-2xl"></i>
+                </div>
+                <span class="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">DOC</span>
+              </div>
+              <h3 class="font-semibold text-lg mb-2 line-clamp-1">员工手册模板.docx</h3>
+              <p class="text-gray-500 text-sm mb-4 line-clamp-2">企业员工手册完整模板，包含公司制度、福利和行为规范。</p>
+              <div class="flex justify-between items-center text-xs text-gray-400 mb-4">
+                <span><i class="fa fa-calendar-o mr-1"></i>2023-05-05</span>
+                <span><i class="fa fa-download mr-1"></i>3.1k</span>
+                <span><i class="fa fa-file-o mr-1"></i>980KB</span>
+              </div>
+              <a href="#" class="btn-primary w-full flex items-center justify-center">
+                <i class="fa fa-download mr-2"></i>立即下载
+              </a>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 分页控制 - 增加自定义页码输入 -->
+        <div class="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+          <button id="prev-page" class="btn-outline" disabled>
+            <i class="fa fa-chevron-left mr-1"></i>上一页
+          </button>
+          
+          <div class="flex mx-2">
+            <button class="page-btn w-10 h-10 rounded-full flex items-center justify-center mx-1 border border-gray-200 page-active" data-page="1">1</button>
+            <button class="page-btn w-10 h-10 rounded-full flex items-center justify-center mx-1 border border-gray-200" data-page="2">2</button>
+            <button class="page-btn w-10 h-10 rounded-full flex items-center justify-center mx-1 border border-gray-200" data-page="3">3</button>
+            <span class="w-10 h-10 flex items-center justify-center mx-1">...</span>
+            <button class="page-btn w-10 h-10 rounded-full flex items-center justify-center mx-1 border border-gray-200" data-page="10">10</button>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <span>跳至</span>
+            <input type="number" id="custom-page" min="1" max="10" value="1" 
+                  class="w-16 h-10 border border-gray-200 rounded-lg text-center focus:outline-none focus:ring-1 focus:ring-primary">
+            <span>页</span>
+            <button id="go-to-page" class="btn-primary px-3 py-1 h-10">确定</button>
+          </div>
+          
+          <button id="next-page" class="btn-outline">
+            下一页<i class="fa fa-chevron-right ml-1"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 下载统计 -->
+  <section class="py-16 bg-primary/5">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold mb-4">资源统计</h2>
+        <p class="text-gray-600 max-w-2xl mx-auto">我们提供丰富多样的资源文件，满足您不同场景的需求</p>
+      </div>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl p-6 text-center shadow-sm">
+          <div class="text-primary text-4xl font-bold mb-2" id="file-count">1,254</div>
+          <p class="text-gray-600">总文件数</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 text-center shadow-sm">
+          <div class="text-primary text-4xl font-bold mb-2" id="download-count">87,342</div>
+          <p class="text-gray-600">总下载量</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 text-center shadow-sm">
+          <div class="text-primary text-4xl font-bold mb-2" id="category-count">12</div>
+          <p class="text-gray-600">文件分类</p>
+        </div>
+        <div class="bg-white rounded-xl p-6 text-center shadow-sm">
+          <div class="text-primary text-4xl font-bold mb-2" id="user-count">15,892</div>
+          <p class="text-gray-600">活跃用户</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 页脚 -->
+  <footer class="bg-dark text-white pt-16 pb-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        <div>
+          <div class="flex items-center space-x-2 mb-6">
+            <i class="fa fa-cloud-download text-primary text-2xl"></i>
+            <span class="text-xl font-bold text-white">资源下载中心</span>
+          </div>
+          <p class="text-gray-400 mb-6">提供各类优质资源文件，一键下载，满足您的工作与学习需求。</p>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">快速链接</h3>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">首页</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">全部资源</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">最新上传</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">热门下载</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="text-lg font-semibold mb-6">文件分类</h3>
+          <ul class="space-y-3">
+            <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">文档资料</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">设计素材</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">模板文件</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">图片资源</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-primary transition-colors">视频教程</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 pt-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <p class="text-gray-500 text-sm mb-4 md:mb-0">© 2023 资源下载中心 版权所有</p>
+          <div class="flex space-x-6">
+            <a href="#" class="text-gray-500 text-sm hover:text-primary transition-colors">隐私政策</a>
+            <a href="#" class="text-gray-500 text-sm hover:text-primary transition-colors">使用条款</a>
+            <a href="#" class="text-gray-500 text-sm hover:text-primary transition-colors">帮助中心</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // 导航栏滚动效果
+    window.addEventListener('scroll', function() {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('shadow-md');
+        navbar.classList.remove('shadow-sm');
+      } else {
+        navbar.classList.remove('shadow-md');
+        navbar.classList.add('shadow-sm');
+      }
+    });
+    
+    // 移动端搜索框切换
+    document.getElementById('mobile-search-btn').addEventListener('click', function() {
+      const mobileSearch = document.getElementById('mobile-search');
+      mobileSearch.classList.toggle('hidden');
+    });
+    
+    // 分类筛选功能实现
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    const fileItems = document.querySelectorAll('#file-grid > div');
+    const fileGrid = document.getElementById('file-grid');
+    const emptyState = document.getElementById('empty-state');
+    
+    categoryBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        // 更新按钮样式
+        categoryBtns.forEach(b => {
+          b.classList.remove('bg-primary', 'text-white');
+          b.classList.add('bg-white', 'border', 'border-gray-200', 'hover:border-primary', 'hover:text-primary');
+        });
+        
+        this.classList.remove('bg-white', 'border', 'border-gray-200', 'hover:border-primary', 'hover:text-primary');
+        this.classList.add('bg-primary', 'text-white');
+        
+        // 筛选文件
+        const category = this.getAttribute('data-category');
+        filterFiles(category, currentPage);
+      });
+    });
+    
+    // 分页功能实现
+    let currentPage = 1;
+    const totalPages = 10; // 总页数
+    const itemsPerPage = 30; // 每页30个文件
+    const pageBtns = document.querySelectorAll('.page-btn');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const customPageInput = document.getElementById('custom-page');
+    const goToPageBtn = document.getElementById('go-to-page');
+    let currentCategory = 'all'; // 当前分类
+    
+    // 筛选文件并分页显示
+    function filterFiles(category, page) {
+      currentCategory = category;
+      currentPage = page;
+      
+      let visibleCount = 0;
+      let startIndex = (page - 1) * itemsPerPage;
+      let endIndex = page * itemsPerPage;
+      
+      fileItems.forEach((item, index) => {
+        const itemCategory = item.getAttribute('data-category');
+        const isInCategory = category === 'all' || itemCategory === category;
+        const isInPageRange = index >= startIndex && index < endIndex;
+        
+        if (isInCategory && isInPageRange) {
+          item.style.display = 'block';
+          visibleCount++;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+      
+      // 显示/隐藏空状态提示
+      if (visibleCount === 0) {
+        fileGrid.style.display = 'none';
+        emptyState.classList.remove('hidden');
+      } else {
+        fileGrid.style.display = 'grid';
+        emptyState.classList.add('hidden');
+      }
+      
+      updatePagination();
+    }
+    
+    // 更新分页状态
+    function updatePagination() {
+      // 更新页码按钮状态
+      pageBtns.forEach(btn => {
+        const page = parseInt(btn.getAttribute('data-page'));
+        if (page === currentPage) {
+          btn.classList.add('page-active');
+        } else {
+          btn.classList.remove('page-active');
+        }
+      });
+      
+      // 更新自定义页码输入框
+      customPageInput.value = currentPage;
+      
+      // 更新上一页/下一页按钮状态
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === totalPages;
+    }
+    
+    // 页码按钮点击事件
+    pageBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const page = parseInt(this.getAttribute('data-page'));
+        filterFiles(currentCategory, page);
+      });
+    });
+    
+    // 上一页按钮点击事件
+    prevBtn.addEventListener('click', function() {
+      if (currentPage > 1) {
+        filterFiles(currentCategory, currentPage - 1);
+      }
+    });
+    
+    // 下一页按钮点击事件
+    nextBtn.addEventListener('click', function() {
+      if (currentPage < totalPages) {
+        filterFiles(currentCategory, currentPage + 1);
+      }
+    });
+    
+    // 自定义页码跳转
+    goToPageBtn.addEventListener('click', function() {
+      let page = parseInt(customPageInput.value);
+      
+      // 验证页码有效性
+      if (isNaN(page) || page < 1 || page > totalPages) {
+        alert('请输入有效的页码');
+        customPageInput.value = currentPage;
+        return;
+      }
+      
+      filterFiles(currentCategory, page);
+    });
+    
+    // 回车键触发自定义页码跳转
+    customPageInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        goToPageBtn.click();
+      }
+    });
+    
+    // 数字增长动画
+    function animateValue(id, start, end, duration) {
+      const obj = document.getElementById(id);
+      if (!obj) return;
+      
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        
+        // 格式化数字，添加千位分隔符
+        obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+        
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+    
+    // 监听元素是否进入视口
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // 开始动画
+          animateValue('file-count', 0, 1254, 2000);
+          animateValue('download-count', 0, 87342, 2000);
+          animateValue('category-count', 0, 12, 2000);
+          animateValue('user-count', 0, 15892, 2000);
+          
+          // 只观察一次
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    // 观察统计区域
+    const statsSection = document.getElementById('file-count').closest('section');
+    observer.observe(statsSection);
+    
+    // 搜索功能
+    document.getElementById('search-input').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      // 这里可以添加实际的搜索逻辑
+      console.log('搜索:', searchTerm);
+    });
+    
+    // 初始化页面
+    filterFiles('all', 1);
+  </script>
+</body>
+</html>
