@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS26风格液态玻璃RGB调色板</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #8A2BE2, #4B0082, #0000FF, #00BFFF);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            padding: 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 480px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 50%, 
+                rgba(255, 255, 255, 0.1) 100%);
+            z-index: -1;
+            border-radius: 24px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.5px;
+        }
+
+        .color-display {
+            width: 100%;
+            height: 180px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+            background: #ffffff;
+            box-shadow: 
+                inset 0 4px 15px rgba(0, 0, 0, 0.1),
+                0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-display::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.3) 0%, 
+                rgba(255, 255, 255, 0) 60%);
+            pointer-events: none;
+        }
+
+        .hex-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .hex-code {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .slider-container {
+            margin-bottom: 25px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .slider-label span {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .slider-input-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .value-input {
+            width: 80px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            padding: 8px 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            margin-left: 15px;
+            -moz-appearance: textfield;
+        }
+
+        .value-input::-webkit-outer-spin-button,
+        .value-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .value-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .input-controls {
+            display: flex;
+            flex-direction: column;
+            margin-left: 8px;
+        }
+
+        .value-btn {
+            width: 20px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .value-btn:first-child {
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 1px;
+        }
+
+        .value-btn:last-child {
+            border-radius: 0 0 4px 4px;
+        }
+
+        .value-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .value-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 14px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 
+                0 4px 10px rgba(0, 0, 0, 0.3),
+                0 0 0 2px rgba(255, 255, 255, 0.8);
+            transition: all 0.2s ease;
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        #redSlider::-webkit-slider-thumb {
+            background: #ff3b30;
+        }
+
+        #greenSlider::-webkit-slider-thumb {
+            background: #34c759;
+        }
+
+        #blueSlider::-webkit-slider-thumb {
+            background: #007aff;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-80px);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 100;
+        }
+
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            .liquid-glass {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .color-display {
+                height: 150px;
+            }
+            
+            .hex-code {
+                font-size: 1.1rem;
+            }
+            
+            .copy-btn {
+                padding: 8px 14px;
+            }
+            
+            .value-input {
+                width: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="liquid-glass">
+        <h1>液态玻璃 RGB 调色板</h1>
+        
+        <div class="color-display" id="colorDisplay">
+            <!-- 颜色将在这里显示 -->
+        </div>
+        
+        <div class="hex-display">
+            <div class="hex-code" id="hexCode">#FFFFFF</div>
+            <button class="copy-btn" id="copyBtn">复制</button>
+        </div>
+        
+        <div class="slider-container">
+            <div class="slider-label">
+                <span style="color: #ff3b30;">红色</span>
+                <div class="slider-input-group">
+                    <input type="number" min="0" max="255" value="255" class="value-input" id="redInput">
+                    <div class="input-controls">
+                        <button class="value-btn" id="redUp">▲</button>
+                        <button class="value-btn" id="redDown">▼</button>
+                    </div>
+                </div>
+            </div>
+            <input type="range" min="0" max="255" value="255" class="slider" id="redSlider">
+        </div>
+        
+        <div class="slider-container">
+            <div class="slider-label">
+                <span style="color: #34c759;">绿色</span>
+                <div class="slider-input-group">
+                    <input type="number" min="0" max="255" value="255" class="value-input" id="greenInput">
+                    <div class="input-controls">
+                        <button class="value-btn" id="greenUp">▲</button>
+                        <button class="value-btn" id="greenDown">▼</button>
+                    </div>
+                </div>
+            </div>
+            <input type="range" min="0" max="255" value="255" class="slider" id="greenSlider">
+        </div>
+        
+        <div class="slider-container">
+            <div class="slider-label">
+                <span style="color: #007aff;">蓝色</span>
+                <div class="slider-input-group">
+                    <input type="number" min="0" max="255" value="255" class="value-input" id="blueInput">
+                    <div class="input-controls">
+                        <button class="value-btn" id="blueUp">▲</button>
+                        <button class="value-btn" id="blueDown">▼</button>
+                    </div>
+                </div>
+            </div>
+            <input type="range" min="0" max="255" value="255" class="slider" id="blueSlider">
+        </div>
+        
+        <div class="footer">
+            拖动滑块或输入数值调整颜色 | iOS26风格液态玻璃效果
+        </div>
+    </div>
+
+    <div class="notification" id="notification">HEX代码已复制到剪贴板</div>
+
+    <script>
+        // 获取DOM元素
+        const redSlider = document.getElementById('redSlider');
+        const greenSlider = document.getElementById('greenSlider');
+        const blueSlider = document.getElementById('blueSlider');
+        
+        const redInput = document.getElementById('redInput');
+        const greenInput = document.getElementById('greenInput');
+        const blueInput = document.getElementById('blueInput');
+        
+        const redUp = document.getElementById('redUp');
+        const redDown = document.getElementById('redDown');
+        const greenUp = document.getElementById('greenUp');
+        const greenDown = document.getElementById('greenDown');
+        const blueUp = document.getElementById('blueUp');
+        const blueDown = document.getElementById('blueDown');
+        
+        const colorDisplay = document.getElementById('colorDisplay');
+        const hexCode = document.getElementById('hexCode');
+        const copyBtn = document.getElementById('copyBtn');
+        const notification = document.getElementById('notification');
+        
+        // 更新颜色显示
+        function updateColor() {
+            const r = parseInt(redSlider.value);
+            const g = parseInt(greenSlider.value);
+            const b = parseInt(blueSlider.value);
+            
+            // 更新输入框值
+            redInput.value = r;
+            greenInput.value = g;
+            blueInput.value = b;
+            
+            // 更新背景颜色
+            colorDisplay.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            
+            // 更新HEX代码
+            const hex = rgbToHex(r, g, b);
+            hexCode.textContent = hex;
+        }
+        
+        // RGB转HEX函数
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        }
+        
+        // 显示通知
+        function showNotification() {
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 2000);
+        }
+        
+        // 复制HEX代码到剪贴板
+        function copyToClipboard() {
+            const hexText = hexCode.textContent;
+            navigator.clipboard.writeText(hexText).then(() => {
+                showNotification();
+            }).catch(err => {
+                console.error('复制失败: ', err);
+            });
+        }
+        
+        // 验证输入值
+        function validateInput(input) {
+            let value = parseInt(input.value);
+            if (isNaN(value)) value = 0;
+            if (value < 0) value = 0;
+            if (value > 255) value = 255;
+            input.value = value;
+            return value;
+        }
+        
+        // 调整数值
+        function adjustValue(input, slider, amount) {
+            let value = parseInt(input.value) + amount;
+            if (value < 0) value = 0;
+            if (value > 255) value = 255;
+            input.value = value;
+            slider.value = value;
+            updateColor();
+        }
+        
+        // 添加事件监听器 - 滑块
+        redSlider.addEventListener('input', updateColor);
+        greenSlider.addEventListener('input', updateColor);
+        blueSlider.addEventListener('input', updateColor);
+        
+        // 添加事件监听器 - 输入框
+        redInput.addEventListener('input', function() {
+            const value = validateInput(this);
+            redSlider.value = value;
+            updateColor();
+        });
+        
+        greenInput.addEventListener('input', function() {
+            const value = validateInput(this);
+            greenSlider.value = value;
+            updateColor();
+        });
+        
+        blueInput.addEventListener('input', function() {
+            const value = validateInput(this);
+            blueSlider.value = value;
+            updateColor();
+        });
+        
+        // 添加事件监听器 - 增减按钮
+        redUp.addEventListener('click', () => adjustValue(redInput, redSlider, 1));
+        redDown.addEventListener('click', () => adjustValue(redInput, redSlider, -1));
+        greenUp.addEventListener('click', () => adjustValue(greenInput, greenSlider, 1));
+        greenDown.addEventListener('click', () => adjustValue(greenInput, greenSlider, -1));
+        blueUp.addEventListener('click', () => adjustValue(blueInput, blueSlider, 1));
+        blueDown.addEventListener('click', () => adjustValue(blueInput, blueSlider, -1));
+        
+        // 添加事件监听器 - 复制按钮
+        copyBtn.addEventListener('click', copyToClipboard);
+        
+        // 初始化
+        updateColor();
+    </script>
+</body>
+</html>
