@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专业导航系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        // 配置Tailwind自定义主题
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // 主色调保持不变
+                        primary: '#3A4895',
+                        
+                        // 浅色模式
+                        light: {
+                            bg: '#F5F7FA',
+                            card: '#FFFFFF',
+                            border: '#D1D5DB',
+                            text: {
+                                primary: '#111827',
+                                secondary: '#4B5563',
+                                tertiary: '#6B7280'
+                            }
+                        },
+                        
+                        // 深色模式
+                        dark: {
+                            bg: '#111827',
+                            card: '#1F2937',
+                            border: '#374151',
+                            text: {
+                                primary: '#F9FAFB',
+                                secondary: '#E5E7EB',
+                                tertiary: '#9CA3AF'
+                            }
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-thin {
+                scrollbar-width: thin;
+            }
+            .scrollbar-thumb-rounded {
+                scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+            }
+            
+            /* 优化的卡片悬停效果 */
+            .card-hover {
+                transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                will-change: transform, box-shadow;
+            }
+            .card-hover:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            }
+            
+            /* 主题过渡动画 */
+            .theme-transition {
+                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            }
+            
+            /* 文字和链接过渡效果 */
+            .text-transition {
+                transition: color 0.3s ease, transform 0.3s ease;
+            }
+        }
+    </style>
+    <style>
+        /* 基础样式 - 浅色模式为默认 */
+        :root {
+            --bg-main: #F5F7FA;
+            --bg-card: #FFFFFF;
+            --border-color: #D1D5DB;
+            --text-primary: #111827;
+            --text-secondary: #4B5563;
+            --text-tertiary: #6B7280;
+            --hover-color: #E5E7EB;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+        
+        /* 深色模式变量 */
+        [data-theme="dark"] {
+            --bg-main: #111827;
+            --bg-card: #1F2937;
+            --border-color: #374151;
+            --text-primary: #F9FAFB;
+            --text-secondary: #E5E7EB;
+            --text-tertiary: #9CA3AF;
+            --hover-color: #374151;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 导航项样式 */
+        .nav-item {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.375rem;
+            text-align: left;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: background-color;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.125rem;
+            background-color: #3A4895;
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .nav-item:hover::after {
+            width: 100%;
+        }
+        
+        .nav-item-active {
+            background-color: rgba(58, 72, 149, 0.15);
+            color: #3A4895;
+            font-weight: 500;
+        }
+        
+        .nav-item-active::after {
+            width: 100%;
+        }
+        
+        .nav-item-inactive {
+            color: var(--text-primary);
+        }
+        
+        .nav-item-inactive:hover {
+            background-color: var(--hover-color);
+        }
+        
+        /* 网站卡片悬停横杠 */
+        .website-card {
+            position: relative;
+        }
+        
+        .website-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0.125rem;
+            background-color: #3A4895;
+            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .website-card:hover::after {
+            width: 100%;
+        }
+        
+        /* 搜索结果分类标签 */
+        .category-tag {
+            font-size: 0.75rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            background-color: rgba(58, 72, 149, 0.15);
+            color: #3A4895;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+        }
+        
+        .website-card:hover .category-tag {
+            transform: translateX(4px);
+        }
+        
+        /* 圆形链接按钮样式 - 同心圆圈设计 */
+        .circle-link {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: background-color, color;
+        }
+        
+        .circle-link:hover {
+            background-color: rgba(58, 72, 149, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .circle-link.clicked {
+            background-color: #3A4895;
+            color: white;
+        }
+        
+        /* 同心圆圈图标样式 */
+        .concentric-circles {
+            position: relative;
+            width: 1rem;
+            height: 1rem;
+        }
+        
+        .concentric-circles::before,
+        .concentric-circles::after {
+            content: '';
+            position: absolute;
+            border-radius: 9999px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        /* 外圆 */
+        .concentric-circles::before {
+            width: 1rem;
+            height: 1rem;
+            border: 0.125rem solid currentColor;
+        }
+        
+        /* 内圆 */
+        .concentric-circles::after {
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: currentColor;
+            top: 0.25rem;
+            left: 0.25rem;
+        }
+        
+        /* 悬停动画效果 */
+        .circle-link:hover .concentric-circles::before {
+            transform: scale(1.1);
+        }
+        
+        .circle-link.clicked .concentric-circles::after {
+            transform: scale(1.25);
+        }
+        
+        /* 主题切换按钮动画 */
+        .theme-toggle {
+            transition: transform 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            transform: rotate(90deg);
+        }
+        
+        /* 卡片内部元素的延迟动画 */
+        .website-card h3 {
+            transition: color 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+        }
+        
+        .website-card:hover h3 {
+            transform: translateX(2px);
+        }
+        
+        .website-card p {
+            transition: color 0.3s ease 0.2s;
+        }
+        
+        .website-card .domain-wrapper {
+            transition: opacity 0.3s ease 0.2s, transform 0.3s ease 0.2s;
+            transform: translateY(0);
+        }
+        
+        .website-card:hover .domain-wrapper {
+            transform: translateY(2px);
+        }
+    </style>
+</head>
+
+<body class="bg-main text-textPrimary font-sans overflow-hidden h-screen flex flex-col theme-transition" style="background-color: var(--bg-main); color: var(--text-primary);">
+    <!-- 顶部导航栏 -->
+    <header class="bg-card border-b border-borderColor py-3 px-4 md:px-6 flex items-center justify-between z-10 transition-all duration-200 theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+        <div class="flex items-center space-x-3">
+            <button id="menuToggle" class="md:hidden text-textPrimary p-2 rounded-md hover:bg-hover transition-colors duration-200 theme-transition" style="color: var(--text-primary); background-color: var(--hover-color);">
+                <i class="fa fa-bars text-lg"></i>
+            </button>
+            <div class="flex items-center">
+                <i class="fa fa-compass text-primary text-2xl mr-2"></i>
+                <h1 class="text-xl font-semibold">专业导航系统</h1>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <!-- 仅保留主题切换按钮 -->
+            <button id="themeToggle" class="text-textPrimary hover:text-primary transition-colors duration-200 theme-toggle theme-transition" style="color: var(--text-primary);">
+                <i class="fa fa-moon-o text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- 左侧导航栏 -->
+        <aside id="sidebar" class="w-64 bg-card border-r border-borderColor flex-shrink-0 hidden md:block transition-all duration-300 ease-in-out overflow-hidden theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <!-- 搜索框 -->
+            <div class="p-4 border-b border-borderColor theme-transition" style="border-color: var(--border-color);">
+                <div class="relative group">
+                    <input type="text" id="navSearch" placeholder="搜索导航分类..." class="w-full pl-10 pr-4 py-2 rounded-md bg-main focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all duration-200 group-hover:ring-1 group-hover:ring-primary/20 theme-transition" style="background-color: var(--bg-main);">
+                    <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textSecondary transition-colors duration-200 group-hover:text-primary theme-transition" style="color: var(--text-secondary);"></i>
+                </div>
+            </div>
+
+            <!-- 导航列表 -->
+            <nav class="overflow-y-auto scrollbar-thin scrollbar-thumb-rounded h-[calc(100%-64px)]">
+                <ul id="navList" class="p-2">
+                    <!-- 导航项将通过JavaScript动态生成 -->
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 overflow-hidden flex flex-col bg-main theme-transition" style="background-color: var(--bg-main);">
+            <!-- 内容区搜索框 -->
+            <div class="p-4 border-b border-borderColor bg-card theme-transition" style="border-color: var(--border-color); background-color: var(--bg-card);">
+                <div class="relative max-w-2xl group">
+                    <input type="text" id="contentSearch" placeholder="搜索所有网站..." class="w-full pl-10 pr-4 py-2 rounded-md bg-main focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all duration-200 group-hover:ring-1 group-hover:ring-primary/20 theme-transition" style="background-color: var(--bg-main);">
+                    <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-textSecondary transition-colors duration-200 group-hover:text-primary theme-transition" style="color: var(--text-secondary);"></i>
+                </div>
+            </div>
+
+            <!-- 内容显示区 -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 scrollbar-thin scrollbar-thumb-rounded">
+                <div id="contentTitle" class="text-xl font-semibold mb-4 text-textPrimary theme-transition" style="color: var(--text-primary);">
+                    标准查询
+                </div>
+
+                <div id="websiteGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
+                    <!-- 网站卡片将通过JavaScript动态生成 -->
+                </div>
+
+                <div id="noResults" class="hidden flex flex-col items-center justify-center h-64 text-textSecondary theme-transition" style="color: var(--text-secondary);">
+                    <i class="fa fa-search text-4xl mb-3 opacity-30"></i>
+                    <p>未找到相关网站</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 预定义关键DOM元素引用
+        const doc = document;
+        const html = document.documentElement;
+        const navList = doc.getElementById('navList');
+        const websiteGrid = doc.getElementById('websiteGrid');
+        const contentTitle = doc.getElementById('contentTitle');
+        const navSearch = doc.getElementById('navSearch');
+        const contentSearch = doc.getElementById('contentSearch');
+        const noResults = doc.getElementById('noResults');
+        const menuToggle = doc.getElementById('menuToggle');
+        const sidebar = doc.getElementById('sidebar');
+        const themeToggle = doc.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // 初始化主题
+        function initTheme() {
+            // 检查本地存储或系统偏好
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            let initialTheme;
+            if (savedTheme) {
+                initialTheme = savedTheme;
+            } else {
+                initialTheme = prefersDark ? 'dark' : 'light';
+            }
+            
+            setTheme(initialTheme);
+        }
+        
+        // 设置主题
+        function setTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            // 更新图标
+            if (theme === 'dark') {
+                themeIcon.classList.remove('fa-moon-o');
+                themeIcon.classList.add('fa-sun-o');
+            } else {
+                themeIcon.classList.remove('fa-sun-o');
+                themeIcon.classList.add('fa-moon-o');
+            }
+        }
+        
+        // 切换主题
+        function toggleTheme() {
+            const currentTheme = html.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(newTheme);
+        }
+        
+        // 提取网址核心域名的函数
+        function extractDomain(url) {
+            try {
+                // 处理没有协议的URL
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'http://' + url;
+                }
+                
+                const domain = new URL(url).hostname;
+                
+                // 移除www.前缀
+                if (domain.startsWith('www.')) {
+                    return domain.slice(4);
+                }
+                
+                return domain;
+            } catch (e) {
+                // 处理解析错误，返回原始URL的前半部分
+                return url.split('/')[0];
+            }
+        }
+        
+        // 处理圆形按钮点击事件
+        function handleCircleClick(event, url) {
+            // 防止事件冒泡影响链接跳转
+            event.preventDefault();
+            
+            // 切换按钮状态
+            const circle = event.currentTarget;
+            circle.classList.add('clicked');
+            
+            // 短暂延迟后打开链接并恢复按钮状态
+            setTimeout(() => {
+                window.open(url, '_blank', 'noopener noreferrer');
+                setTimeout(() => {
+                    circle.classList.remove('clicked');
+                }, 300);
+            }, 150);
+        }
+        
+        // 网站数据
+        const websiteData = [
+            {
+                id: 1,
+                title: "标准查询",
+                icon: "fa-code",
+                websites: [
+                    { name: "全国认证认可信息公共服务平台", url: "http://cx.cnca.cn/CertECloud/index/index/page", desc: "全国认证认可信息公共服务平台" },
+                    { name: "全国标准信息公共服务平台", url: "https://std.samr.gov.cn/", desc: "全国标准信息公共服务平台" },
+                    { name: "国家标准全文公开系统", url: "https://openstd.samr.gov.cn/bzgk/gb/index", desc: "国家标准全文公开系统" },
+                    { name: "MDSAP标准", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-audit-procedures-and-forms", desc: "MDSAP Audit Procedures and Forms | FDA" },
+                    { name: "ISO官网", url: "https://www.iso.org/home.html", desc: "ISO官网" },
+                    { name: "GRI标准", url: "https://www.globalreporting.org", desc: "GRI标准下载" },
+                    { name: "SASB标准", url: "https://www.sasb.org", desc: "SASB标准下载" },
+                    { name: "TCFD", url: "https://www.tcfdhub.org", desc: "气候相关财务信息披露工作组（TCFD）建议案" },
+                    { name: "IIRC", url: "https://integratedreporting.org", desc: "国际综合报告委员会（IIRC）框架" },
+                    { name: "CDP", url: "https://www.cdp.net/zh", desc: "碳信息披露项目(官网" },
+                    { name: "CDSB", url: "https://www.cdsb.net/", desc: "气候披露标准委员会" },
+                    { name: "ISSB", url: "https://www.ifrs.org/", desc: "国际可持续发展准则委员会" },
+                    { name: "小绿典", url: "https://dljs123.com/#/search/criteria", desc: "标准下载" },
+                    { name: "食品伙伴网", url: "http://down.foodmate.net/wap/", desc: "食品标准下载" },
+                    { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" },
+                    { name: "化学品安全法规标准信息平台", url: "https://law.chemicalsafety.org.cn/", desc: "化学品标准下载" },
+                    { name: "协筑资源", url: "https://www.webfree.net/home", desc: "建筑标准下载" }
+                ]
+            },
+            {
+                id: 2,
+                title: "效率工具",
+                icon: "fa-paint-brush",
+                websites: [
+                    { name: "drow.io", url: "https://app.diagrams.net/", desc: "流程图" },
+                    { name: "Excalidraw", url: "https://excalidraw.com/", desc: "流程图" },
+                    { name: "process on", url: "https://www.processon.com/login", desc: "流程图" },
+                    { name: "Smallpdf", url: "https://smallpdf.com/cn/unlock-pdf", desc: "PDF工具" },
+                    { name: "ALL TO ALL", url: "https://www.alltoall.net/", desc: "PDF工具" },
+                    { name: "Dpdf", url: "https://www.dpdf.com/", desc: "PDF工具" },
+                    { name: "Ilovepdf", url: "https://www.ilovepdf.com/", desc: "PDF工具" },
+                    { name: "PDF24 Tools", url: "https://tools.pdf24.org/zh/", desc: "PDF工具" },
+                    { name: "Stirling PDF", url: "https://stirlingpdf.io/?lang=zh_CN", desc: "PDF工具" },
+                    { name: "超级PDF", url: "https://xpdf.cn/", desc: "PDF工具" },
+                    { name: "EPUB.to", url: "https://www.epub.to/pdf/?lang=zh", desc: "EPUB转PDF" },
+                    { name: "在线HEIC转PDF", url: "https://heictopdf.run/zh", desc: "HEIC转PDF" },
+                    { name: "ScanNerd", url: "https://scannerd.co/zh", desc: "扫描成PDF" },
+                    { name: "CDKM", url: "https://cdkm.com/", desc: "文件格式转换" },
+                    { name: "Convertio", url: "https://convertio.co/zh/", desc: "格式转换工具" },
+                    { name: "Aconvert", url: "https://www.aconvert.com/cn/", desc: "格式转换工具" },
+                    { name: "imgdiet", url: "https://www.imgdiet.com/zh-CN", desc: "图片压缩工具" },
+                    { name: "极速图片压缩器", url: "https://www.zgcoder.com/tic/", desc: "图片压缩工具" },
+                    { name: "Free Tinypng", url: "https://free.tinypng.site/", desc: "图片压缩工具" },
+                    { name: "记灵在线工具", url: "https://remeins.com/", desc: "记灵在线工具" },
+                    { name: "FileCodeBox", url: "https://share.lanol.cn/#/", desc: "文件快递柜" },
+                    { name: "文叔叔", url: "https://www.wenshushu.cn/", desc: "文件快递柜" },
+                    { name: "zrfme", url: "https://mail.zrfme.com/", desc: "临时邮箱" },
+                    { name: "临时邮箱", url: "https://tempmailto.online/zh/", desc: "临时邮箱" },
+                    { name: "MoeMail", url: "https://moemail.app/", desc: "临时邮箱" },
+                    { name: "时间瓶子", url: "https://timebottle.toolooz.com/", desc: "时间小工具" },
+                    { name: "Microsoft SAM TTS", url: "https://samtts.com/", desc: "文字转语音" },
+                    { name: "gantt-chart", url: "https://gantt.vicsdf.com/", desc: "甘特图生成" },
+                    { name: "中国传统色", url: "https://noneko.cn/", desc: "色系查询" },
+                    { name: "鼠标测试", url: "https://www.setupcheck.tech/zh/tools/mouse", desc: "电脑硬件测试" }
+                ]
+            },
+            {
+                id: 3,
+                title: "专业软件",
+                icon: "fa-graduation-cap",
+                websites: [
+                    { name: "格式工厂", url: "https://www.jinzhoutool.com/bing189107598/gszhgc.html?jx=s6.p569917310.g1180877375523224.k73805272990168.c73805046769292&msclkid=b5aec0a6f768170e05daa812f93eb59d", desc: "格式转换" },
+                    { name: "ev录屏", url: "https://www.sootool.net/nexus/bi1/evluping.shtml?msclkid=1ea8e3bd237c12b4823d8b092c630dd1", desc: "录屏" },
+                    { name: "Everything", url: "https://www.voidtools.com/zh-cn/downloads/", desc: "文件检索" },
+                    { name: "FastStone Capture", url: "https://www.faststonecapture.cn/", desc: "截长图" },
+                    { name: "小旺AI截图", url: "https://www.xiaowang.com/", desc: "截长图" },
+                    { name: "PixPin", url: "https://pixpin.cn/", desc: "截长图" },
+                    { name: "Fengling", url: "https://fengling.nocmt.com/", desc: "剪贴板同步" },
+                    { name: "方方格子", url: "http://www.ffcell.com/", desc: "excel插件" },
+                    { name: "51PPT模板", url: "https://www.51pptmoban.com/ppt-soft/", desc: "PPT插件" },
+                    { name: "Office Tool Plus", url: "https://otp.landian.vip/zh-cn/#google_vignette", desc: "一键部署Office" },
+                    { name: "机查查", url: "https://devink.techartlife.com/zh/", desc: "机查查" }
+                ]
+            },
+            {
+                id: 4,
+                title: "模板下载",
+                icon: "fa-cubes",
+                websites: [
+                    { name: "微软officePLUS", url: "https://www.officeplus.cn/", desc: "ppt/word/excel" },
+                    { name: "优品PPT", url: "https://www.ypppt.com/", desc: "ppt/ppt元素/课件/字体" },
+                    { name: "爱PPT", url: "https://www.2ppt.com/", desc: "ppt" },
+                    { name: "第1PPT", url: "https://www.1ppt.com/tags/419/", desc: "ppt/ppt元素/字体/音效/课件" }, 
+                    { name: "枣知网", url: "https://www.51zaozhi.com/", desc: "ppt/word/excel" },
+                    { name: "GitCode", url: "https://gitcode.com/Open-source-documentation-tutorial", desc: "开源文档下载" },
+                    { name: "知识星球", url: "https://wx.zsxq.com/login", desc: "资料下载" },
+                    { name: "百度文库", url: "https://wenku.baidu.com/?fr=brandad_2&_wkts_=1755328356957", desc: "资料下载" },
+                    { name: "腾讯文档", url: "https://docs.qq.com/desktop/?nlc=1", desc: "资料下载" },
+                    { name: "仪器信息网", url: "https://www.instrument.com.cn/", desc: "资料下载" }
+                ]
+            },
+            {
+                id: 5,
+                title: "常用网站",
+                icon: "fa-bar-chart",
+                websites: [
+                  { name: "微软翻译", url: "https://cn.bing.com/translator", desc: "在线翻译" },
+                  { name: "DeepL翻译", url: "https://www.deepl.com/zh/translator", desc: "在线翻译" },
+                  { name: "有道翻译", url: "https://fanyi.youdao.com/#/TextTranslate", desc: "在线翻译" },
+                  { name: "163邮箱", url: "https://mail.163.com/", desc: "邮箱" },
+                  { name: "问卷星", url: "https://www.wjx.cn/newwjx/manage/myquestionnaires.aspx?randomt=1744110951", desc: "问卷调查" },
+                  { name: "知乎", url: "https://www.zhihu.com/", desc: "知乎" },
+                  { name: "百度一下", url: "https://www.baidu.com/index.php?tn=75144485_2_dg&ch=1", desc: "百度搜索" },
+                  { name: "123云盘", url: "https://www.123pan.com/", desc: "网盘" },
+                  { name: "阿里云盘", url: "https://www.alipan.com/", desc: "网盘" }
+                ]
+            },
+            {
+                id: 6,
+                title: "AI大模型",
+                icon: "fa-line-chart",
+                websites: [
+                    { name: "DeepSeek", url: "https://chat.deepseek.com/sign_in", desc: "在线AI" },
+                    { name: "ima", url: "https://ima.qq.com/?webFrom=10000028", desc: "在线AI" },
+                    { name: "豆包", url: "https://www.doubao.com/chat/?channel=baidu_pz&from_login=1", desc: "在线AI" },
+                    { name: "百度AI", url: "https://chat.baidu.com/search?isShowHello=1&extParams=%7B%22out_enter_type%22%3A%22sidebar_dialog%22%2C%22enter_type%22%3A%22sidebar_dialog%22%2C%22forceRefresh%22%3Atrue%7D", desc: "在线AI" },
+                    { name: "腾讯元宝", url: "https://yuanbao.tencent.com/chat/naQivTmsDa", desc: "在线AI" },
+                    { name: "小艺", url: "https://xiaoyi.huawei.com/chat/", desc: "华为小艺AI" },
+                    { name: "CodeBuddy", url: "https://copilot.tencent.com/chat/", desc: "腾讯云代码助手" },
+                    { name: "扣子空间", url: "https://space.coze.cn/?from=landingpage&keywordid=%E6%89%A3%E5%AD%90%E7%A9%BA%E9%97%B4-&msclkid=beda8a449f5a1495141ee2f6e949910b&utm_campaign=486599295&utm_content=home&utm_id=0&utm_medium=sem&utm_source=bing&utm_source_platform=pc&utm_term=coze_bing_sem_dm_cpc_pc_czkj_pp_guanw_1&category=7524912604796452873", desc: "在线AI" },
+                    { name: "秘塔AI搜索", url: "https://metaso.cn/", desc: "在线AI" },
+                    { name: "飞书多维表格", url: "https://acnkgpefayvj.feishu.cn/base", desc: "在线AI" },
+                    { name: "天工AI", url: "https://www.tiangong.cn/", desc: "在线AI" },
+                    { name: "ChatGPT", url: "https://chatgpt.com", desc: "AI软件" },
+                    { name: "文小言", url: "http://www.wenxiaoyan.com/pc", desc: "AI软件" }
+                ]
+            },
+            {
+                id: 7,
+                title: "国内法规/认证信息",
+                icon: "fa-newspaper-o",
+                websites: [
+                    { name: "国家法律法规数据库", url: "https://flk.npc.gov.cn/index", desc: "国家法律法规数据库" },
+                    { name: "国家市场监督管理总局", url: "https://www.samr.gov.cn/", desc: "国家市场监督管理总局" },
+                    { name: "国家药品监督管理局", url: "https://www.nmpa.gov.cn/index.html", desc: "国家药品监督管理局" },
+                    { name: "国家税务总局", url: "https://www.chinatax.gov.cn/", desc: "国家税务总局" },
+                    { name: "国家知识产权局", url: "http://www.cnipa.gov.cn/", desc: "国家知识产权局" },
+                    { name: "国家发展和改革委员会", url: "https://www.ndrc.gov.cn/", desc: "国家发展和改革委员会" },
+                    { name: "国家标准化管理委员会", url: "https://www.sac.gov.cn/index.html", desc: "国家标准化管理委员会" },
+                    { name: "国家卫生健康委员会", url: "http://www.nhc.gov.cn/", desc: "国家卫生健康委员会" },
+                    { name: "中国合格评定国家认可委员会", url: "https://ltbzh.mofcom.gov.cn/ltbz/view/bzfk/listBzfk.jsp", desc: "中国合格评定国家认可委员会" },
+                    { name: "卫健委政务服务平台", url: "https://www.nhc.gov.cn/wjw/wsbzxx/wsbz.shtml", desc: "国家卫生健康委员会政务服务平台" },  
+                    { name: "食品生产许可获证查询", url: "https://spaqjg.e-cqs.cn/spscxk/", desc: "食品生产许可获证查询" },
+                    { name: "特种设备公示信息查询", url: "https://cnse.samr.gov.cn/info-pub/pub", desc: "特种设备公示信息查询" },
+                    { name: "国家企业信用信息公示系统", url: "http://www.gsxt.gov.cn/", desc: "国家企业信用信息公示系统" }, 
+                    { name: "食品经营许可管理系统", url: "https://spjyxk.gsxt.gov.cn/cfdaPub/index/page/", desc: "食品经营许可管理系统" },
+                    { name: "职业卫生技术服务机构信息系统", url: "https://jsfw.zyjkfw.cn/", desc: "全国职业卫生放射卫生技术服务机构管理信息系统" },
+                    { name: "中国电子质量监督(e-CQS)公共服务门户", url: "https://psp.e-cqs.cn/egov/iwantMore.jsp?type=1", desc: "中国电子质量监督(e-CQS)公共服务门户" },
+                    { name: "中央人民政府", url: "https://www.gov.cn/", desc: "中央人民政府" },
+                    { name: "生态环境部", url: "https://www.mee.gov.cn/", desc: "生态环境部" },
+                    { name: "商务部", url: "https://ltbzh.mofcom.gov.cn/ltbz/view/bzfk/listBzfk.jsp", desc: "商务部" },
+                    { name: "应急管理部", url: "https://www.mem.gov.cn/fw/flfgbz/bz/bzwb/", desc: "应急管理部" },
+                    { name: "人力资源和社会保障部", url: "https://www.mohrss.gov.cn/", desc: "人力资源和社会保障部" },
+                    { name: "司法部", url: "http://www.moj.gov.cn/", desc: "司法部" },
+                    { name: "财政部", url: "http://www.mof.gov.cn/", desc: "财政部" },
+                    { name: "外交部", url: "https://www.fmprc.gov.cn/", desc: "外交部" },
+                    { name: "科学技术部", url: "https://www.most.gov.cn/", desc: "科学技术部" },
+                    { name: "工业和信息化部", url: "https://www.miit.gov.cn/", desc: "工业和信息化部" },
+                    { name: "住房和城乡建设部", url: "https://www.mohurd.gov.cn/xinwen/jsyw/index.html", desc: "住房和城乡建设部" },
+                    { name: "海关总署", url: "http://www.customs.gov.cn/", desc: "海关总署" }
+                ]
+            },
+            {
+                id: 8,
+                title: "法规（国外）",
+                icon: "fa-tasks",
+                websites: [
+                    { name: "美国FDA", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm/", desc: "产品注册查询" },
+                    { name: "美国CFR", url: "https://www.ecfr.gov/", desc: "Code of Federal Regulations" },
+                    { name: "加拿大卫生局（注册）", url: "https://health-products.canada.ca/mdall-limh/prepareSearch?type=active", desc: "产品注册查询" },
+                    { name: "加拿大法规SOR/98-282", url: "https://lois-laws.justice.gc.ca/eng/regulations/SOR-98-282/index.html", desc: "SOR/98-282法规下载" },
+                    { name: "欧盟EUR-Lex（MDR_IVDR）", url: "https://eur-lex.europa.eu/homepage.html", desc: "EU 2017/745下载" },
+                    { name: "REACH清单", url: "https://echa.europa.eu/candidate-list-table", desc: "REACH查询" },
+                    { name: "日本PMDA（注册）", url: "https://www.pmda.go.jp/review-services/drug-reviews/foreign-mfr/0003.html", desc: "产品注册查询" },
+                    { name: "澳大利亚TGA", url: "https://www.tga.gov.au/", desc: "澳大利亚医疗器械" },
+                    { name: "德国MPG", url: "https://www.gesetze-im-internet.de/mpg/", desc: "德国医疗器械" },
+                    { name: "德国BfArM", url: "https://www.bfarm.de/DE/Medizinprodukte/Ueberblick/Gesetze-und-Verordnungen/_node.html", desc: "德国医疗器械" },
+                    { name: "国际电工委员会（IEC）", url: "https://webstore.iec.ch/", desc: "国际电工委员会（IEC）" }
+                ]
+            },
+            {
+                id: 9,
+                title: "学教程",
+                icon: "fa-cloud",
+                websites: [
+                    { name: "技能看点", url: "https://wrf00123.github.io/tool6.html", desc: "教程查询" },
+                    { name: "懒人Excel", url: "https://www.lanrenexcel.com/", desc: "Excel教程" },
+                    { name: "Excel之家", url: "https://www.excelhome.net/", desc: "Excel教程" },
+                    { name: "Word联盟", url: "https://www.wordlm.cn/", desc: "Word教程" },
+                    { name: "优品PPT", url: "https://www.ypppt.com/jiaocheng/", desc: "PPT教程" },
+                    { name: "51PPT模板", url: "https://www.51pptmoban.com/jiaocheng/", desc: "PPT教程" },
+                    { name: "我要自学网", url: "https://www.51zxw.net/List.aspx?cid=3", desc: "PPT教程" },
+                    { name: "方方格子不显示", url: "http://ffcell.com/WenKu/Data/2016051616004881.html", desc: "方方格子不显示教程" }
+                ]
+            },
+            {
+                id: 10,
+                title: "学习网站",
+                icon: "fa-bolt",
+                websites: [
+                    { name: "多邻国", url: "https://www.duolingo.com/learn", desc: "英语学习" },
+                    { name: "VOA Learning English", url: "https://learningenglish.voanews.com/", desc: "英语学习" },
+                    { name: "BBC Learning English", url: "https://www.bbc.co.uk/learningenglish/", desc: "英语学习" },
+                    { name: "英语巴士网", url: "https://www.engbus.cn/", desc: "英语学习" },
+                    { name: "英语口语网", url: "http://www.ny-yy.com/", desc: "英语学习" },
+                    { name: "Ries", url: "https://ries.ai/zh/learn-english", desc: "英语学习" },
+                    { name: "LetMeEnglish.com", url: "https://letmeenglish.com/", desc: "英语学习" },
+                    { name: "English Daily", url: "https://englishdaily.ai/", desc: "英语学习" },
+                    { name: "英语小说网", url: "https://yingyuxiaoshuo.com/", desc: "英语小说" },
+                    { name: "小故事铺", url: "https://storynook.cn/", desc: "小故事" },
+                    { name: "网上厨房", url: "https://www.xiaochushuo.com/", desc: "菜谱查询" }
+                ]
+            },
+          {
+                id: 11,
+                title: "其他",
+                icon: "fa-bolt",
+                websites: [
+                    { name: "天下老照片", url: "http://www.laozhaopian5.com/", desc: "老照片" },
+                ]
+            }
+        ];
+        
+        // 初始化导航列表
+        function initNavList() {
+            let html = '';
+            websiteData.forEach(category => {
+                const isActive = category.id === 1;
+                html += `
+                    <li class="mb-1">
+                        <button class="nav-item ${isActive ? 'nav-item-active' : 'nav-item-inactive'}" 
+                                data-id="${category.id}">
+                            <i class="fa ${category.icon} w-5 text-center mr-3"></i>
+                            <span>${category.title}</span>
+                        </button>
+                    </li>
+                `;
+            });
+            
+            navList.innerHTML = html;
+        
+            doc.querySelectorAll('.nav-item').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    contentSearch.blur();
+                    
+                    doc.querySelectorAll('.nav-item').forEach(b => {
+                        b.classList.remove('nav-item-active');
+                        b.classList.add('nav-item-inactive');
+                    });
+                    
+                    e.currentTarget.classList.add('nav-item-active');
+                    e.currentTarget.classList.remove('nav-item-inactive');
+                    
+                    const categoryId = parseInt(e.currentTarget.dataset.id);
+                    showCategoryContent(categoryId);
+                    
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('hidden');
+                    }
+                });
+            });
+        
+            showCategoryContent(1);
+        }
+        
+        // 显示分类内容
+        function showCategoryContent(categoryId) {
+            const category = websiteData.find(item => item.id === categoryId);
+            if (!category) return;
+            
+            contentTitle.textContent = category.title;
+            renderWebsites(category.websites, false);
+        }
+        
+        // 渲染网站卡片 - 优化动态效果
+        function renderWebsites(websites, isSearchResult = false) {
+            if (websites.length === 0) {
+                websiteGrid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+            
+            noResults.classList.add('hidden');
+            
+            let html = '';
+            websites.forEach(website => {
+                const domain = extractDomain(website.url);
+                
+                const categoryTag = isSearchResult && website.category 
+                    ? `<span class="category-tag">${website.category}</span>` 
+                    : '';
+                    
+                html += `
+                    <a href="${website.url}" target="_blank" rel="noopener noreferrer" class="block">
+                        <div class="bg-card rounded-lg border border-borderColor p-4 card-hover h-full website-card theme-transition" style="background-color: var(--bg-card); border-color: var(--border-color);">
+                            ${categoryTag}
+                            <div class="flex items-start justify-between mb-3">
+                                <h3 class="font-medium text-textPrimary hover:text-primary line-clamp-1 text-base theme-transition text-transition" style="color: var(--text-primary);">
+                                    ${website.name}
+                                </h3>
+                                <div class="circle-link" onclick="handleCircleClick(event, '${website.url}')">
+                                    <div class="concentric-circles"></div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-textSecondary line-clamp-2 mb-4 theme-transition text-transition" style="color: var(--text-secondary);">${website.desc}</p>
+                            <div class="domain-wrapper flex items-center text-xs text-textTertiary pt-1 border-t border-gray-100 theme-transition" style="color: var(--text-tertiary); border-color: var(--border-color);">
+                                <i class="fa fa-link mr-1.5 opacity-70"></i>
+                                <span>${domain}</span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            });
+            websiteGrid.innerHTML = html;
+        }
+        
+        // 导航搜索功能
+        function setupNavSearch() {
+            navSearch.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                
+                doc.querySelectorAll('.nav-item').forEach(btn => {
+                    const title = btn.querySelector('span').textContent.toLowerCase();
+                    const parentLi = btn.parentElement;
+                    
+                    if (searchTerm === '' || title.includes(searchTerm)) {
+                        parentLi.classList.remove('hidden');
+                    } else {
+                        parentLi.classList.add('hidden');
+                    }
+                });
+            });
+        }
+        
+        // 内容搜索功能
+        function setupContentSearch() {
+            contentSearch.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                
+                if (!searchTerm) {
+                    const activeCategoryId = parseInt(doc.querySelector('.nav-item-active').dataset.id);
+                    const category = websiteData.find(item => item.id === activeCategoryId);
+                    if (category) {
+                        contentTitle.textContent = category.title;
+                        renderWebsites(category.websites, false);
+                    }
+                    return;
+                }
+                
+                let allWebsites = [];
+                websiteData.forEach(category => {
+                    const websitesWithCategory = category.websites.map(website => ({
+                        ...website,
+                        category: category.title
+                    }));
+                    allWebsites = [...allWebsites, ...websitesWithCategory];
+                });
+                
+                const filteredWebsites = allWebsites.filter(website => 
+                    website.name.toLowerCase().includes(searchTerm) || 
+                    website.desc.toLowerCase().includes(searchTerm) ||
+                    website.url.toLowerCase().includes(searchTerm) ||
+                    website.category.toLowerCase().includes(searchTerm)
+                );
+                
+                contentTitle.textContent = `搜索结果: "${searchTerm}" (${filteredWebsites.length})`;
+                renderWebsites(filteredWebsites, true);
+            });
+        }
+        
+        // 移动端菜单切换
+        function setupMenuToggle() {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('absolute');
+                sidebar.classList.toggle('top-16');
+                sidebar.classList.toggle('left-0');
+                sidebar.classList.toggle('h-[calc(100%-4rem)]');
+                sidebar.classList.toggle('z-20');
+            });
+            
+            doc.addEventListener('click', (e) => {
+                if (window.innerWidth < 768 && 
+                    !sidebar.classList.contains('hidden') && 
+                    !sidebar.contains(e.target) && 
+                    e.target !== menuToggle &&
+                    !menuToggle.contains(e.target)) {
+                    sidebar.classList.add('hidden');
+                }
+            });
+            
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('hidden', 'absolute', 'top-16', 'left-0', 'h-[calc(100%-4rem)]', 'z-20');
+                    sidebar.classList.add('block');
+                } else if (!sidebar.classList.contains('hidden') && !sidebar.classList.contains('absolute')) {
+                    sidebar.classList.add('hidden');
+                }
+            });
+        }
+        
+        // 初始化主题切换事件
+        function setupThemeToggle() {
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // 监听系统主题变化
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme')) {
+                    setTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+        
+        // 初始化函数
+        function init() {
+            initTheme();
+            initNavList();
+            setupNavSearch();
+            setupContentSearch();
+            setupMenuToggle();
+            setupThemeToggle();
+        }
+        
+        if (doc.readyState === 'loading') {
+            doc.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+
+</html>
