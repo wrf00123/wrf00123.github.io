@@ -83,7 +83,7 @@ body {
     position: sticky;
     top: 10px;
     z-index: 50;
-    padding: 15px 20px;
+    padding: 15px;
     margin-bottom: 20px;
     backdrop-filter: var(--backdrop-blur);
     -webkit-backdrop-filter: var(--backdrop-blur);
@@ -91,21 +91,24 @@ body {
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
     border-radius: 16px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
     flex-wrap: wrap;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .header-content .search-container {
     flex: 1;
     max-width: 100%;
-    margin: 0 auto;
+    margin: 0;
     position: relative;
     top: auto;
     z-index: auto;
@@ -113,6 +116,7 @@ body {
     padding: 0;
     margin-bottom: 0;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .title {
@@ -157,6 +161,7 @@ body {
     margin-bottom: 20px;
     position: relative;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .search-input {
@@ -173,6 +178,7 @@ body {
     -webkit-backdrop-filter: var(--backdrop-blur);
     box-shadow: var(--shadow);
     box-sizing: border-box;
+    width: 100%;
 }
 
 .search-input:focus {
