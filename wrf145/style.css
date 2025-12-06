@@ -419,7 +419,7 @@ body.dark-theme .website-category {
 /* 菜单弹窗 */
 .menu-modal {
     position: fixed;
-    bottom: 80px;
+    bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--bg-glass);
@@ -434,15 +434,15 @@ body.dark-theme .website-category {
     flex-direction: column;
     gap: 12px;
     min-width: 280px;
-    max-width: 90vw;
-    max-height: 60vh;
+    max-width: 95vw;
+    max-height: 75vh;
     overflow-y: auto;
     /* 优化滚动性能 */
     -webkit-overflow-scrolling: touch;
     overflow-scrolling: touch;
     will-change: transform;
-    /* 确保滚动时内容不消失 */
-    contain: strict;
+    /* 调整contain属性，确保内容完整显示 */
+    contain: layout style;
 }
 
 /* 自定义滚动条样式 */
@@ -598,10 +598,10 @@ body.dark-theme .website-category {
 
     .menu-modal {
         width: 95%;
-        max-width: 340px;
-        bottom: 90px;
-        padding: 16px;
-        max-height: 70vh;
+        max-width: 95vw;
+        bottom: 100px;
+        padding: 20px;
+        max-height: 80vh;
     }
 
     .modal-buttons {
