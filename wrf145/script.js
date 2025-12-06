@@ -873,6 +873,12 @@ function init() {
     
     // 检查本地存储的主题偏好
     checkThemePreference();
+    
+    // 预创建所有分类按钮，优化菜单搜索弹窗渲染性能
+    initCategoryButtons();
+    
+    // 预渲染菜单搜索结果，避免点击时的延迟
+    preRenderMenuSearch();
 }
 
 // 动态生成分类菜单
@@ -1201,21 +1207,38 @@ function getCategoryCount(categoryId) {
     return category ? category.websites.length : 0;
 }
 
-// 渲染菜单搜索结果
-function renderMenuSearchResults(searchTerm = '') {
-    // 过滤分类
-    const filteredCategories = categories.filter(category => {
-        return category.name.toLowerCase().includes(searchTerm);
-    });
+// 缓存分类数量，避免重复计算
+const categoryCountCache = {};
+
+// 优化的分类数量统计函数
+function getCategoryCount(categoryId) {
+    // 检查缓存
+    if (categoryCountCache[categoryId]) {
+        return categoryCountCache[categoryId];
+    }
     
-    // 清空搜索结果
-    menuSearchResults.innerHTML = '';
+    let count;
+    if (categoryId === 'all') {
+        count = 0;
+        websiteData.forEach(category => {
+            count += category.websites.length;
+        });
+    } else {
+        const category = websiteData.find(cat => cat.id.toString() === categoryId);
+        count = category ? category.websites.length : 0;
+    }
     
-    // 优化渲染：使用文档片段批量添加元素
-    const fragment = document.createDocumentFragment();
-    
-    // 渲染搜索结果
-    filteredCategories.forEach(category => {
+    // 缓存结果
+    categoryCountCache[categoryId] = count;
+    return count;
+}
+
+// 预创建所有分类按钮，避免重复创建
+const allCategoryButtons = [];
+
+// 初始化分类按钮缓存
+function initCategoryButtons() {
+    categories.forEach(category => {
         const count = getCategoryCount(category.id);
         const button = document.createElement('button');
         button.className = 'category-btn';
@@ -1239,7 +1262,29 @@ function renderMenuSearchResults(searchTerm = '') {
             button.style.transform = 'scale(1)';
         });
         
-        fragment.appendChild(button);
+        allCategoryButtons.push(button);
+    });
+}
+
+// 渲染菜单搜索结果 - 优化版
+function renderMenuSearchResults(searchTerm = '') {
+    // 清空搜索结果
+    menuSearchResults.innerHTML = '';
+    
+    // 过滤分类
+    const searchLower = searchTerm.toLowerCase();
+    const filteredButtons = allCategoryButtons.filter(button => {
+        const categoryId = button.dataset.category;
+        const category = categories.find(cat => cat.id === categoryId);
+        return category.name.toLowerCase().includes(searchLower);
+    });
+    
+    // 优化渲染：使用文档片段批量添加元素
+    const fragment = document.createDocumentFragment();
+    
+    // 添加过滤后的按钮
+    filteredButtons.forEach(button => {
+        fragment.appendChild(button.cloneNode(true));
     });
     
     // 一次性添加所有元素，提高性能
