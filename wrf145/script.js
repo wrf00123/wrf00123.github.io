@@ -335,7 +335,6 @@ const websiteData = [
     }
 ];
 
-
 // DOM元素
 const searchInput = document.getElementById('searchInput');
 const websitesGrid = document.getElementById('websitesGrid');
