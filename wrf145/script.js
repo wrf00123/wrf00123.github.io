@@ -1271,36 +1271,24 @@ function renderMenuSearchResults(searchTerm = '') {
         return category.name.toLowerCase().includes(searchLower);
     });
     
-    // 优化渲染：减少DOM操作
+    // 生成HTML字符串，简化样式和结构
     let buttonsHTML = '';
     
-    // 生成HTML字符串，减少DOM操作次数
+    // 生成HTML，使用简化的样式
     filteredCategories.forEach(category => {
         const count = getCategoryCount(category.id);
-        buttonsHTML += `<button class="category-btn" data-category="${category.id}">${category.name} <span style="font-size: 12px; opacity: 0.7; font-weight: normal;">(${count})</span></button>`;
+        // 简化按钮样式，减少渲染负担
+        buttonsHTML += `<button class="category-btn" data-category="${category.id}">${category.name} (${count})</button>`;
     });
     
-    // 一次性添加所有HTML，提高性能
+    // 一次性添加所有HTML，减少DOM操作
     menuSearchResults.innerHTML = buttonsHTML;
     
-    // 绑定点击事件
-    const buttons = menuSearchResults.querySelectorAll('.category-btn');
-    buttons.forEach(button => {
-        button.addEventListener('click', handleCategoryChange);
-        
-        // 优化触摸反馈
-        button.addEventListener('touchstart', () => {
-            button.style.transform = 'scale(0.95)';
-            button.style.transition = 'transform 0.1s ease';
-        });
-        
-        button.addEventListener('touchend', () => {
-            button.style.transform = 'scale(1)';
-        });
-        
-        button.addEventListener('touchcancel', () => {
-            button.style.transform = 'scale(1)';
-        });
+    // 绑定事件委托，减少事件监听器数量
+    menuSearchResults.addEventListener('click', (e) => {
+        if (e.target.classList.contains('category-btn')) {
+            handleCategoryChange(e);
+        }
     });
 }
 

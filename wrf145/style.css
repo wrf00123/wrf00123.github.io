@@ -447,8 +447,10 @@ body.dark-theme .website-category {
     -webkit-overflow-scrolling: touch;
     overflow-scrolling: touch;
     will-change: transform;
-    /* 调整contain属性，确保内容完整显示 */
-    contain: layout style;
+    /* 简化contain属性，提高性能 */
+    contain: layout;
+    /* 简化样式，提高渲染性能 */
+    box-sizing: border-box;
 }
 
 /* 自定义滚动条样式 */
