@@ -203,6 +203,31 @@ body {
     .container {
         padding-top: 10px;
     }
+    
+    /* 优化触摸目标大小 */
+    .category-btn,
+    .menu-search-btn {
+        min-width: 85px;
+        padding: 12px 16px;
+        font-size: 14px;
+        margin: 0 4px;
+    }
+    
+    /* 优化按钮间距 */
+    .category-menu {
+        gap: 8px;
+    }
+    
+    /* 优化滚动体验 */
+    html {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* 防止点击延迟 */
+    * {
+        -webkit-tap-highlight-color: transparent;
+    }
 }
 
 /* 主要内容区 */
@@ -558,51 +583,80 @@ body.dark-theme .website-category {
     }
     
     .title {
-        font-size: 18px;
+        font-size: 20px;
+        font-weight: 600;
     }
     
     .website-card {
-        padding: 16px;
+        padding: 20px;
+        margin: 0 auto;
+        max-width: 100%;
     }
     
     .website-card h3 {
-        font-size: 16px;
+        font-size: 18px;
+        margin-bottom: 8px;
     }
     
     .website-card p {
-        font-size: 13px;
+        font-size: 15px;
+        line-height: 1.6;
+        margin-bottom: 12px;
     }
     
     .search-input {
-        padding: 10px 14px;
-        font-size: 14px;
+        padding: 14px 18px;
+        font-size: 16px;
     }
     
     .category-btn {
-        padding: 9px 14px;
-        font-size: 12px;
-        min-width: 70px;
+        padding: 12px 16px;
+        font-size: 14px;
+        min-width: 80px;
+        border-radius: 24px;
     }
     
     .menu-search-btn {
-        padding: 9px 14px;
-        font-size: 12px;
-        min-width: 90px;
+        padding: 12px 16px;
+        font-size: 14px;
+        min-width: 80px;
+        border-radius: 24px;
     }
     
     .menu-modal {
-        bottom: 80px;
-        padding: 14px;
+        bottom: 90px;
+        padding: 20px;
         width: 95%;
+        max-width: 360px;
     }
     
     .main-content {
-        margin-bottom: 90px;
+        margin-bottom: 100px;
+        padding: 0 0 20px 0;
     }
     
     .theme-toggle {
-        font-size: 20px;
-        padding: 6px;
+        font-size: 24px;
+        padding: 8px;
+    }
+    
+    /* 优化菜单弹窗按钮大小 */
+    .menu-modal .category-btn {
+        min-width: auto;
+        padding: 12px;
+        font-size: 15px;
+        margin: 0;
+    }
+    
+    /* 优化网址卡片间距 */
+    .websites-grid {
+        gap: 16px;
+    }
+    
+    /* 优化分类标签大小 */
+    .website-category {
+        font-size: 12px;
+        padding: 4px 12px;
     }
 }
 

@@ -958,18 +958,32 @@ function renderWebsites() {
     
     // 过滤网址
     const filteredWebsites = allWebsites.filter(website => {
-        const matchesCategory = currentCategory === 'all' || website.category === currentCategory;
+        // 当没有搜索词时，只显示当前分类的网站
+        // 当有搜索词时，忽略分类过滤，搜索所有分类
+        const matchesCategory = (currentSearchTerm === '' && (currentCategory === 'all' || website.category === currentCategory)) || 
+                              (currentSearchTerm !== '' && true);
         const matchesSearch = currentSearchTerm === '' || 
             website.name.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
             website.desc.toLowerCase().includes(currentSearchTerm.toLowerCase());
         return matchesCategory && matchesSearch;
     });
     
+    // 优化搜索结果排序：按匹配度排序
+    let sortedWebsites = filteredWebsites;
+    if (currentSearchTerm) {
+        const searchTerm = currentSearchTerm.toLowerCase();
+        sortedWebsites = filteredWebsites.sort((a, b) => {
+            const scoreA = calculateMatchScore(a, searchTerm);
+            const scoreB = calculateMatchScore(b, searchTerm);
+            return scoreB - scoreA; // 降序排列，分数高的排在前面
+        });
+    }
+    
     // 清空网格
     websitesGrid.innerHTML = '';
     
     // 渲染过滤后的网址
-    if (filteredWebsites.length === 0) {
+    if (sortedWebsites.length === 0) {
         // 显示空状态
         websitesGrid.innerHTML = `
             <div class="empty-state">
@@ -980,10 +994,39 @@ function renderWebsites() {
         return;
     }
     
-    filteredWebsites.forEach(website => {
+    sortedWebsites.forEach(website => {
         const websiteCard = createWebsiteCard(website);
         websitesGrid.appendChild(websiteCard);
     });
+}
+
+// 计算匹配分数
+function calculateMatchScore(website, searchTerm) {
+    let score = 0;
+    const nameLower = website.name.toLowerCase();
+    const descLower = website.desc.toLowerCase();
+    
+    // 完全匹配网站名称，最高优先级
+    if (nameLower === searchTerm) {
+        score += 100;
+    }
+    // 网站名称以搜索词开头
+    else if (nameLower.startsWith(searchTerm)) {
+        score += 80;
+    }
+    // 网站名称包含搜索词
+    else if (nameLower.includes(searchTerm)) {
+        score += 60;
+    }
+    // 网站描述包含搜索词
+    else if (descLower.includes(searchTerm)) {
+        score += 40;
+    }
+    
+    // 匹配长度加分
+    score += searchTerm.length * 2;
+    
+    return score;
 }
 
 // 创建网址卡片
@@ -999,6 +1042,20 @@ function createWebsiteCard(website) {
     // 添加点击事件，点击卡片打开网址
     card.addEventListener('click', () => {
         window.open(website.url, '_blank', 'noopener noreferrer');
+    });
+    
+    // 优化触摸反馈
+    card.addEventListener('touchstart', () => {
+        card.style.transform = 'scale(0.98)';
+        card.style.transition = 'transform 0.1s ease';
+    });
+    
+    card.addEventListener('touchend', () => {
+        card.style.transform = 'scale(1)';
+    });
+    
+    card.addEventListener('touchcancel', () => {
+        card.style.transform = 'scale(1)';
     });
     
     return card;
@@ -1025,6 +1082,10 @@ function handleCategoryChange(e) {
     
     // 更新当前分类
     currentCategory = category;
+    
+    // 清空搜索框
+    searchInput.value = '';
+    currentSearchTerm = '';
     
     // 更新所有分类按钮状态（包括底部菜单和搜索弹窗中的按钮）
     const allCategoryBtns = document.querySelectorAll('.category-btn');
@@ -1087,6 +1148,13 @@ function toggleMenuSearch() {
     
     // 如果打开弹窗，重置搜索状态
     if (menuSearchModal.classList.contains('active')) {
+        // 清空搜索框
+        searchInput.value = '';
+        currentSearchTerm = '';
+        // 重新渲染网址列表
+        renderWebsites();
+        
+        // 清空菜单搜索输入
         menuSearchInput.value = '';
         // 重新渲染所有分类，确保显示全部菜单按钮
         renderMenuSearchResults('');
@@ -1156,6 +1224,20 @@ function renderMenuSearchResults(searchTerm = '') {
         
         // 添加点击事件
         button.addEventListener('click', handleCategoryChange);
+        
+        // 优化触摸反馈
+        button.addEventListener('touchstart', () => {
+            button.style.transform = 'scale(0.95)';
+            button.style.transition = 'transform 0.1s ease';
+        });
+        
+        button.addEventListener('touchend', () => {
+            button.style.transform = 'scale(1)';
+        });
+        
+        button.addEventListener('touchcancel', () => {
+            button.style.transform = 'scale(1)';
+        });
         
         fragment.appendChild(button);
     });
