@@ -1141,6 +1141,13 @@ function preRenderMenuSearch() {
     renderMenuSearchResults();
 }
 
+// 绑定菜单搜索结果点击事件（只绑定一次）
+menuSearchResults.addEventListener('click', (e) => {
+    if (e.target.classList.contains('category-btn')) {
+        handleCategoryChange(e);
+    }
+});
+
 // 切换菜单搜索弹窗
 function toggleMenuSearch() {
     menuSearchModal.classList.toggle('active');
@@ -1182,10 +1189,10 @@ function handleMenuSearch(e) {
     // 清除之前的定时器
     clearTimeout(searchTimeout);
     
-    // 设置新的定时器，延迟100ms执行搜索，避免频繁渲染
+    // 设置新的定时器，延迟200ms执行搜索，避免频繁渲染
     searchTimeout = setTimeout(() => {
         renderMenuSearchResults(searchTerm);
-    }, 100);
+    }, 200);
 }
 
 // 统计每个分类的网址数量
@@ -1278,18 +1285,13 @@ function renderMenuSearchResults(searchTerm = '') {
     filteredCategories.forEach(category => {
         const count = getCategoryCount(category.id);
         // 简化按钮样式，减少渲染负担
-        buttonsHTML += `<button class="category-btn" data-category="${category.id}">${category.name} (${count})</button>`;
+        buttonsHTML += `<button class="category-btn" data-category="${category.id}">${category.name}</button>`;
     });
     
     // 一次性添加所有HTML，减少DOM操作
     menuSearchResults.innerHTML = buttonsHTML;
     
-    // 绑定事件委托，减少事件监听器数量
-    menuSearchResults.addEventListener('click', (e) => {
-        if (e.target.classList.contains('category-btn')) {
-            handleCategoryChange(e);
-        }
-    });
+    // 事件监听器已在页面加载时绑定，无需重复绑定
 }
 
 // 初始化应用

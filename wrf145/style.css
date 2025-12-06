@@ -431,26 +431,24 @@ body.dark-theme .website-category {
     background-color: var(--bg-glass);
     border: 1px solid var(--border-color);
     border-radius: 20px;
-    padding: 20px;
-    box-shadow: var(--shadow-elevated);
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
+    padding: 16px;
+    box-shadow: var(--shadow);
     z-index: 200;
     display: none;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     min-width: 280px;
     max-width: 95vw;
-    max-height: 75vh;
+    max-height: 70vh;
     overflow-y: auto;
     /* 优化滚动性能 */
     -webkit-overflow-scrolling: touch;
-    overflow-scrolling: touch;
-    will-change: transform;
-    /* 简化contain属性，提高性能 */
-    contain: layout;
     /* 简化样式，提高渲染性能 */
     box-sizing: border-box;
+    /* 移除复杂的玻璃效果，提高性能 */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: var(--bg-secondary);
 }
 
 /* 自定义滚动条样式 */
