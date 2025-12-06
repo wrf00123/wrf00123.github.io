@@ -72,6 +72,9 @@ body {
 
 /* 头部样式 */
 .header {
+    position: sticky;
+    top: 10px;
+    z-index: 50;
     padding: 15px 20px;
     margin-bottom: 20px;
     backdrop-filter: var(--backdrop-blur);
@@ -86,6 +89,21 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.header-content .search-container {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+    top: auto;
+    z-index: auto;
+    background: transparent;
+    padding: 0;
+    margin-bottom: 0;
 }
 
 .title {
@@ -128,6 +146,7 @@ body {
 /* 搜索栏样式 */
 .search-container {
     margin-bottom: 20px;
+    position: relative;
 }
 
 .search-input {
@@ -153,6 +172,37 @@ body {
 
 .search-input::placeholder {
     color: var(--text-secondary);
+}
+
+/* 手机端响应式设计 */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .title {
+        text-align: center;
+    }
+    
+    .header-actions {
+        justify-content: center;
+    }
+    
+    .header-content .search-container {
+        max-width: none;
+        margin: 0;
+    }
+    
+    .main-content {
+        margin-top: 10px;
+    }
+    
+    /* 确保搜索框在滚动时保持在顶部 */
+    .container {
+        padding-top: 10px;
+    }
 }
 
 /* 主要内容区 */
