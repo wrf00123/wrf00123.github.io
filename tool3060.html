@@ -1,0 +1,152 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站迁移通知</title>
+    <style>
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* 核心容器样式 */
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px 20px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* 标题样式 */
+        .title {
+            color: #e74c3c;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* 提示文字样式 */
+        .message {
+            color: #34495e;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* 新网址展示样式 */
+        .new-url {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            font-size: 16px;
+            margin: 25px 0;
+            word-break: break-all;
+            color: #2c3e50;
+        }
+
+        /* 倒计时样式 */
+        .countdown {
+            color: #95a5a6;
+            font-size: 16px;
+            margin: 20px 0;
+        }
+
+        /* 跳转按钮样式 */
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: #ffffff;
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* 页脚样式 */
+        .footer {
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 480px) {
+            .title {
+                font-size: 24px;
+            }
+            .message {
+                font-size: 16px;
+            }
+            .new-url {
+                font-size: 14px;
+            }
+            .btn {
+                padding: 10px 25px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">网站迁移通知</h1>
+        <p class="message">您好！本网站已永久迁移至新地址，原地址将不再维护和更新。</p>
+        <p class="message">请将新网址加入收藏夹，方便后续访问：</p>
+        <div class="new-url">https://wrf00123.github.io/3060/index.html</div>
+        <p class="countdown">您将在 <span id="countdown">5</span> 秒后自动跳转到新网址...</p>
+        <a href="https://wrf00123.github.io/3060/index.html" class="btn">立即前往新网址</a>
+    </div>
+    <div class="footer">
+        © 2025 网站迁移提示 | 如有疑问请联系网站管理员
+    </div>
+
+    <script>
+        // 倒计时自动跳转逻辑
+        let countdown = 60;
+        const countdownElement = document.getElementById('countdown');
+        const redirectUrl = 'https://wrf00123.github.io/3060/index.html';
+
+        // 倒计时定时器
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
+            // 倒计时结束后跳转
+            if (countdown <= 0) {
+                clearInterval(timer);
+                window.location.href = redirectUrl;
+            }
+        }, 1000);
+
+        // 点击手动跳转按钮时清除倒计时，避免重复跳转
+        document.querySelector('.btn').addEventListener('click', () => {
+            clearInterval(timer);
+        });
+    </script>
+</body>
+</html>
