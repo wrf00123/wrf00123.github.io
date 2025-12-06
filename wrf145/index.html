@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网址收录站</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">网址收录站</h1>
+                <div class="header-actions">
+                    <button class="theme-toggle" id="themeToggle">
+                        <span class="theme-icon">🌞</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 搜索栏 -->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="搜索网址..." class="search-input">
+        </div>
+
+        <!-- 网址列表 -->
+        <main class="main-content">
+            <div class="websites-grid" id="websitesGrid">
+                <!-- 网址卡片将通过JavaScript动态生成 -->
+            </div>
+        </main>
+
+        <!-- 底部分类菜单 -->
+        <footer class="footer">
+            <nav class="category-menu">
+                <button class="category-btn active" data-category="all">全部</button>
+                <button class="category-btn" data-category="social">社交</button>
+                <button class="category-btn" data-category="news">新闻</button>
+                <button class="category-btn" data-category="tools">工具</button>
+                <button class="category-btn" data-category="education">教育</button>
+                <button class="menu-search-btn" id="menuSearchBtn">
+                    菜单搜索
+                </button>
+            </nav>
+        </footer>
+
+        <!-- 菜单搜索弹窗 -->
+        <div class="menu-modal" id="menuSearchModal">
+            <h3 style="margin: 0 0 15px 0; font-size: 16px; color: var(--text-primary); text-align: center;">菜单搜索</h3>
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="menuSearchInput" placeholder="搜索分类..." style="
+                    width: 100%;
+                    padding: 12px 16px;
+                    font-size: 14px;
+                    border: 1px solid var(--border-color);
+                    border-radius: 20px;
+                    background-color: var(--search-bg);
+                    color: var(--search-text);
+                    outline: none;
+                    backdrop-filter: var(--backdrop-blur);
+                    -webkit-backdrop-filter: var(--backdrop-blur);
+                ">
+            </div>
+            <div class="modal-buttons" id="menuSearchResults">
+                <!-- 搜索结果将动态生成 -->
+            </div>
+        </div>
+
+        <!-- 遮罩层 -->
+        <div class="overlay" id="overlay"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
