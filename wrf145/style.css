@@ -104,7 +104,7 @@ body {
 
 .header-content .search-container {
     flex: 1;
-    max-width: 600px;
+    max-width: 100%;
     margin: 0 auto;
     position: relative;
     top: auto;
@@ -112,6 +112,7 @@ body {
     background: transparent;
     padding: 0;
     margin-bottom: 0;
+    width: 100%;
 }
 
 .title {
@@ -250,11 +251,23 @@ body {
 /* 网址网格 */
 .websites-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(3, 1fr); /* 每横排显示3个卡片 */
     gap: 24px;
     width: 100%; /* 确保与搜索框宽度一致 */
-    max-width: 600px; /* 与搜索框最大宽度一致 */
+    max-width: 100%; /* 宽度自适应，确保能显示3个卡片 */
     margin: 0 auto; /* 居中对齐 */
+}
+
+/* 确保卡片和搜索框左右边距一致 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    overflow-x: hidden; /* 防止容器左右滑动 */
 }
 
 /* 网址卡片 */
@@ -272,6 +285,7 @@ body {
     flex-direction: column;
     min-height: 160px; /* 设置最小高度，确保卡片大小一致 */
     justify-content: space-between;
+    min-width: 0; /* 确保卡片能够收缩，适应不同屏幕尺寸 */
 }
 
 .website-card:hover {
