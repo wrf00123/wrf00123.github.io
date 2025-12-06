@@ -873,12 +873,6 @@ function init() {
     
     // 检查本地存储的主题偏好
     checkThemePreference();
-    
-    // 预创建所有分类按钮，优化菜单搜索弹窗渲染性能
-    initCategoryButtons();
-    
-    // 预渲染菜单搜索结果，避免点击时的延迟
-    preRenderMenuSearch();
 }
 
 // 动态生成分类菜单
@@ -1273,22 +1267,41 @@ function renderMenuSearchResults(searchTerm = '') {
     
     // 过滤分类
     const searchLower = searchTerm.toLowerCase();
-    const filteredButtons = allCategoryButtons.filter(button => {
-        const categoryId = button.dataset.category;
-        const category = categories.find(cat => cat.id === categoryId);
+    const filteredCategories = categories.filter(category => {
         return category.name.toLowerCase().includes(searchLower);
     });
     
-    // 优化渲染：使用文档片段批量添加元素
-    const fragment = document.createDocumentFragment();
+    // 优化渲染：减少DOM操作
+    let buttonsHTML = '';
     
-    // 添加过滤后的按钮
-    filteredButtons.forEach(button => {
-        fragment.appendChild(button.cloneNode(true));
+    // 生成HTML字符串，减少DOM操作次数
+    filteredCategories.forEach(category => {
+        const count = getCategoryCount(category.id);
+        buttonsHTML += `<button class="category-btn" data-category="${category.id}">${category.name} <span style="font-size: 12px; opacity: 0.7; font-weight: normal;">(${count})</span></button>`;
     });
     
-    // 一次性添加所有元素，提高性能
-    menuSearchResults.appendChild(fragment);
+    // 一次性添加所有HTML，提高性能
+    menuSearchResults.innerHTML = buttonsHTML;
+    
+    // 绑定点击事件
+    const buttons = menuSearchResults.querySelectorAll('.category-btn');
+    buttons.forEach(button => {
+        button.addEventListener('click', handleCategoryChange);
+        
+        // 优化触摸反馈
+        button.addEventListener('touchstart', () => {
+            button.style.transform = 'scale(0.95)';
+            button.style.transition = 'transform 0.1s ease';
+        });
+        
+        button.addEventListener('touchend', () => {
+            button.style.transform = 'scale(1)';
+        });
+        
+        button.addEventListener('touchcancel', () => {
+            button.style.transform = 'scale(1)';
+        });
+    });
 }
 
 // 初始化应用
