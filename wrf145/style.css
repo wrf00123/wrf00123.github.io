@@ -345,26 +345,43 @@ body.dark-theme .website-category {
 /* 底部样式 */
 .footer {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     backdrop-filter: var(--backdrop-blur);
     -webkit-backdrop-filter: var(--backdrop-blur);
     background-color: var(--bg-glass);
-    border-top: 1px solid var(--border-color);
-    padding: 15px 0;
+    border: 1px solid var(--border-color);
+    padding: 12px 20px;
     z-index: 100;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    border-radius: 30px;
+    max-width: 90vw;
+    width: auto;
+    /* 苹果风格设计 */
+    overflow: hidden;
 }
 
 /* 分类菜单 */
 .category-menu {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    padding: 0 20px;
+    gap: 10px;
+    flex-wrap: nowrap;
+    padding: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    /* 隐藏滚动条 */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    white-space: nowrap;
+}
+
+/* 隐藏滚动条 */
+.category-menu::-webkit-scrollbar {
+    display: none;
 }
 
 .category-btn {
@@ -386,6 +403,33 @@ body.dark-theme .website-category {
     /* 简化样式，提高渲染性能 */
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+    /* 确保文字横向显示 */
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    min-width: auto;
+}
+
+/* 菜单搜索按钮 */
+.menu-search-btn {
+    background-color: var(--category-btn);
+    color: var(--category-btn-text);
+    border: 1px solid var(--border-color);
+    padding: 10px 16px;
+    border-radius: 24px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: var(--shadow);
+    /* 简化样式，提高渲染性能 */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    /* 确保文字横向显示 */
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    min-width: auto;
 }
 
 .category-btn:hover {
