@@ -1278,14 +1278,14 @@ function renderMenuSearchResults(searchTerm = '') {
         return category.name.toLowerCase().includes(searchLower);
     });
     
-    // 生成HTML字符串，简化样式和结构
+    // 生成HTML字符串，显示分类数量
     let buttonsHTML = '';
     
-    // 生成HTML，使用简化的样式
+    // 生成HTML，包含分类数量
     filteredCategories.forEach(category => {
         const count = getCategoryCount(category.id);
-        // 简化按钮样式，减少渲染负担
-        buttonsHTML += `<button class="category-btn" data-category="${category.id}">${category.name}</button>`;
+        // 显示分类名称和数量
+        buttonsHTML += `<button class="category-btn" data-category="${category.id}">${category.name} (${count})</button>`;
     });
     
     // 一次性添加所有HTML，减少DOM操作
