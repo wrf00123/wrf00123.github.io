@@ -269,7 +269,8 @@ const websiteData = [
                     { name: "时光计算器", url: "https://wrf00123.github.io/tool4.html", desc: "日期计算" },
                     { name: "RGB调色板", url: "https://wrf00123.github.io/tool13.html", desc: "调色板" },
                     {  name: "单位换算器", url: "https://wrf00123.github.io/tool14.html", desc: "单位换算器" },
-                    { name: "html导出工具", url: "https://wrf00123.github.io/tool5.html", desc: "html工具" },
+                    { name: "html导出", url: "https://wrf00123.github.io/tool5.html", desc: "html工具" },
+                    { name: "txt导出", url: "https://wrf00123.github.io/tool17.html", desc: "txt工具" },
                     { name: "不良影响演示", url: "https://wrf00123.github.io/tool10.html", desc: "演示工具" }
                 ]
             },
