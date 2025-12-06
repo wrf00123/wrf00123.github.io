@@ -510,6 +510,7 @@ body.dark-theme .website-category {
         grid-template-columns: 1fr;
         gap: 16px;
         max-width: none; /* 移动端宽度自适应，与搜索框一致 */
+        width: 100%; /* 确保宽度为100% */
     }
 
     .website-card {
@@ -521,6 +522,8 @@ body.dark-theme .website-category {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+        width: 100%; /* 确保卡片宽度为100% */
+        box-sizing: border-box; /* 确保内边距不会影响宽度 */
     }
 
     .website-card:active {
@@ -630,7 +633,9 @@ body.dark-theme .website-category {
     .website-card {
         padding: 20px;
         margin: 0 auto;
+        width: 100%;
         max-width: 100%;
+        box-sizing: border-box;
     }
     
     .website-card h3 {
