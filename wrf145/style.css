@@ -377,9 +377,15 @@ body.dark-theme .website-category {
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
-    backdrop-filter: var(--backdrop-blur);
-    -webkit-backdrop-filter: var(--backdrop-blur);
     box-shadow: var(--shadow);
+    /* 优化文字渲染，避免延迟显示 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* 强制文字渲染，避免滚动延迟 */
+    transform: translateZ(0);
+    /* 简化样式，提高渲染性能 */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 .category-btn:hover {
@@ -428,7 +434,7 @@ body.dark-theme .website-category {
     bottom: 100px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: var(--bg-glass);
+    background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 16px;
@@ -445,10 +451,11 @@ body.dark-theme .website-category {
     -webkit-overflow-scrolling: touch;
     /* 简化样式，提高渲染性能 */
     box-sizing: border-box;
-    /* 移除复杂的玻璃效果，提高性能 */
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    background-color: var(--bg-secondary);
+    /* 强制硬件加速，提高渲染性能 */
+    transform: translateX(-50%) translateZ(0);
+    /* 优化文字渲染 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* 自定义滚动条样式 */
