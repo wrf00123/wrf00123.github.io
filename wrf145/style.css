@@ -253,6 +253,7 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
     width: 100%; /* 确保与搜索框宽度一致 */
+    max-width: 600px; /* 与搜索框最大宽度一致 */
     margin: 0 auto; /* 居中对齐 */
 }
 
@@ -494,6 +495,7 @@ body.dark-theme .website-category {
     .websites-grid {
         grid-template-columns: 1fr;
         gap: 16px;
+        max-width: none; /* 移动端宽度自适应，与搜索框一致 */
     }
 
     .website-card {
