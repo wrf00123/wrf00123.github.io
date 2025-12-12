@@ -1,4 +1,4 @@
-// 示例网址数据 - 新的嵌套分类格式
+﻿// 示例网址数据 - 新的嵌套分类格式
 const websiteData = [
             {
                 id: 1,
@@ -320,6 +320,7 @@ const websiteData = [
                     { name: "MuseTransfer", url: "https://musetransfer.com/", desc: "文件快递柜" },
                     { name: "Wormhole:https", url: "https://wormhole.app/", desc: "文件快递柜" },
                     { name: "轻松传", url: "https://easychuan.cn/", desc: "文件快递柜" },
+                    { name: "Temporam", url: "https://www.temporam.com/zh", desc: "临时邮箱" },
                     { name: "zrfme", url: "https://mail.zrfme.com/", desc: "临时邮箱" },
                     { name: "临时邮箱", url: "https://tempmailto.online/zh/", desc: "临时邮箱" },
                     { name: "MoeMail", url: "https://moemail.app/", desc: "临时邮箱" },
@@ -425,6 +426,8 @@ const websiteData = [
                     { name: "FastStone Capture", url: "https://www.faststonecapture.cn/", desc: "截长图" },
                     { name: "小旺AI截图", url: "https://www.xiaowang.com/", desc: "截长图" },
                     { name: "PixPin", url: "https://pixpin.cn/", desc: "截长图" },
+                    { name: "鹰迅办公", url: "https://www.inxunoffice.com/", desc: "批量文档处理" },
+                    { name: "我的ABC软件工具箱", url: "https://www.wodeabc.com/", desc: "批量文档处理" },
                     { name: "7-Zip", url: "https://www.7-zip.org/", desc: "解压" },
                     { name: "PeaZip", url: "https://peazip.github.io/download-installer-p-windows.html", desc: "解压" },
                     { name: "Bandizip", url: "https://www.bandisoft.com/bandizip/", desc: "解压" },
@@ -553,8 +556,7 @@ const websiteData = [
                     { name: "豆包", url: "https://www.doubao.com/chat/?channel=baidu_pz&from_login=1", desc: "在线AI" },
                     { name: "sora", url: "https://sora.chatgpt.com/explore", desc: "视视频生成" },
                     { name: "腾讯元宝", url: "https://yuanbao.tencent.com/chat/naQivTmsDa", desc: "在线AI" },
-                    { name: "千问", url: "https://bailian.console.aliyun.com/?spm=5176.29597918.J_SEsSjsNv72yRuRFS2VknO.2.58097b08NLCCAi&tab=model#/efm/model_experience_center/text/experience", desc: "在线AI" },
-                    { name: "Kimi", url: "https://www.kimi.com/zh/", desc: "在线AI" },
+                    { name: "千问", url: "https://www.qianwen.com/chat", desc: "在线AI" },
                     { name: "WPS灵犀", url: "https://lingxi.wps.cn/echo", desc: "AI生成文档" },
                     { name: "飞书多维表格", url: "https://acnkgpefayvj.feishu.cn/base", desc: "在线AI" },
                     { name: "inviteChain", url: "https://invite-chain.vercel.app/", desc: "sora邀请码获取" },
@@ -568,8 +570,8 @@ const websiteData = [
                     { name: "火山方舟", url: "https://www.volcengine.com/experience/ark", desc: "在线AI" },
                     { name: "腾讯问卷", url: "https://wj.qq.com/ai/generate.html", desc: "AI生成问卷" },
                     { name: "小艺", url: "https://xiaoyi.huawei.com/chat/", desc: "华为小艺AI" },
-                    { name: "小布助手", url: "https://xiaoyi.huawei.com/chat/", desc: "OPPO小布AI" },
-                    
+                    { name: "小布助手", url: "https://xiaobu.coloros.com/chat", desc: "OPPO小布AI" },
+                    { name: "灵光", url: "https://www.lingguang.com/chat", desc: "在线AI" },
                     { name: "扣子空间", url: "https://space.coze.cn/?from=landingpage&keywordid=%E6%89%A3%E5%AD%90%E7%A9%BA%E9%97%B4-&msclkid=beda8a449f5a1495141ee2f6e949910b&utm_campaign=486599295&utm_content=home&utm_id=0&utm_medium=sem&utm_source=bing&utm_source_platform=pc&utm_term=coze_bing_sem_dm_cpc_pc_czkj_pp_guanw_1&category=7524912604796452873", desc: "在线AI" },
                     { name: "TRAE", url: "https://www.trae.cn/sem?utm_source=bing&utm_medium=bing_sem&utm_campaign=486432838&utm_term=trae_bing_sem_dm_pc_cpc_tongy_aibczs_dmsc_1&msclkid=631e30d0a1751fa2ce4e582fd990f7a3", desc: "代码生成软件" },
                     { name: "CodeBuddy", url: "https://copilot.tencent.com/?utm_source=maomu.com", desc: "代码生成软件" },
