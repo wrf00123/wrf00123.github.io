@@ -702,7 +702,6 @@ const websiteData = [
                 title: "资源网站",
                 icon: "fa-ellipsis-h",
                 websites: [
-                    { name: "墨晨的万事屋", url: "https://www.flowus.cn/tzh1/share/e4d10f9e-6da9-4b18-acb1-11fed98f9eff", desc: "资源合集" },
                     { name: "科淘科研导航", url: "https://www.bioscitao.com/", desc: "资源合集" },
                     { name: "聚神铺导航", url: "https://www.jspoo.com/", desc: "资源合集" },
                     { name: "数智未来", url: "https://diglit.cn/", desc: "资源合集" },
