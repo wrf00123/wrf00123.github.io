@@ -1210,13 +1210,14 @@ function toggleMoreMenu(e) {
     if (e) e.stopPropagation();
     moreMenu.classList.toggle('active');
     
-    // 如果打开更多菜单，聚焦搜索框
-    if (moreMenu.classList.contains('active')) {
-        setTimeout(() => {
-            moreMenuSearch.focus();
-        }, 100);
-    }
+    // 移除自动聚焦，只有点击搜索框时才弹出键盘
 }
+
+// 为更多菜单搜索框添加点击事件，确保点击时能正确聚焦
+moreMenuSearch.addEventListener('click', (e) => {
+    e.stopPropagation();
+    moreMenuSearch.focus();
+});
 
 // 渲染书签卡片
 function renderBookmarks() {
@@ -1305,8 +1306,99 @@ function renderCategorySection(category, websites) {
     // 创建分类标题 - 全部文字改为灰色
     const categoryTitle = document.createElement('h2');
     categoryTitle.className = 'category-title fade-in';
+    
+    // 根据分类名称设置合适的图标，与菜单栏保持一致
+    let icon = category.icon;
+    switch(category.title) {
+        case "国际标准":
+            icon = "fa-flag";
+            break;
+        case "国家标准":
+            icon = "fa-book";
+            break;
+        case "行业标准":
+            icon = "fa-industry";
+            break;
+        case "地方标准":
+            icon = "fa-map-marker-alt";
+            break;
+        case "团体标准":
+            icon = "fa-users";
+            break;
+        case "其他标准":
+            icon = "fa-file-alt";
+            break;
+        case "资质查询":
+            icon = "fa-id-card";
+            break;
+        case "程序开发":
+            icon = "fa-code";
+            break;
+        case "办公工具":
+            icon = "fa-desktop";
+            break;
+        case "效率工具":
+            icon = "fa-bolt";
+            break;
+        case "专业软件":
+            icon = "fa-cogs";
+            break;
+        case "模板下载":
+            icon = "fa-download";
+            break;
+        case "图库":
+            icon = "fa-images";
+            break;
+        case "常用网站":
+            icon = "fa-link";
+            break;
+        case "AI模型":
+            icon = "fa-robot";
+            break;
+        case "国内法规":
+            icon = "fa-gavel";
+            break;
+        case "合同范本":
+            icon = "fa-file-contract";
+            break;
+        case "学教程":
+            icon = "fa-graduation-cap";
+            break;
+        case "学习网站":
+            icon = "fa-book-open";
+            break;
+        case "资源网站":
+            icon = "fa-folder-open";
+            break;
+        case "科普网站":
+            icon = "fa-lightbulb";
+            break;
+        case "有趣网站":
+            icon = "fa-gamepad";
+            break;
+        case "邮箱":
+            icon = "fa-envelope";
+            break;
+        case "采购平台":
+            icon = "fa-shopping-cart";
+            break;
+        case "招聘平台":
+            icon = "fa-user-plus";
+            break;
+        case "其他":
+            icon = "fa-ellipsis-h";
+            break;
+        default:
+            // 处理搜索结果和全部网址的情况
+            if (category.title.includes("搜索结果") || category.title.includes("全部网址")) {
+                icon = "fa-globe";
+            } else {
+                icon = "fa-search";
+            }
+    }
+    
     categoryTitle.innerHTML = `
-        <i class="fas ${category.icon}"></i>
+        <i class="fas ${icon}"></i>
         <span>${category.title} <span style="color: var(--text-secondary); font-weight: 600;">(${websites.length})</span></span>
     `;
     bookmarksContainer.appendChild(categoryTitle);
