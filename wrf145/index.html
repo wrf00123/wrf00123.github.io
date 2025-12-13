@@ -3,67 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>网址收录站</title>
+    <title>iOS 26 网址收藏</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <!-- 头部 -->
+        <!-- 顶部栏 -->
         <header class="header">
-            <div class="header-content">
-                <h1 class="title">网址收录站</h1>
-                
-                <!-- 搜索栏 - 与标题同一横排居中 -->
-                <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="搜索网址..." class="search-input">
-                </div>
-                
-                <div class="header-actions">
-                    <button class="theme-toggle" id="themeToggle">
-                        <span class="theme-icon">🌞</span>
-                    </button>
-                </div>
+            <h1><i class="fas fa-compass"></i> 网址收藏库</h1>
+            
+            <!-- 搜索框 -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索网址名称...">
             </div>
+            
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
         </header>
 
-        <!-- 网址列表 -->
-        <main class="main-content">
-            <div class="websites-grid" id="websitesGrid">
-                <!-- 网址卡片将通过JavaScript动态生成 -->
-            </div>
+        <!-- 网址卡片区域 -->
+        <main id="bookmarksContainer">
+            <!-- 分类和卡片将通过JavaScript动态生成 -->
         </main>
 
-        <!-- 底部分类菜单 -->
-        <footer class="footer">
-            <nav class="category-menu">
-                <!-- 分类按钮将通过JavaScript动态生成 -->
-            </nav>
-        </footer>
+        <!-- 底部菜单栏 -->
+        <nav class="bottom-menu" id="bottomMenu">
+            <!-- 菜单项将通过JavaScript动态生成 -->
+        </nav>
 
-        <!-- 菜单搜索弹窗 -->
-        <div class="menu-modal" id="menuSearchModal">
-            <h3 style="margin: 0 0 15px 0; font-size: 16px; color: var(--text-primary); text-align: center;">菜单搜索</h3>
-            <div style="margin-bottom: 15px;">
-                <input type="text" id="menuSearchInput" placeholder="搜索分类..." style="
-                    width: 100%;
-                    padding: 12px 16px;
-                    font-size: 14px;
-                    border: 1px solid var(--border-color);
-                    border-radius: 20px;
-                    background-color: var(--search-bg);
-                    color: var(--search-text);
-                    outline: none;
-                    backdrop-filter: var(--backdrop-blur);
-                    -webkit-backdrop-filter: var(--backdrop-blur);
-                ">
+        <!-- 更多菜单弹出 -->
+        <div class="more-menu" id="moreMenu">
+            <div class="more-menu-header">
+                <div class="more-menu-title">所有分类</div>
+                <div class="more-menu-search-container">
+                    <i class="fas fa-search more-menu-search-icon"></i>
+                    <input type="text" class="more-menu-search" id="moreMenuSearch" placeholder="搜索分类或网址...">
+                </div>
             </div>
-            <div class="modal-buttons" id="menuSearchResults">
-                <!-- 搜索结果将动态生成 -->
+            <div class="more-menu-categories" id="moreCategories">
+                <!-- 更多分类将通过JavaScript动态生成 -->
             </div>
         </div>
-
-        <!-- 遮罩层 -->
-        <div class="overlay" id="overlay"></div>
     </div>
 
     <script src="script.js"></script>

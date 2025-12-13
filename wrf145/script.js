@@ -1,8 +1,8 @@
-﻿// 示例网址数据 - 新的嵌套分类格式
+﻿// 数据模型 - 按照您提供的格式
 const websiteData = [
             {
                 id: 1,
-                title: "国际标准查询",
+                title: "国际标准",
                 icon: "fa-search",
                 websites: [
                     { name: "ISO官网", url: "https://www.iso.org/iso-update.html", desc: "标准每月发布的报告" },
@@ -88,7 +88,7 @@ const websiteData = [
             },
           {
                 id: 2,
-                title: "国家标准查询",
+                title: "国家标准",
                 icon: "fa-search",
                 websites: [
                     { name: "全国标准信息公共服务平台", url: "https://std.samr.gov.cn/", desc: "国家/行业/地方/团体/企业/国际/国外标准" },
@@ -121,7 +121,7 @@ const websiteData = [
             },
           {
                 id: 3,
-                title: "行业标准查询",
+                title: "行业标准",
                 icon: "fa-search",
                 websites: [
                     { name: "行业标准信息服务平台", url: "https://hbba.sacinfo.org.cn/", desc: "行标综合平台" },
@@ -170,7 +170,7 @@ const websiteData = [
             },
           {
                 id: 4,
-                title: "地方标准查询",
+                title: "地方标准",
                 icon: "fa-search",
                 websites: [
                     { name: "地方标准信息服务平台", url: "https://dbba.sacinfo.org.cn/", desc: "标准下载" },
@@ -193,7 +193,7 @@ const websiteData = [
             },
           {
                 id: 5,
-                title: "团体标准查询",
+                title: "团体标准",
                 icon: "fa-search",
                 websites: [
                     { name: "全国团体标准信息平台", url: "https://www.ttbz.org.cn/Home/Standard", desc: "标准下载" },
@@ -209,7 +209,7 @@ const websiteData = [
             },
           {
                 id: 6,
-                title: "其他标准查询",
+                title: "其他标准",
                 icon: "fa-search",
                 websites: [
                     { name: "企业标准信息公共服务平台", url: "https://www.qybz.org.cn/", desc: "标准下载" },
@@ -254,7 +254,7 @@ const websiteData = [
           
           {
                 id: 8,
-                title: "工具开发中心",
+                title: "程序开发",
                 icon: "fa-bolt",
                 websites: [
                     { name: "AQL抽样", url: "https://wrf00123.github.io/tool3.html", desc: "查询程序" },
@@ -271,7 +271,8 @@ const websiteData = [
                     {  name: "单位换算器", url: "https://wrf00123.github.io/tool14.html", desc: "单位换算器" },
                     { name: "html导出", url: "https://wrf00123.github.io/tool5.html", desc: "html工具" },
                     { name: "txt导出", url: "https://wrf00123.github.io/tool17.html", desc: "txt工具" },
-                    { name: "不良影响演示", url: "https://wrf00123.github.io/tool10.html", desc: "演示工具" }
+                    { name: "不良影响演示", url: "https://wrf00123.github.io/tool10.html", desc: "演示工具" },
+                    { name: "生日祝福", url: "https://wrf00123.github.io/tool18.html", desc: "演示工具" }
                 ]
             },
             {
@@ -548,7 +549,7 @@ const websiteData = [
             },
             {
                 id: 15,
-                title: "AI大模型",
+                title: "AI模型",
                 icon: "fa-microchip",
                 websites: [
                     { name: "DeepSeek", url: "https://chat.deepseek.com/sign_in", desc: "在线AI" },
@@ -590,7 +591,7 @@ const websiteData = [
             {
                 id: 16,
                 title: "国内法规",
-                icon: "fa-file-text-o",
+                icon: "fa-ellipsis-h",
                 websites: [
                     { name: "全球法规网", url: "https://policy.mofcom.gov.cn/law/index.shtml", desc: "全球法规网" },
                     { name: "最高人民法院公报", url: "http://gongbao.court.gov.cn/?ref=https://szsyw.cn", desc: "最高人民法院公报" },
@@ -838,467 +839,628 @@ const websiteData = [
             }
           
         ];
+
+// 状态管理
+let currentCategory = 0; // 0表示显示全部
+let isDarkMode = false;
+let searchQuery = '';
+let moreMenuSearchQuery = '';
+
 // DOM元素
-const searchInput = document.getElementById('searchInput');
-const websitesGrid = document.getElementById('websitesGrid');
+const bookmarksContainer = document.getElementById('bookmarksContainer');
+const bottomMenu = document.getElementById('bottomMenu');
+const moreMenu = document.getElementById('moreMenu');
+const moreCategories = document.getElementById('moreCategories');
 const themeToggle = document.getElementById('themeToggle');
-const themeIcon = document.querySelector('.theme-icon');
-let categoryBtns = document.querySelectorAll('.category-btn');
-let menuSearchBtn = document.getElementById('menuSearchBtn');
-const menuSearchModal = document.getElementById('menuSearchModal');
-const menuSearchInput = document.getElementById('menuSearchInput');
-const menuSearchResults = document.getElementById('menuSearchResults');
-const overlay = document.getElementById('overlay');
+const themeIcon = themeToggle.querySelector('i');
+const searchInput = document.getElementById('searchInput');
+const moreMenuSearch = document.getElementById('moreMenuSearch');
 
-// 从websiteData中动态提取分类数据
-const categories = [
-    { id: 'all', name: '全部' },
-    ...websiteData.map(category => ({
-        id: category.id.toString(),
-        name: category.title
-    }))
-];
-
-// 当前状态
-let currentCategory = 'all';
-let currentSearchTerm = '';
-
-// 初始化函数
+// 初始化
 function init() {
-    // 动态生成分类菜单
-    generateCategoryMenu();
+    renderCategories();
+    renderBookmarks();
+    setupEventListeners();
     
-    // 绑定事件监听器
-    bindEventListeners();
-    
-    // 渲染初始网址列表
-    renderWebsites();
-    
-    // 检查本地存储的主题偏好
-    checkThemePreference();
+    // 检查用户是否已设置主题偏好
+    const savedTheme = localStorage.getItem('bookmarks-theme');
+    if (savedTheme === 'dark') {
+        enableDarkMode();
+    }
 }
 
-// 动态生成分类菜单
-function generateCategoryMenu() {
-    // 获取分类菜单容器
-    const categoryMenu = document.querySelector('.category-menu');
+// 渲染分类菜单 - 固定8个按钮
+function renderCategories() {
+    // 清空底部菜单
+    bottomMenu.innerHTML = '';
     
-    // 清空现有菜单
-    categoryMenu.innerHTML = '';
+    // 添加"全部"菜单项（第一个按钮）
+    const allMenuItem = createMenuItem(0, "全部", "fas fa-globe", currentCategory === 0);
+    bottomMenu.appendChild(allMenuItem);
     
-    // 添加菜单搜索按钮（四叶草图标）到最左侧
-    const searchBtn = document.createElement('button');
-    searchBtn.className = 'menu-search-btn';
-    searchBtn.id = 'menuSearchBtn';
-    searchBtn.innerHTML = '🍀'; // 四叶草图标
-    searchBtn.title = '菜单搜索';
-    categoryMenu.appendChild(searchBtn);
-    
-    // 添加全部分类按钮
-    const allBtn = document.createElement('button');
-    allBtn.className = 'category-btn active';
-    allBtn.dataset.category = 'all';
-    allBtn.textContent = '全部';
-    categoryMenu.appendChild(allBtn);
-    
-    // 限制底部显示的菜单数量（最多显示10个，包括"全部"和"菜单搜索"）
-    const maxDisplayCount = 10;
-    const categoriesToDisplay = websiteData.slice(0, maxDisplayCount - 2); // 减去"全部"和"菜单搜索"
-    
-    // 添加部分分类按钮到底部菜单
-    categoriesToDisplay.forEach(category => {
-        const btn = document.createElement('button');
-        btn.className = 'category-btn';
-        btn.dataset.category = category.id.toString();
-        btn.textContent = category.title;
-        categoryMenu.appendChild(btn);
+    // 添加前6个分类（第2-7个按钮）
+    const categoriesToShow = websiteData.slice(0, 6);
+    categoriesToShow.forEach(category => {
+        const isActive = currentCategory === category.id;
+        // 根据分类名称设置合适的图标
+        let icon = category.icon;
+        switch(category.title) {
+            case "国际标准":
+                icon = "fa-flag";
+                break;
+            case "国家标准":
+                icon = "fa-book";
+                break;
+            case "行业标准":
+                icon = "fa-industry";
+                break;
+            case "地方标准":
+                icon = "fa-map-marker-alt";
+                break;
+            case "团体标准":
+                icon = "fa-users";
+                break;
+            case "其他标准":
+                icon = "fa-file-alt";
+                break;
+            case "资质查询":
+                icon = "fa-id-card";
+                break;
+            case "程序开发":
+                icon = "fa-code";
+                break;
+            case "办公工具":
+                icon = "fa-desktop";
+                break;
+            case "效率工具":
+                icon = "fa-bolt";
+                break;
+            case "专业软件":
+                icon = "fa-cogs";
+                break;
+            case "模板下载":
+                icon = "fa-download";
+                break;
+            case "图库":
+                icon = "fa-images";
+                break;
+            case "常用网站":
+                icon = "fa-link";
+                break;
+            case "AI模型":
+                icon = "fa-robot";
+                break;
+            case "国内法规":
+                icon = "fa-gavel";
+                break;
+            case "合同范本":
+                icon = "fa-file-contract";
+                break;
+            case "学教程":
+                icon = "fa-graduation-cap";
+                break;
+            case "学习网站":
+                icon = "fa-book-open";
+                break;
+            case "资源网站":
+                icon = "fa-folder-open";
+                break;
+            case "科普网站":
+                icon = "fa-lightbulb";
+                break;
+            case "有趣网站":
+                icon = "fa-gamepad";
+                break;
+            case "邮箱":
+                icon = "fa-envelope";
+                break;
+            case "采购平台":
+                icon = "fa-shopping-cart";
+                break;
+            case "招聘平台":
+                icon = "fa-user-plus";
+                break;
+            case "其他":
+                icon = "fa-ellipsis-h";
+                break;
+            default:
+                icon = "fa-search";
+        }
+        const menuItem = createMenuItem(category.id, category.title, `fas ${icon}`, isActive);
+        bottomMenu.appendChild(menuItem);
     });
     
-    // 更新分类按钮引用
-    categoryBtns = document.querySelectorAll('.category-btn');
-    menuSearchBtn = document.getElementById('menuSearchBtn');
+    // 添加"更多"按钮（第8个按钮）
+    const moreMenuItem = document.createElement('div');
+    moreMenuItem.className = 'menu-item';
+    moreMenuItem.id = 'moreMenuItem';
+    moreMenuItem.innerHTML = `
+        <i class="fas fa-ellipsis-h"></i>
+        <span>更多</span>
+    `;
+    moreMenuItem.addEventListener('click', toggleMoreMenu);
+    bottomMenu.appendChild(moreMenuItem);
     
-    // 绑定分类按钮事件
-    bindCategoryEvents();
+    // 渲染更多菜单内容
+    renderMoreCategories();
+    
+    // 添加网址征集按钮
+    addUrlCollectionButton();
 }
 
-// 绑定事件监听器
-function bindEventListeners() {
-    // 搜索功能
-    searchInput.addEventListener('input', handleSearch);
+// 创建菜单项
+function createMenuItem(id, title, icon, isActive) {
+    const menuItem = document.createElement('div');
+    menuItem.className = `menu-item ${isActive ? 'active' : ''}`;
+    menuItem.dataset.id = id;
+    menuItem.innerHTML = `
+        <i class="${icon}"></i>
+        <span>${title}</span>
+    `;
     
-    // 主题切换
-    themeToggle.addEventListener('click', toggleTheme);
+    menuItem.addEventListener('click', () => {
+        // 更新当前分类并重新渲染书签
+        currentCategory = id;
+        searchQuery = '';
+        searchInput.value = '';
+        moreMenuSearchQuery = '';
+        moreMenuSearch.value = '';
+        
+        renderBookmarks();
+        updateActiveMenu();
+        
+        // 关闭更多菜单（如果打开）
+        moreMenu.classList.remove('active');
+    });
     
-    // 菜单搜索输入
-    menuSearchInput.addEventListener('input', handleMenuSearch);
-    
-    // 遮罩层点击关闭菜单
-    overlay.addEventListener('click', closeMenuSearch);
+    return menuItem;
 }
 
-// 绑定分类按钮事件
-function bindCategoryEvents() {
-    // 分类菜单
-    categoryBtns.forEach(btn => {
-        btn.addEventListener('click', handleCategoryChange);
-    });
+// 渲染更多分类
+function renderMoreCategories() {
+    moreCategories.innerHTML = '';
     
-    // 菜单搜索按钮
-    menuSearchBtn.addEventListener('click', toggleMenuSearch);
-}
-
-// 渲染网址列表
-function renderWebsites() {
-    // 获取所有网址并添加分类ID
-    let allWebsites = [];
-    websiteData.forEach(category => {
-        allWebsites = [...allWebsites, ...category.websites.map(website => ({
-            ...website,
-            category: category.id.toString()
-        }))];
+    // 先添加"全部"分类按钮
+    const allCategoryItem = document.createElement('div');
+    allCategoryItem.className = `more-category-item ${currentCategory === 0 ? 'active' : ''}`;
+    allCategoryItem.innerHTML = `
+        <div class="more-category-name">
+            <i class="fas fa-globe"></i> 全部
+        </div>
+        <div class="more-category-count">${websiteData.reduce((sum, cat) => sum + cat.websites.length, 0)}</div>
+    `;
+    allCategoryItem.addEventListener('click', () => {
+        currentCategory = 0;
+        searchQuery = '';
+        searchInput.value = '';
+        moreMenuSearchQuery = '';
+        moreMenuSearch.value = '';
+        
+        renderBookmarks();
+        updateActiveMenu();
+        moreMenu.classList.remove('active');
+        
+        // 重新渲染更多分类（恢复默认视图）
+        renderMoreCategories();
     });
+    moreCategories.appendChild(allCategoryItem);
     
-    // 过滤网址
-    const filteredWebsites = allWebsites.filter(website => {
-        // 当没有搜索词时，只显示当前分类的网站
-        // 当有搜索词时，忽略分类过滤，搜索所有分类
-        const matchesCategory = (currentSearchTerm === '' && (currentCategory === 'all' || website.category === currentCategory)) || 
-                              (currentSearchTerm !== '' && true);
-        const matchesSearch = currentSearchTerm === '' || 
-            website.name.toLowerCase().includes(currentSearchTerm.toLowerCase()) ||
-            website.desc.toLowerCase().includes(currentSearchTerm.toLowerCase());
-        return matchesCategory && matchesSearch;
-    });
+    // 筛选更多分类
+    let filteredCategories = [];
     
-    // 优化搜索结果排序：按匹配度排序
-    let sortedWebsites = filteredWebsites;
-    if (currentSearchTerm) {
-        const searchTerm = currentSearchTerm.toLowerCase();
-        sortedWebsites = filteredWebsites.sort((a, b) => {
-            const scoreA = calculateMatchScore(a, searchTerm);
-            const scoreB = calculateMatchScore(b, searchTerm);
-            return scoreB - scoreA; // 降序排列，分数高的排在前面
-        });
+    if (moreMenuSearchQuery) {
+        // 仅搜索分类名称
+        const searchLower = moreMenuSearchQuery.toLowerCase();
+        filteredCategories = websiteData.filter(category => 
+            category.title.toLowerCase().includes(searchLower)
+        );
+    } else {
+        // 显示所有分类
+        filteredCategories = [...websiteData];
     }
     
-    // 清空网格
-    websitesGrid.innerHTML = '';
+    // 渲染筛选后的分类
+    filteredCategories.forEach(category => {
+        // 自动统计网址数量
+        const count = category.websites.length;
+        const categoryItem = document.createElement('div');
+        categoryItem.className = `more-category-item ${currentCategory === category.id ? 'active' : ''}`;
+        
+        // 根据分类名称设置合适的图标
+        let icon = category.icon;
+        switch(category.title) {
+            case "国际标准":
+                icon = "fa-flag";
+                break;
+            case "国家标准":
+                icon = "fa-book";
+                break;
+            case "行业标准":
+                icon = "fa-industry";
+                break;
+            case "地方标准":
+                icon = "fa-map-marker-alt";
+                break;
+            case "团体标准":
+                icon = "fa-users";
+                break;
+            case "其他标准":
+                icon = "fa-file-alt";
+                break;
+            case "资质查询":
+                icon = "fa-id-card";
+                break;
+            case "程序开发":
+                icon = "fa-code";
+                break;
+            case "办公工具":
+                icon = "fa-desktop";
+                break;
+            case "效率工具":
+                icon = "fa-bolt";
+                break;
+            case "专业软件":
+                icon = "fa-cogs";
+                break;
+            case "模板下载":
+                icon = "fa-download";
+                break;
+            case "图库":
+                icon = "fa-images";
+                break;
+            case "常用网站":
+                icon = "fa-link";
+                break;
+            case "AI模型":
+                icon = "fa-robot";
+                break;
+            case "国内法规":
+                icon = "fa-gavel";
+                break;
+            case "合同范本":
+                icon = "fa-file-contract";
+                break;
+            case "学教程":
+                icon = "fa-graduation-cap";
+                break;
+            case "学习网站":
+                icon = "fa-book-open";
+                break;
+            case "资源网站":
+                icon = "fa-folder-open";
+                break;
+            case "科普网站":
+                icon = "fa-lightbulb";
+                break;
+            case "有趣网站":
+                icon = "fa-gamepad";
+                break;
+            case "邮箱":
+                icon = "fa-envelope";
+                break;
+            case "采购平台":
+                icon = "fa-shopping-cart";
+                break;
+            case "招聘平台":
+                icon = "fa-user-plus";
+                break;
+            case "其他":
+                icon = "fa-ellipsis-h";
+                break;
+            default:
+                icon = "fa-search";
+        }
+        
+        categoryItem.innerHTML = `
+            <div class="more-category-name">
+                <i class="fas ${icon}"></i> ${category.title}
+            </div>
+            <div class="more-category-count">${count}</div>
+        `;
+        categoryItem.addEventListener('click', () => {
+            currentCategory = category.id;
+            searchQuery = '';
+            searchInput.value = '';
+            moreMenuSearchQuery = '';
+            moreMenuSearch.value = '';
+            
+            renderBookmarks();
+            updateActiveMenu();
+            moreMenu.classList.remove('active');
+            
+            // 重新渲染更多分类（恢复默认视图）
+            renderMoreCategories();
+        });
+        moreCategories.appendChild(categoryItem);
+    });
     
-    // 渲染过滤后的网址
-    if (sortedWebsites.length === 0) {
-        // 显示空状态
-        websitesGrid.innerHTML = `
-            <div class="empty-state">
-                <h3>没有找到匹配的网址</h3>
-                <p>请尝试调整搜索条件或分类</p>
+    // 如果没有匹配的分类且不是空搜索，显示提示
+    if (filteredCategories.length === 0 && moreMenuSearchQuery) {
+        const noResults = document.createElement('div');
+        noResults.className = 'more-category-item';
+        noResults.innerHTML = `
+            <div class="more-category-name">
+                未找到匹配的分类
             </div>
         `;
+        moreCategories.appendChild(noResults);
+    }
+}
+
+// 添加网址征集按钮
+function addUrlCollectionButton() {
+    // 创建网址征集按钮
+    const collectionButton = document.createElement('a');
+    collectionButton.className = 'theme-toggle';
+    collectionButton.href = 'https://www.wjx.top/vm/wAGGMpW.aspx#';
+    collectionButton.target = '_blank';
+    collectionButton.rel = 'noopener noreferrer';
+    collectionButton.innerHTML = `
+        <i class="fas fa-plus-circle"></i>
+    `;
+    collectionButton.title = '网址征集';
+    
+    // 添加到顶部栏
+    const header = document.querySelector('.header');
+    header.appendChild(collectionButton);
+}
+
+// 切换更多菜单
+function toggleMoreMenu(e) {
+    if (e) e.stopPropagation();
+    moreMenu.classList.toggle('active');
+    
+    // 如果打开更多菜单，聚焦搜索框
+    if (moreMenu.classList.contains('active')) {
+        setTimeout(() => {
+            moreMenuSearch.focus();
+        }, 100);
+    }
+}
+
+// 渲染书签卡片
+function renderBookmarks() {
+    // 清空容器
+    bookmarksContainer.innerHTML = '';
+    
+    // 筛选网址
+    let filteredWebsites = [];
+    
+    if (currentCategory === 0) {
+        // 显示全部网址
+        websiteData.forEach(category => {
+            filteredWebsites.push(...category.websites.map(website => ({
+                ...website,
+                categoryId: category.id,
+                categoryTitle: category.title
+            })));
+        });
+    } else {
+        // 显示当前分类的网址
+        const category = websiteData.find(cat => cat.id === currentCategory);
+        if (category) {
+            filteredWebsites = category.websites.map(website => ({
+                ...website,
+                categoryId: category.id,
+                categoryTitle: category.title
+            }));
+        }
+    }
+    
+    // 应用搜索过滤
+    if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase();
+        filteredWebsites = filteredWebsites.filter(website => 
+            website.name.toLowerCase().includes(searchLower)
+        );
+    }
+    
+    // 如果没有网址，显示提示
+    if (filteredWebsites.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'no-results';
+        emptyMessage.innerHTML = `
+            <i class="fas fa-search"></i>
+            <h3>没有找到网址</h3>
+            <p>${searchQuery ? `未找到与"${searchQuery}"相关的网址` : '当前分类没有网址'}</p>
+        `;
+        bookmarksContainer.appendChild(emptyMessage);
         return;
     }
     
-    sortedWebsites.forEach(website => {
-        const websiteCard = createWebsiteCard(website);
-        websitesGrid.appendChild(websiteCard);
-    });
+    // 按分类分组网址（仅当显示全部且没有搜索时）
+    if (currentCategory === 0 && !searchQuery) {
+        // 显示所有分类的网址，按分类分组
+        const categoriesWithWebsites = websiteData.filter(category => {
+            const categoryWebsites = filteredWebsites.filter(
+                website => website.categoryId === category.id
+            );
+            return categoryWebsites.length > 0;
+        });
+        
+        categoriesWithWebsites.forEach(category => {
+            const categoryWebsites = filteredWebsites.filter(
+                website => website.categoryId === category.id
+            );
+            renderCategorySection(category, categoryWebsites);
+        });
+    } else {
+        // 显示当前分类的网址或搜索结果
+        const category = currentCategory === 0 
+            ? { 
+                id: 0, 
+                title: searchQuery ? `搜索结果: "${searchQuery}"` : "全部网址", 
+                icon: "fa-globe" 
+              }
+            : websiteData.find(cat => cat.id === currentCategory);
+            
+        if (category) {
+            renderCategorySection(category, filteredWebsites);
+        }
+    }
 }
 
-// 计算匹配分数
-function calculateMatchScore(website, searchTerm) {
-    let score = 0;
-    const nameLower = website.name.toLowerCase();
-    const descLower = website.desc.toLowerCase();
-    
-    // 完全匹配网站名称，最高优先级
-    if (nameLower === searchTerm) {
-        score += 100;
-    }
-    // 网站名称以搜索词开头
-    else if (nameLower.startsWith(searchTerm)) {
-        score += 80;
-    }
-    // 网站名称包含搜索词
-    else if (nameLower.includes(searchTerm)) {
-        score += 60;
-    }
-    // 网站描述包含搜索词
-    else if (descLower.includes(searchTerm)) {
-        score += 40;
-    }
-    
-    // 匹配长度加分
-    score += searchTerm.length * 2;
-    
-    return score;
-}
-
-// 创建网址卡片
-function createWebsiteCard(website) {
-    const card = document.createElement('div');
-    card.className = 'website-card';
-    card.innerHTML = `
-        <h3>${website.name}</h3>
-        <p>${website.desc}</p>
-        <span class="website-category">${getCategoryName(website.category)}</span>
+// 渲染分类部分
+function renderCategorySection(category, websites) {
+    // 创建分类标题 - 全部文字改为灰色
+    const categoryTitle = document.createElement('h2');
+    categoryTitle.className = 'category-title fade-in';
+    categoryTitle.innerHTML = `
+        <i class="fas ${category.icon}"></i>
+        <span>${category.title} <span style="color: var(--text-secondary); font-weight: 600;">(${websites.length})</span></span>
     `;
+    bookmarksContainer.appendChild(categoryTitle);
     
-    // 添加点击事件，点击卡片打开网址
-    card.addEventListener('click', () => {
-        window.open(website.url, '_blank', 'noopener noreferrer');
+    // 创建网址网格
+    const bookmarksGrid = document.createElement('div');
+    bookmarksGrid.className = 'bookmarks-grid';
+    
+    // 添加网址卡片 - 不显示网址地址
+    websites.forEach((website, index) => {
+        const card = document.createElement('a');
+        card.className = 'bookmark-card fade-in';
+        card.href = website.url;
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+        card.style.animationDelay = `${index * 0.02}s`;
+        card.innerHTML = `
+            <div class="bookmark-title">${website.name}</div>
+            <div class="bookmark-desc">${website.desc || ''}</div>
+            <div class="bookmark-category">${website.categoryTitle || category.title}</div>
+        `;
+        
+        bookmarksGrid.appendChild(card);
     });
     
-    // 优化触摸反馈
-    card.addEventListener('touchstart', () => {
-        card.style.transform = 'scale(0.98)';
-        card.style.transition = 'transform 0.1s ease';
-    });
-    
-    card.addEventListener('touchend', () => {
-        card.style.transform = 'scale(1)';
-    });
-    
-    card.addEventListener('touchcancel', () => {
-        card.style.transform = 'scale(1)';
-    });
-    
-    return card;
+    bookmarksContainer.appendChild(bookmarksGrid);
 }
 
-// 获取分类中文名称
-function getCategoryName(categoryId) {
-    if (categoryId === 'all') {
-        return '全部';
-    }
-    const category = websiteData.find(cat => cat.id.toString() === categoryId);
-    return category ? category.title : categoryId;
-}
-
-// 处理搜索
-function handleSearch(e) {
-    currentSearchTerm = e.target.value;
-    renderWebsites();
-}
-
-// 处理分类切换
-function handleCategoryChange(e) {
-    const category = e.target.dataset.category;
+// 更新活动菜单项
+function updateActiveMenu() {
+    // 移除所有菜单项的active类
+    document.querySelectorAll('.menu-item').forEach(item => {
+        item.classList.remove('active');
+    });
     
-    // 更新当前分类
-    currentCategory = category;
-    
-    // 清空搜索框
-    searchInput.value = '';
-    currentSearchTerm = '';
-    
-    // 更新所有分类按钮状态（包括底部菜单和搜索弹窗中的按钮）
-    const allCategoryBtns = document.querySelectorAll('.category-btn');
-    allCategoryBtns.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.category === category) {
-            btn.classList.add('active');
+    // 找到对应的菜单项并添加active类
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => {
+        if (parseInt(item.dataset.id) === currentCategory) {
+            item.classList.add('active');
         }
     });
     
-    // 关闭菜单搜索弹窗
-    closeMenuSearch();
+    // 更新更多菜单中的active状态
+    document.querySelectorAll('.more-category-item').forEach(item => {
+        item.classList.remove('active');
+    });
+}
+
+// 设置事件监听器
+function setupEventListeners() {
+    // 主题切换
+    themeToggle.addEventListener('click', toggleTheme);
     
-    // 重新渲染网址列表
-    renderWebsites();
+    // 顶部搜索框
+    searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value.trim();
+        renderBookmarks();
+    });
+    
+    // 更多菜单搜索框
+    moreMenuSearch.addEventListener('input', (e) => {
+        moreMenuSearchQuery = e.target.value.trim();
+        renderMoreCategories();
+    });
+    
+    // 点击其他地方关闭更多菜单
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('#moreMenuItem') && !e.target.closest('#moreMenu')) {
+            moreMenu.classList.remove('active');
+        }
+    });
+    
+    // 键盘快捷键：ESC关闭更多菜单
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && moreMenu.classList.contains('active')) {
+            moreMenu.classList.remove('active');
+        }
+    });
+    
+    // 修复更多菜单滚动问题
+    moreMenu.addEventListener('wheel', (e) => {
+        // 阻止事件冒泡，防止滚动传播到body
+        e.stopPropagation();
+        
+        // 检查是否需要滚动更多菜单
+        const moreMenuCategories = document.querySelector('.more-menu-categories');
+        const isAtTop = moreMenuCategories.scrollTop === 0;
+        const isAtBottom = moreMenuCategories.scrollHeight - moreMenuCategories.scrollTop === moreMenuCategories.clientHeight;
+        
+        // 如果正在向上滚动且已经在顶部，或者向下滚动且已经在底部
+        // 则阻止默认行为，防止body滚动
+        if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // 阻止更多菜单区域外的滚动传播
+    document.addEventListener('wheel', (e) => {
+        if (moreMenu.classList.contains('active') && 
+            !e.target.closest('.more-menu') && 
+            !e.target.closest('#moreMenuItem')) {
+            // 当更多菜单打开且滚动事件发生在菜单外时，阻止body滚动
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // 优化滚动性能，减少卡片闪烁
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        // 清除之前的定时器
+        clearTimeout(scrollTimeout);
+        
+        // 在滚动期间暂停部分动画
+        document.querySelectorAll('.bookmark-card').forEach(card => {
+            card.style.transition = 'none';
+        });
+        
+        // 设置新的定时器
+        scrollTimeout = setTimeout(() => {
+            // 滚动停止后，恢复动画
+            document.querySelectorAll('.bookmark-card').forEach(card => {
+                card.style.transition = '';
+            });
+        }, 100);
+    }, false);
 }
 
 // 切换主题
 function toggleTheme() {
-    const body = document.body;
-    body.classList.toggle('dark-theme');
-    
-    // 更新主题图标
-    if (body.classList.contains('dark-theme')) {
-        themeIcon.textContent = '🌙';
-        // 保存主题偏好到本地存储
-        localStorage.setItem('theme', 'dark');
+    if (isDarkMode) {
+        disableDarkMode();
     } else {
-        themeIcon.textContent = '🌞';
-        localStorage.setItem('theme', 'light');
+        enableDarkMode();
     }
 }
 
-// 检查主题偏好
-function checkThemePreference() {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    // 如果本地存储有主题，使用本地存储的主题；否则使用系统偏好
-    const isDark = savedTheme === 'dark' || (savedTheme === null && prefersDark);
-    
-    if (isDark) {
-        document.body.classList.add('dark-theme');
-        themeIcon.textContent = '🌙';
-    } else {
-        document.body.classList.remove('dark-theme');
-        themeIcon.textContent = '🌞';
-    }
+// 启用深色模式
+function enableDarkMode() {
+    document.body.classList.add('dark-mode');
+    document.body.classList.remove('light-mode');
+    themeIcon.className = 'fas fa-sun';
+    isDarkMode = true;
+    localStorage.setItem('bookmarks-theme', 'dark');
 }
 
-// 提前预渲染菜单搜索结果，避免点击时的延迟
-function preRenderMenuSearch() {
-    renderMenuSearchResults();
+// 禁用深色模式
+function disableDarkMode() {
+    document.body.classList.remove('dark-mode');
+    document.body.classList.add('light-mode');
+    themeIcon.className = 'fas fa-moon';
+    isDarkMode = false;
+    localStorage.setItem('bookmarks-theme', 'light');
 }
 
-// 绑定菜单搜索结果点击事件（只绑定一次）
-menuSearchResults.addEventListener('click', (e) => {
-    if (e.target.classList.contains('category-btn')) {
-        handleCategoryChange(e);
-    }
-});
-
-// 切换菜单搜索弹窗
-function toggleMenuSearch() {
-    menuSearchModal.classList.toggle('active');
-    overlay.classList.toggle('active');
-    
-    // 如果打开弹窗，重置搜索状态
-    if (menuSearchModal.classList.contains('active')) {
-        // 清空搜索框
-        searchInput.value = '';
-        currentSearchTerm = '';
-        // 重新渲染网址列表
-        renderWebsites();
-        
-        // 清空菜单搜索输入
-        menuSearchInput.value = '';
-        // 重新渲染所有分类，确保显示全部菜单按钮
-        renderMenuSearchResults('');
-        // 阻止页面滚动
-        document.body.style.overflow = 'hidden';
-    } else {
-        // 恢复页面滚动
-        document.body.style.overflow = 'auto';
-    }
-}
-
-// 关闭菜单搜索弹窗
-function closeMenuSearch() {
-    menuSearchModal.classList.remove('active');
-    overlay.classList.remove('active');
-    // 恢复页面滚动
-    document.body.style.overflow = 'auto';
-}
-
-// 处理菜单搜索 - 优化搜索性能，使用防抖
-let searchTimeout;
-function handleMenuSearch(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    
-    // 清除之前的定时器
-    clearTimeout(searchTimeout);
-    
-    // 设置新的定时器，延迟200ms执行搜索，避免频繁渲染
-    searchTimeout = setTimeout(() => {
-        renderMenuSearchResults(searchTerm);
-    }, 200);
-}
-
-// 统计每个分类的网址数量
-function getCategoryCount(categoryId) {
-    if (categoryId === 'all') {
-        let total = 0;
-        websiteData.forEach(category => {
-            total += category.websites.length;
-        });
-        return total;
-    }
-    const category = websiteData.find(cat => cat.id.toString() === categoryId);
-    return category ? category.websites.length : 0;
-}
-
-// 缓存分类数量，避免重复计算
-const categoryCountCache = {};
-
-// 优化的分类数量统计函数
-function getCategoryCount(categoryId) {
-    // 检查缓存
-    if (categoryCountCache[categoryId]) {
-        return categoryCountCache[categoryId];
-    }
-    
-    let count;
-    if (categoryId === 'all') {
-        count = 0;
-        websiteData.forEach(category => {
-            count += category.websites.length;
-        });
-    } else {
-        const category = websiteData.find(cat => cat.id.toString() === categoryId);
-        count = category ? category.websites.length : 0;
-    }
-    
-    // 缓存结果
-    categoryCountCache[categoryId] = count;
-    return count;
-}
-
-// 预创建所有分类按钮，避免重复创建
-const allCategoryButtons = [];
-
-// 初始化分类按钮缓存
-function initCategoryButtons() {
-    categories.forEach(category => {
-        const count = getCategoryCount(category.id);
-        const button = document.createElement('button');
-        button.className = 'category-btn';
-        button.dataset.category = category.id;
-        button.innerHTML = `${category.name} <span style="font-size: 12px; opacity: 0.7; font-weight: normal;">(${count})</span>`;
-        
-        // 添加点击事件
-        button.addEventListener('click', handleCategoryChange);
-        
-        // 优化触摸反馈
-        button.addEventListener('touchstart', () => {
-            button.style.transform = 'scale(0.95)';
-            button.style.transition = 'transform 0.1s ease';
-        });
-        
-        button.addEventListener('touchend', () => {
-            button.style.transform = 'scale(1)';
-        });
-        
-        button.addEventListener('touchcancel', () => {
-            button.style.transform = 'scale(1)';
-        });
-        
-        allCategoryButtons.push(button);
-    });
-}
-
-// 渲染菜单搜索结果 - 优化版
-function renderMenuSearchResults(searchTerm = '') {
-    // 清空搜索结果
-    menuSearchResults.innerHTML = '';
-    
-    // 过滤分类
-    const searchLower = searchTerm.toLowerCase();
-    const filteredCategories = categories.filter(category => {
-        return category.name.toLowerCase().includes(searchLower);
-    });
-    
-    // 生成HTML字符串，显示分类数量
-    let buttonsHTML = '';
-    
-    // 生成HTML，包含分类数量
-    filteredCategories.forEach(category => {
-        const count = getCategoryCount(category.id);
-        // 显示分类名称和数量
-        buttonsHTML += `<button class="category-btn" data-category="${category.id}">${category.name} (${count})</button>`;
-    });
-    
-    // 一次性添加所有HTML，减少DOM操作
-    menuSearchResults.innerHTML = buttonsHTML;
-    
-    // 事件监听器已在页面加载时绑定，无需重复绑定
-}
-
-// 初始化应用
-init();
-
-// 页面加载完成后预渲染菜单搜索结果，提高响应速度
-window.addEventListener('DOMContentLoaded', preRenderMenuSearch);
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', init);
