@@ -134,6 +134,32 @@ body {
     gap: 10px;
 }
 
+/* 网址征集按钮 */
+.submit-website-btn {
+    background: var(--accent-color);
+    color: white;
+    border: 1px solid var(--accent-color);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 10px 18px;
+    border-radius: 24px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.submit-website-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-elevated);
+    border-color: var(--accent-hover);
+}
+
 /* 主题切换按钮 */
 .theme-toggle {
     background: transparent;
