@@ -1,39 +1,39 @@
 :root {
-    /* 浅色模式变量 */
-    --bg-primary: rgba(255, 255, 255, 0.95);
-    --bg-secondary: rgba(255, 255, 255, 0.85);
-    --bg-tertiary: rgba(255, 255, 255, 0.75);
-    --text-primary: #1d1d1f;
-    --text-secondary: #6d6d6f;
-    --text-tertiary: #86868b;
-    --accent: #007AFF;
+    /* 浅色模式变量 - iOS 26风格 */
+    --bg-primary: rgba(255, 255, 255, 0.97);
+    --bg-secondary: rgba(250, 250, 250, 0.92);
+    --bg-tertiary: rgba(245, 245, 245, 0.90);
+    --text-primary: #1c1c1e;
+    --text-secondary: #6e6e73;
+    --text-tertiary: #8e8e93;
+    --accent: #007aff;
     --accent-light: #5ac8fa;
     --accent-secondary: #34c759;
-    --card-bg: rgba(255, 255, 255, 0.9);
-    --card-shadow: rgba(0, 0, 0, 0.08);
-    --border-color: rgba(0, 0, 0, 0.06);
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-shadow: rgba(0, 0, 0, 0.05);
+    --border-color: rgba(0, 0, 0, 0.08);
     --blur-bg: blur(20px);
     --transition-speed: 0.3s;
-    --menu-active-bg: rgba(0, 122, 255, 0.1);
-    --menu-active-border: rgba(0, 122, 255, 0.2);
+    --menu-active-bg: rgba(0, 122, 255, 0.08);
+    --menu-active-border: rgba(0, 122, 255, 0.15);
 }
 
 .dark-mode {
-    /* 深色模式变量 */
-    --bg-primary: rgba(28, 28, 30, 0.95);
-    --bg-secondary: rgba(44, 44, 46, 0.85);
-    --bg-tertiary: rgba(58, 58, 60, 0.75);
+    /* 深色模式变量 - iOS 26风格 */
+    --bg-primary: rgba(16, 16, 17, 0.97);
+    --bg-secondary: rgba(28, 28, 30, 0.92);
+    --bg-tertiary: rgba(39, 39, 41, 0.90);
     --text-primary: #f5f5f7;
     --text-secondary: #a1a1a6;
     --text-tertiary: #8e8e93;
     --accent: #0a84ff;
     --accent-light: #5ac8fa;
     --accent-secondary: #30d158;
-    --card-bg: rgba(30, 30, 32, 0.9);
-    --card-shadow: rgba(0, 0, 0, 0.2);
-    --border-color: rgba(255, 255, 255, 0.06);
-    --menu-active-bg: rgba(10, 132, 255, 0.15);
-    --menu-active-border: rgba(10, 132, 255, 0.3);
+    --card-bg: rgba(23, 23, 25, 0.95);
+    --card-shadow: rgba(0, 0, 0, 0.3);
+    --border-color: rgba(255, 255, 255, 0.12);
+    --menu-active-bg: rgba(10, 132, 255, 0.12);
+    --menu-active-border: rgba(10, 132, 255, 0.25);
 }
 
 * {
@@ -44,7 +44,7 @@
 }
 
 body {
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f7 100%);
     color: var(--text-primary);
     min-height: 100vh;
     padding: 20px;
@@ -54,7 +54,7 @@ body {
 }
 
 .dark-mode body {
-    background: linear-gradient(135deg, #0d0d0d 0%, #1c1c1e 100%);
+    background: linear-gradient(135deg, #000000 0%, #0d0d0d 100%);
 }
 
 .container {
@@ -70,13 +70,12 @@ body {
     margin-bottom: 30px;
     padding: 18px 25px;
     background: var(--bg-primary);
-    backdrop-filter: var(--blur-bg);
-    -webkit-backdrop-filter: var(--blur-bg);
     border-radius: 20px;
     border: 1px solid var(--border-color);
     box-shadow: 0 8px 24px var(--card-shadow);
     position: relative;
     z-index: 10;
+    contain: layout paint;
 }
 
 .header h1 {
@@ -131,6 +130,13 @@ body {
 }
 
 /* 主题切换按钮 */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
 .theme-toggle {
     background: var(--bg-secondary);
     border: none;
@@ -168,13 +174,11 @@ body {
 
 .bookmark-card {
     background: var(--card-bg);
-    backdrop-filter: var(--blur-bg);
-    -webkit-backdrop-filter: var(--blur-bg);
     border-radius: 18px;
     padding: 20px;
     border: 1px solid var(--border-color);
     box-shadow: 0 8px 24px var(--card-shadow);
-    transition: transform var(--transition-speed), box-shadow var(--transition-speed), border-color var(--transition-speed);
+    transition: none;
     cursor: pointer;
     display: flex;
     flex-direction: column;
@@ -183,12 +187,14 @@ body {
     height: 180px;
     position: relative;
     overflow: hidden;
+    opacity: 1;
 }
 
 .bookmark-card:hover {
     transform: translateY(-6px);
     box-shadow: 0 12px 32px var(--card-shadow);
     border-color: var(--accent);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .bookmark-title {
@@ -228,18 +234,18 @@ body {
     width: 92%;
     max-width: 750px;
     background: var(--bg-primary);
-    backdrop-filter: var(--blur-bg);
-    -webkit-backdrop-filter: var(--blur-bg);
     border-radius: 25px;
     border: 1px solid var(--border-color);
     box-shadow: 0 -8px 32px var(--card-shadow);
-    padding: 14px 20px;
+    padding: 8px 20px;
     display: flex;
     justify-content: space-around;
     align-items: center;
     z-index: 1000;
     overflow: hidden;
     white-space: nowrap;
+    will-change: transform;
+    contain: layout paint;
 }
 
 .menu-item {
@@ -247,7 +253,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 8px 8px;
+    padding: 6px 8px;
     border-radius: 18px;
     cursor: pointer;
     transition: all var(--transition-speed);
@@ -255,9 +261,14 @@ body {
     min-width: 0;
     max-width: none;
     position: relative;
-    min-height: 70px;
+    min-height: 55px;
     user-select: none;
     margin: 0 2px;
+}
+
+.menu-item:hover {
+    background: var(--menu-active-bg);
+    border: 1px solid var(--menu-active-border);
 }
 
 .menu-item.active {
@@ -266,13 +277,13 @@ body {
 }
 
 .menu-item i {
-    font-size: 20px;
-    margin-bottom: 4px;
+    font-size: 18px;
+    margin-bottom: 2px;
     color: var(--text-primary);
 }
 
 .menu-item span {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--text-primary);
     text-align: center;
@@ -296,8 +307,6 @@ body {
     width: 90%;
     max-width: 500px;
     background: var(--bg-primary);
-    backdrop-filter: var(--blur-bg);
-    -webkit-backdrop-filter: var(--blur-bg);
     border-radius: 24px;
     border: 1px solid var(--border-color);
     box-shadow: 0 -10px 40px var(--card-shadow);
@@ -306,6 +315,7 @@ body {
     flex-direction: column;
     max-height: 70vh;
     overflow: hidden;
+    contain: layout paint;
 }
 
 .more-menu.active {
@@ -390,11 +400,12 @@ body {
     border-radius: 16px;
     background: var(--bg-secondary);
     cursor: pointer;
-    transition: background-color var(--transition-speed);
+    transition: all 0.15s ease;
 }
 
 .more-category-item:hover {
-    background: var(--bg-tertiary);
+    background: var(--menu-active-bg);
+    border: 1px solid var(--menu-active-border);
 }
 
 .more-category-item.active {
@@ -594,21 +605,12 @@ body {
 }
 
 /* 动画 */
-@keyframes fadeIn {
-    from { 
-        opacity: 0; 
-        transform: translateY(10px);
-    }
-    to { 
-        opacity: 1; 
-        transform: translateY(0);
-    }
-}
+/* 移除动画以避免闪烁 */
 
 .bookmark-card {
-    animation: fadeIn 0.3s ease-out forwards;
+    opacity: 1;
 }
 
 .fade-in {
-    animation: fadeIn 0.2s ease-out;
+    opacity: 1;
 }

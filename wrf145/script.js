@@ -322,10 +322,6 @@ const websiteData = [
                     { name: "MuseTransfer", url: "https://musetransfer.com/", desc: "文件快递柜" },
                     { name: "Wormhole:https", url: "https://wormhole.app/", desc: "文件快递柜" },
                     { name: "轻松传", url: "https://easychuan.cn/", desc: "文件快递柜" },
-                    { name: "Temporam", url: "https://www.temporam.com/zh", desc: "临时邮箱" },
-                    { name: "zrfme", url: "https://mail.zrfme.com/", desc: "临时邮箱" },
-                    { name: "临时邮箱", url: "https://tempmailto.online/zh/", desc: "临时邮箱" },
-                    { name: "MoeMail", url: "https://moemail.app/", desc: "临时邮箱" },
                     { name: "gantt-chart", url: "https://gantt.vicsdf.com/", desc: "甘特图生成" },
                     { name: "发票查验", url: "https://inv-veri.chinatax.gov.cn/", desc: "发票查验" },
                     { name: "发票提取助手", url: "https://airegex.cn/", desc: "发票提取" },
@@ -563,6 +559,7 @@ const websiteData = [
                     { name: "千问", url: "https://www.qianwen.com/chat", desc: "在线AI" },
                     { name: "WPS灵犀", url: "https://lingxi.wps.cn/echo", desc: "AI生成文档" },
                     { name: "飞书多维表格", url: "https://acnkgpefayvj.feishu.cn/base", desc: "在线AI" },
+                    { name: "Xiaomi MlMo Studio", url: "https://aistudio.xiaomimimo.com/#/ ", desc: "小米AI" },
                     { name: "inviteChain", url: "https://invite-chain.vercel.app/", desc: "sora邀请码获取" },
                     { name: "MindVideo", url: "https://www.mindvideo.ai/zh/text-to-video/", desc: "视频生成" },
                     { name: "去sora2水印", url: "https://nosorawm.app/zh", desc: "去sora2水印" },
@@ -742,7 +739,7 @@ const websiteData = [
                     { name: "维科普", url: "https://www.wkepu.com/?ref=https://szsyw.cn", desc: "科普" },
                     { name: "中国考古", url: "http://kaogu.cssn.cn/zwb/?ref=https://szsyw.cn", desc: "科普" },
                     { name: "网易探索", url: "https://discovery.163.com/?ref=https://szsyw.cn", desc: "科普" },
-                    { name: "实时台风消息", url: "https://typhoon.slt.zj.gov.cn/#/", desc: "科普" },
+                    { name: "实时台风消息", url: "https://typhoon.slt.zj.gov.cn/#/", desc: "科普" }
                 ]
             },
           {
@@ -795,6 +792,10 @@ const websiteData = [
                     { name: "tom邮箱", url: "https://mail.tom.com/", desc: "邮箱" },
                     { name: "新浪邮箱", url: "https://mail.sina.com.cn/", desc: "邮箱" },
                     { name: "Foxmail", url: "https://www.foxmail.com/", desc: "邮箱软件" },
+                    { name: "Temporam", url: "https://www.temporam.com/zh", desc: "临时邮箱" },
+                    { name: "zrfme", url: "https://mail.zrfme.com/", desc: "临时邮箱" },
+                    { name: "临时邮箱", url: "https://tempmailto.online/zh/", desc: "临时邮箱" },
+                    { name: "MoeMail", url: "https://moemail.app/", desc: "临时邮箱" }
                 ]
             },
            {
@@ -1202,9 +1203,15 @@ function addUrlCollectionButton() {
     `;
     collectionButton.title = '网址征集';
     
-    // 添加到顶部栏
-    const header = document.querySelector('.header');
-    header.appendChild(collectionButton);
+    // 添加到主题切换按钮容器中，使所有按钮相邻
+    const headerActions = document.querySelector('.header-actions');
+    if (headerActions) {
+        headerActions.insertBefore(collectionButton, null);
+    } else {
+        // 如果没有header-actions容器，添加到header末尾
+        const header = document.querySelector('.header');
+        header.appendChild(collectionButton);
+    }
 }
 
 // 切换更多菜单
@@ -1254,8 +1261,28 @@ function renderBookmarks() {
     if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
         filteredWebsites = filteredWebsites.filter(website => 
-            website.name.toLowerCase().includes(searchLower)
+            website.name.toLowerCase().includes(searchLower) ||
+            (website.desc && website.desc.toLowerCase().includes(searchLower))
         );
+        
+        // 排序：名称匹配优先于用途匹配
+        filteredWebsites.sort((a, b) => {
+            const aNameMatch = a.name.toLowerCase().includes(searchLower);
+            const bNameMatch = b.name.toLowerCase().includes(searchLower);
+            const aDescMatch = a.desc && a.desc.toLowerCase().includes(searchLower);
+            const bDescMatch = b.desc && b.desc.toLowerCase().includes(searchLower);
+            
+            // 名称匹配优先
+            if (aNameMatch && !bNameMatch) return -1;
+            if (!aNameMatch && bNameMatch) return 1;
+            
+            // 其次是描述匹配
+            if (aDescMatch && !bDescMatch) return -1;
+            if (!aDescMatch && bDescMatch) return 1;
+            
+            // 都匹配或都不匹配时按名称字母顺序
+            return a.name.localeCompare(b.name, 'zh-CN');
+        });
     }
     
     // 如果没有网址，显示提示
@@ -1305,9 +1332,12 @@ function renderBookmarks() {
 
 // 渲染分类部分
 function renderCategorySection(category, websites) {
+    // 使用文档片段减少DOM操作，避免闪烁
+    const fragment = document.createDocumentFragment();
+    
     // 创建分类标题 - 全部文字改为灰色
     const categoryTitle = document.createElement('h2');
-    categoryTitle.className = 'category-title fade-in';
+    categoryTitle.className = 'category-title';
     
     // 根据分类名称设置合适的图标，与菜单栏保持一致
     let icon = category.icon;
@@ -1403,7 +1433,7 @@ function renderCategorySection(category, websites) {
         <i class="fas ${icon}"></i>
         <span>${category.title} <span style="color: var(--text-secondary); font-weight: 600;">(${websites.length})</span></span>
     `;
-    bookmarksContainer.appendChild(categoryTitle);
+    fragment.appendChild(categoryTitle);
     
     // 创建网址网格
     const bookmarksGrid = document.createElement('div');
@@ -1412,11 +1442,10 @@ function renderCategorySection(category, websites) {
     // 添加网址卡片 - 不显示网址地址
     websites.forEach((website, index) => {
         const card = document.createElement('a');
-        card.className = 'bookmark-card fade-in';
+        card.className = 'bookmark-card';
         card.href = website.url;
         card.target = '_blank';
         card.rel = 'noopener noreferrer';
-        card.style.animationDelay = `${index * 0.02}s`;
         card.innerHTML = `
             <div class="bookmark-title">${website.name}</div>
             <div class="bookmark-desc">${website.desc || ''}</div>
@@ -1426,7 +1455,10 @@ function renderCategorySection(category, websites) {
         bookmarksGrid.appendChild(card);
     });
     
-    bookmarksContainer.appendChild(bookmarksGrid);
+    fragment.appendChild(bookmarksGrid);
+    
+    // 一次性添加到DOM，减少重排重绘
+    bookmarksContainer.appendChild(fragment);
 }
 
 // 更新活动菜单项
