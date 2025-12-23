@@ -16,6 +16,7 @@ const websiteData = [
                     { name: "ICH", url: "https://www.ich.org/", desc: "人用药品技术要求国际协调理事会" },
                     { name: "PIC/S", url: "https://picscheme.org/", desc: "国际药品认证合作组织" },  
                     { name: "amfori", url: "https://www.amfori.org/amfori-bsci/", desc: "BSCI" },  
+                    { name: "GRS标准", url: "https://textileexchange.org/recycled-claim-global-recycled-standard/", desc: "全球回收标准" }, 
                     { name: "GRI标准", url: "https://www.globalreporting.org", desc: "GRI标准下载" },
                     { name: "SASB标准", url: "https://www.sasb.org", desc: "SASB标准下载" },
                     { name: "FDA（注册）", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm/", desc: "美国医疗器械注册查询" },
@@ -34,7 +35,6 @@ const websiteData = [
                     { name: "MDR信息上报", url: "https://www.fda.gov/medical-devices/medical-device-safety/reporting-allegations-regulatory-misconduct", desc: "美国FDA" },
                     { name: "召回数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRES/res.cfm", desc: "美国FDA" },
                     { name: "GUDID数据库", url: "https://accessgudid.nlm.nih.gov/", desc: "美国FDA" },
-                  
                     { name: "联邦公报", url: "https://www.federalregister.gov/", desc: "美国联邦政府的官方日报" },
                     { name: "CFR", url: "https://www.ecfr.gov/", desc: "美国联邦政府规章制度汇编" },
                     { name: "医药与食品联邦法规", url: "https://www.ecfr.gov/current/title-21", desc: "美国CFR" },
