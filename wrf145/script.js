@@ -595,7 +595,7 @@ const websiteData = [
                     { name: "腾讯混元", url: "https://hunyuan.tencent.com/?utm_source=maomu.com", desc: "在线AI" },
                     { name: "夸克AI", url: "https://ai.quark.cn/?utm_source=maomu.com", desc: "在线AI" },
                     { name: "ChatGPT", url: "https://chatgpt.com", desc: "在线AI" },
-                    { name: Google AI Studio", url: "https://aistudio.google.com/", desc: "在线AI" },
+                    { name: "Google AI Studio", url: "https://aistudio.google.com/", desc: "在线AI" },
                     { name: "文小言", url: "https://yiyan.baidu.com/", desc: "在线AI" }
                 ]
             },
