@@ -62,7 +62,7 @@ const websiteData = [
                     { name: "加拿大医疗器械最新消息", url: "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/what-new.html", desc: "关注加拿大医疗器械相关的最新动态" },
                     { name: "日本PMDA（注册）", url: "https://www.pmda.go.jp/review-services/drug-reviews/foreign-mfr/0003.html", desc: "医疗器械注册查询" },
                     { name: "日本法规翻译", url: "https://www.japaneselawtranslation.go.jp/en/laws", desc: "关注日本医疗器械法规的变化" },
-                   { name: "厚生劳动省官网", url: "https://www.mhlw.go.jp/english/index.html", desc: "药品和医疗器械" },
+                    { name: "厚生劳动省官网", url: "https://www.mhlw.go.jp/english/index.html", desc: "药品和医疗器械" },
                     { name: "英国医疗器械监管", url: "https://www.gov.uk/topic/medicines-medical-devices-blood/medical-devices-regulation-safety", desc: "关注英国医疗器械相关的最新动态" },
                     { name: "英国医疗器械指南", url: "https://www.gov.uk/government/collections/new-guidance-and-information-for-industry-from-the-mhra", desc: "关注英国医疗器械相关的最新动态" },
                     { name: "TGA法规", url: "https://www.legislation.gov.au/Search/Therapeutic%20Goods", desc: "澳大利亚TGA法规" },
@@ -103,21 +103,7 @@ const websiteData = [
                     { name: "国家药品监督管理局4", url: "http://app.nifdc.org.cn/jianybz/jybzTwoGj.do?formAction=listYlqx", desc: "GB标准下载" },
                     { name: "中国国家标准化管理委员会", url: "https://www.sac.gov.cn/", desc: "中国国家标准化管理委员会" },
                     { name: "中国政府网", url: "https://www.gov.cn/", desc: "中国政府网" },
-                    { name: "中国标准信息服务网", url: "https://www.sacinfo.cn/", desc: "标准文档检索" },
-                    { name: "小绿典", url: "https://dljs123.com/#/search/criteria", desc: "标准下载" },
-                    { name: "蒲公英", url: "https://www.ouryao.com/forum.php", desc: "医疗标准下载（论坛）" },
-                    { name: "标准网", url: "https://bbs.biaozhuns.com//home.php?mod=space&uid=2047951&do=profile&mycenter=1&mobile=2", desc: "标准下载（论坛）每72h限1次" },
-                    { name: "QPDCA", url: "https://www.qpdca.com/portal.php", desc: "汽车行业论坛" },
-                    { name: "电子工程世界", url: "https://download.eeworld.com.cn/", desc: "电子工程论坛" },
-                    { name: "六西格玛品质网", url: "https://www.6sq.net/portal/", desc: "六西格玛专业论坛" },
-                    { name: "学兔兔", url: "http://www.bzfxw.com/", desc: "标准下载(每日限3次)" },
-                    { name: "艾索管理咨询", url: "http://www.iso-iso9000.com/", desc: "标准下载" },
-                    { name: "标准下载网1", url: "https://www.bzxz.net/gb/", desc: "标准下载" },
-                    { name: "食品伙伴网1", url: "http://down.foodmate.net/wap/", desc: "食品标准下载" },
-                    { name: "食品伙伴网2", url: "http://down.foodmate.net/", desc: "食品标准下载" },
-                    { name: "协筑资源", url: "https://www.webfree.net/home", desc: "建筑标准下载" },
-                    { name: "标准下载网2", url: "https://www.315368.com/", desc: "标准下载" },
-                    { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" }   
+                    { name: "中国标准信息服务网", url: "https://www.sacinfo.cn/", desc: "标准文档检索" }
                 ]
             },
           {
@@ -135,6 +121,7 @@ const websiteData = [
                     { name: "国家应急管理部", url: "https://www.mem.gov.cn/fw/flfgbz/bz/bzwb/", desc: "AQ/AQT/YGT/XFT/MT标准下载" },
                     { name: "中华人民共和国商务部", url: "https://www.mem.gov.cn/fw/flfgbz/bz/bzwb/", desc: "SBT/WMT标准下载" },
                     { name: "自然资源标准化信息服务平台", url: "http://www.nrsis.org.cn/portal/xxcx/std", desc: "TDT/TD/HYT/CHT/CH标准下载" },
+                    { name: "中国证券监督管理委员", url: "https://www.csrc.gov.cn/", desc: "标准" },
                     { name: "国家文物局", url: "http://www.ncha.gov.cn/col/col2423/index.html", desc: "WWT标准下载" },
                     { name: "矿山安全监察局", url: "https://www.chinamine-safety.gov.cn/zfxxgk/fdzdgknr/zcfg/hybz_01/mkanj/", desc: "MTT/MT标准下载" },
                     { name: "铁路技术标准信息服务平台", url: "https://biaozhun.tdpress.com/", desc: "TB标准下载" },
@@ -217,7 +204,21 @@ const websiteData = [
                     { name: "国家统计局", url: "https://www.stats.gov.cn/", desc: "标准" },
                     { name: "中关村材料试验技术联盟", url: "https://www.ccs.org.cn/ccswz/special?columnid=201900002000000016&id=0", desc: "标准" },
                     { name: "食典通", url: "https://www.sdtdata.com/fx/fcv1/tsLibIndex", desc: "GB/NY/LS/SC/QB标准下载" },
-                    { name: "中国就业培训技术指导中心", url: "https://chinajob.mohrss.gov.cn/ywpd/pxjd/rmzt/zyjnbz/zcwj/", desc: "标准下载" }
+                    { name: "中国就业培训技术指导中心", url: "https://chinajob.mohrss.gov.cn/ywpd/pxjd/rmzt/zyjnbz/zcwj/", desc: "标准下载" },
+                    { name: "小绿典", url: "https://dljs123.com/#/search/criteria", desc: "标准下载" },
+                    { name: "蒲公英", url: "https://www.ouryao.com/forum.php", desc: "医疗标准下载（论坛）" },
+                    { name: "标准网", url: "https://bbs.biaozhuns.com//home.php?mod=space&uid=2047951&do=profile&mycenter=1&mobile=2", desc: "标准下载（论坛）每72h限1次" },
+                    { name: "QPDCA", url: "https://www.qpdca.com/portal.php", desc: "汽车行业论坛" },
+                    { name: "电子工程世界", url: "https://download.eeworld.com.cn/", desc: "电子工程论坛" },
+                    { name: "六西格玛品质网", url: "https://www.6sq.net/portal/", desc: "六西格玛专业论坛" },
+                    { name: "学兔兔", url: "http://www.bzfxw.com/", desc: "标准下载(每日限3次)" },
+                    { name: "艾索管理咨询", url: "http://www.iso-iso9000.com/", desc: "标准下载" },
+                    { name: "标准下载网1", url: "https://www.bzxz.net/gb/", desc: "标准下载" },
+                    { name: "食品伙伴网1", url: "http://down.foodmate.net/wap/", desc: "食品标准下载" },
+                    { name: "食品伙伴网2", url: "http://down.foodmate.net/", desc: "食品标准下载" },
+                    { name: "协筑资源", url: "https://www.webfree.net/home", desc: "建筑标准下载" },
+                    { name: "标准下载网2", url: "https://www.315368.com/", desc: "标准下载" },
+                    { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" }   
                 ]
             },
           {
@@ -225,7 +226,7 @@ const websiteData = [
                 title: "资质查询",
                 icon: "fa-ellipsis-h",
                 websites: [
-                    { name: "全国认证认可信息公共服务平台", url: "http://cx.cnca.cn/CertECloud/index/index/page", desc: "认证认可信息" },
+                    { name: "全国认证认可信息公共服务平台", url: "http://cx.cnca.cn/CertECloud/index/index/page", desc: "认证资质查询" },
                     { name: "中国合格评定国家认可委员会", url: "https://www.cnas.org.cn/?ref=https://szsyw.cn", desc: "资质查询" },
                     { name: "全国排污许可证管理信息平台", url: "https://permit.mee.gov.cn/permitExt/outside/PageQueryServlet?pageno=1&type=Law", desc: "排污许可证" },
                     { name: "高新技术企业认定工作网", url: "http://www.innocom.gov.cn/?ref=https://szsyw.cn", desc: "资质查询" },
@@ -292,6 +293,7 @@ const websiteData = [
                     { name: "词云", url: "https://wordcloud.online/zh", desc: "词云" },
                     { name: "二维工坊", url: "https://tools.2weima.com/ciyun", desc: "词云" },
                     { name: "造字侠词云", url: "http://wordcloud.reeji.com/", desc: "词云" },
+                    { name: "WORD ART", url: "https://wordart.com/", desc: "词云" },
                     { name: "chatexcel", url: "https://chatexcel.com/#/", desc: "AI excel" },
                     { name: "Smallpdf", url: "https://smallpdf.com/cn/unlock-pdf", desc: "PDF工具" },
                     { name: "ALL TO ALL", url: "https://www.alltoall.net/", desc: "PDF工具" },
@@ -592,7 +594,8 @@ const websiteData = [
                     { name: "天工AI", url: "https://www.tiangong.cn/", desc: "在线AI" },
                     { name: "腾讯混元", url: "https://hunyuan.tencent.com/?utm_source=maomu.com", desc: "在线AI" },
                     { name: "夸克AI", url: "https://ai.quark.cn/?utm_source=maomu.com", desc: "在线AI" },
-                    { name: "ChatGPT", url: "https://chatgpt.com", desc: "AI软件" },
+                    { name: "ChatGPT", url: "https://chatgpt.com", desc: "在线AI" },
+                    { name: Google AI Studio", url: "https://aistudio.google.com/", desc: "在线AI" },
                     { name: "文小言", url: "https://yiyan.baidu.com/", desc: "在线AI" }
                 ]
             },
