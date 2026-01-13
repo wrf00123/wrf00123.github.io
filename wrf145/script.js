@@ -219,7 +219,8 @@ const websiteData = [
                     { name: "食品伙伴网2", url: "http://down.foodmate.net/", desc: "食品标准下载" },
                     { name: "协筑资源", url: "https://www.webfree.net/home", desc: "建筑标准下载" },
                     { name: "标准下载网2", url: "https://www.315368.com/", desc: "标准下载" },
-                    { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" }   
+                    { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" } ,
+                    { name: "深圳市中小企业服务局", url: "https://zxqyj.sz.gov.cn/", desc: "其他" }   
                 ]
             },
           {
@@ -541,6 +542,7 @@ const websiteData = [
                   { name: "DeepL翻译", url: "https://www.deepl.com/zh/translator", desc: "在线翻译" },
                   { name: "有道翻译", url: "https://fanyi.youdao.com/#/TextTranslate", desc: "在线翻译" },
                   { name: "谷歌翻译", url: "https://translate.google.com/", desc: "在线翻译" },
+                  { name: "沉浸式翻译", url: "https://immersivetranslate.com/docs/installation/", desc: "在线插件翻译" },
                   { name: "问卷星", url: "https://www.wjx.cn/newwjx/manage/myquestionnaires.aspx?randomt=1744110951", desc: "问卷调查" },
                   { name: "知乎", url: "https://www.zhihu.com/", desc: "搜索" },
                   { name: "百度一下", url: "https://www.baidu.com/index.php?tn=75144485_2_dg&ch=1", desc: "搜索" },
