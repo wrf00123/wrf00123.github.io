@@ -1,4 +1,4 @@
-// 示例网址数据 - 新的嵌套分类格式
+﻿// 示例网址数据 - 新的嵌套分类格式
 const websiteData = [
             {
                 id: 1,
@@ -32,6 +32,7 @@ const websiteData = [
                     { name: "drow.io", url: "https://app.diagrams.net/", desc: "流程图" },
                     { name: "Excalidraw", url: "https://excalidraw.com/", desc: "流程图" },
                     { name: "process on", url: "https://www.processon.com/login", desc: "流程图" },
+                    { name: "WordClouds", url: "https://www.wordclouds.com/", desc: "词云" },
                     { name: "Smallpdf", url: "https://smallpdf.com/cn/unlock-pdf", desc: "PDF工具" },
                     { name: "ALL TO ALL", url: "https://www.alltoall.net/", desc: "PDF工具" },
                     { name: "Dpdf", url: "https://www.dpdf.com/", desc: "PDF工具" },
