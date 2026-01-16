@@ -349,6 +349,7 @@ const websiteData = [
                     { name: "兔兔图床", url: "https://tutu.to/#google_vignette", desc: "免费图片托管平台" },
                     { name: "路过图床", url: "https://imgse.com/", desc: "免费图片托管平台（每日限8）" },
                     { name: "黑猫图床", url: "https://img.hmvod.cc/", desc: "图床" },
+                    { name: "Inno Setup", url: "https://jrsoftware.org/isdl.php", desc: "网页转app" },
                     { name: "PakePlus", url: "https://pakeplus.com/zh/", desc: "网页转app" },
                     { name: "bkhtmltopdf", url: "https://demo.bkhtmltopdf.com/ui/#/html-to-pdf", desc: "html转pdf" },
                     { name: "草料二维码", url: "https://cli.im/", desc: "文件转二维码" },
