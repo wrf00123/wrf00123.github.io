@@ -822,7 +822,7 @@ const websiteData = [
                 title: "采购平台",
                 icon: "fa-ellipsis-h",
                 websites: [
-                  { name: "淘宝网", url: "https://www.taobao.com/", desc: "采购平台" },
+                    { name: "淘宝网", url: "https://www.taobao.com/", desc: "采购平台" },
                     { name: "天猫", url: "https://www.tmall.com/", desc: "采购平台" },
                     { name: "京东", url: "https://www.jd.com/", desc: "采购平台" },
                     { name: "亚马逊", url: "https://www.amazon.com/", desc: "采购平台" },
@@ -830,7 +830,21 @@ const websiteData = [
                     { name: "唯品会", url: "https://www.vip.com/", desc: "采购平台" },
                     { name: "网易严选", url: "https://you.163.com/", desc: "采购平台" },
                     { name: "当当网", url: "https://www.dangdang.com/", desc: "采购平台" },
-                    { name: "国美", url: "https://sitemap.gome.com.cn/", desc: "采购平台" }
+                    { name: "国美", url: "https://sitemap.gome.com.cn/", desc: "采购平台" },
+                   { name: "沃尔玛", url: "https://www.walmart.com/", desc: "采购平台" },
+                   { name: "易贝", url: "https://cn.ebay.com/", desc: "采购平台" },
+                   { name: "塔吉特", url: "https://www.target.com/", desc: "采购平台" },
+                   { name: "Temu", url: "https://www.temu.com/us-zh-Hans?_x_sessn_id=p8v8dwhd6w&refer_page_name=home&refer_page_id=10005_1768986853524_0fn92s00k7&refer_page_sn=10005", desc: "采购平台" },
+                   { name: "Costco", url: "https://www.costco.com/", desc: "采购平台" },
+                   { name: "SHEIN", url: "https://us.shein.com/", desc: "采购平台" },
+                   { name: "OTTO", url: "https://www.otto.de/", desc: "采购平台" },
+                   { name: "Cdiscount", url: "https://www.cdiscount.com/", desc: "采购平台" },
+                   { name: "乐天市场", url: "https://www.rakuten.co.jp/", desc: "采购平台" },
+                   { name: "雅虎购物", url: "https://shopping.yahoo.co.jp/", desc: "采购平台" },
+                   { name: "野莓", url: "https://www.wildberries.ru/", desc: "采购平台" },
+                   { name: "OZON", url: "https://www.ozon.ru/", desc: "采购平台" },
+                   { name: "Kogan.com", url: "https://www.kogan.com/au/", desc: "采购平台" }
+
                 ]
             },
           {
