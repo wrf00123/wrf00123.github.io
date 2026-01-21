@@ -220,6 +220,7 @@ const websiteData = [
                     { name: "协筑资源", url: "https://www.webfree.net/home", desc: "建筑标准下载" },
                     { name: "标准下载网2", url: "https://www.315368.com/", desc: "标准下载" },
                     { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" } ,
+                    { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" } ,
                     { name: "深圳市中小企业服务局", url: "https://zxqyj.sz.gov.cn/", desc: "其他" }   
                 ]
             },
