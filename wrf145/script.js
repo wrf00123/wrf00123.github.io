@@ -6,7 +6,9 @@ const websiteData = [
                 icon: "fa-search",
                 websites: [
                     { name: "ISO官网", url: "https://www.iso.org/iso-update.html", desc: "标准每月发布的报告" },
+                    { name: "IATF", url: "https://www.iatfglobaloversight.org/", desc: "国际汽车工作组" },
                     { name: "IEC", url: "https://webstore.iec.ch/", desc: "电工电子领域国际标准" },
+                { name: "IPC", url: "https://www.ipc.org.cn/standards", desc: "国际电子工业联接协会" },
                     { name: "IMDRF", url: "https://www.imdrf.org/", desc: "国际医疗器械监管机构论坛" },
                     { name: "ITU", url: "https://webstore.iec.ch/", desc: "全球电信标准化" },
                     { name: "MDSAP（日本、巴西、澳大利亚）", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-international-regulations-english-australia-brazil-canada-japan-and-usa", desc: "MDSAP五国的QMS相关法规" },
@@ -81,6 +83,7 @@ const websiteData = [
                     { name: "瑞士联邦法律", url: "https://www.fedlex.admin.ch/eli/cc/2020/552/en", desc: "瑞士法规" },
                     { name: "瑞士卫生部", url: "https://www.swissmedic.ch/swissmedic/en/home/news.html", desc: "关注瑞士医疗器械法规变化" },
                     { name: "菲律宾FDA官网", url: "https://www.fda.gov.ph/", desc: "关注菲律宾医疗器械法规的变化" },
+                    { name: "CE认证", url: "https://europa.eu/youreurope/index_en.htm", desc: "产品认证" },
                     { name: "TCFD", url: "https://www.tcfdhub.org", desc: "气候相关财务信息披露工作组（TCFD）建议案" },
                     { name: "IIRC", url: "https://integratedreporting.org", desc: "国际综合报告委员会（IIRC）框架" },
                     { name: "CDP", url: "https://www.cdp.net/zh", desc: "碳信息披露项目(官网" },
@@ -221,6 +224,10 @@ const websiteData = [
                     { name: "标准下载网2", url: "https://www.315368.com/", desc: "标准下载" },
                     { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" } ,
                     { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" } ,
+                    { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" } ,
+                    { name: "CAQ", url: "https://www.caq.org.cn/", desc: "中国质量协会" } ,
+                    { name: "中国企业诚信网", url: "http://211.161.2.172:8088/cms/credit/index.jsp", desc: "其他" } ,
+                    { name: "中国质量保证论坛", url: "CQAF：http://www.cqaf.org/?lang=cn", desc: "其他" } ,
                     { name: "深圳市中小企业服务局", url: "https://zxqyj.sz.gov.cn/", desc: "其他" }   
                 ]
             },
