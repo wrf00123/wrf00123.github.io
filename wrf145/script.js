@@ -11,7 +11,7 @@ const websiteData = [
                     { name: "IPC", url: "https://www.ipc.org.cn/standards", desc: "国际电子工业联接协会" },
                     { name: "IMDRF", url: "https://www.imdrf.org/", desc: "国际医疗器械监管机构论坛" },
                     { name: "ITU", url: "https://webstore.iec.ch/", desc: "全球电信标准化" },
-                    { name: "IAF", url: "https://iaf.nu/en/home/", desc: "国际认可论坛" },
+                    { name: "IAF", url: "https://iaf.nu/en/home/", desc: "国际认证论坛" },
                     { name: "MDSAP（日本、巴西、澳大利亚）", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-international-regulations-english-australia-brazil-canada-japan-and-usa", desc: "MDSAP五国的QMS相关法规" },
                     { name: "MDSAP标准", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-audit-procedures-and-forms", desc: "MDSAP Audit Procedures and Forms | FDA" },
                     { name: "REACH清单", url: "https://echa.europa.eu/candidate-list-table", desc: "REACH查询" },
