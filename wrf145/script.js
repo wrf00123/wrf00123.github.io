@@ -225,12 +225,13 @@ const websiteData = [
                     { name: "食品伙伴网2", url: "http://down.foodmate.net/", desc: "食品标准下载" },
                     { name: "协筑资源", url: "https://www.webfree.net/home", desc: "建筑标准下载" },
                     { name: "标准下载网2", url: "https://www.315368.com/", desc: "标准下载" },
-                    { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" } ,
-                    { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" } ,
-                    { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" } ,
-                    { name: "CAQ", url: "https://www.caq.org.cn/", desc: "中国质量协会" } ,
-                    { name: "中国企业诚信网", url: "http://211.161.2.172:8088/cms/credit/index.jsp", desc: "其他" } ,
-                    { name: "中国质量保证论坛", url: "CQAF：http://www.cqaf.org/?lang=cn", desc: "其他" } ,
+                    { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" },
+                    { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" },
+                    { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" },
+                    { name: "CAQ", url: "https://www.caq.org.cn/", desc: "中国质量协会" },
+                    { name: "中国企业诚信网", url: "http://211.161.2.172:8088/cms/credit/index.jsp", desc: "其他" },
+                    { name: "CQAF", url: "：http://www.cqaf.org/?lang=cn", desc: "中国质量保证论坛" },
+                    { name: "深圳市人力资源和社会保障局", url: "https://hrss.sz.gov.cn/", desc: "其他" },
                     { name: "深圳市中小企业服务局", url: "https://zxqyj.sz.gov.cn/", desc: "其他" }   
                 ]
             },
@@ -244,6 +245,8 @@ const websiteData = [
                     { name: "CQC", url: "https://www.cqc.com.cn/www/index.html", desc: "中国质量认证中心" },
                     { name: "全国排污许可证管理信息平台", url: "https://permit.mee.gov.cn/permitExt/outside/PageQueryServlet?pageno=1&type=Law", desc: "排污许可证" },
                     { name: "高新技术企业认定工作网", url: "http://www.innocom.gov.cn/?ref=https://szsyw.cn", desc: "资质查询" },
+                    { name: "深i企", url: "https://www.szsiq.com/#/specialized?temp=1770014537978", desc: "专精特新中小企业查询（仅限深圳企业）" },
+                    { name: "优质中小企业梯度培育平台", url: "https://zjtx.miit.gov.cn/zxqySy/main", desc: "科技型/创新型/专精特新/专精特新“小巨人”中小企业" },      
                     { name: "建筑工程施工许可证电子证照查询", url: "https://jzsc.mohurd.gov.cn/data/elePermit?ref=https%3A%2F%2Fszsyw.cn", desc: "资质查询" },
                     { name: "全国建筑企业资质查询系统", url: "https://www.jzzzcx.cn/?ref=https://szsyw.cn#/", desc: "资质查询" },
                     { name: "食品生产许可获证查询", url: "https://spaqjg.e-cqs.cn/spscxk/", desc: "食品生产许可获证查询" },
@@ -255,6 +258,8 @@ const websiteData = [
                     { name: "质量证书查询", url: "https://www.cqc.com.cn/www/chinese/zscx/?ref=https://szsyw.cn", desc: "资质查询" },
                     { name: "特种设备公示信息查询", url: "https://cnse.samr.gov.cn/info-pub/pub", desc: "特种设备公示信息查询" },
                     { name: "技能证书", url: "https://zscx.osta.org.cn/?ref=https://szsyw.cn", desc: "资质查询" },
+                    { name: "中国商标网", url: "https://sso.cnipa.gov.cn/am/#/login", desc: "资质查询" },
+                    { name: "欧盟商标查询系统", url: "https://eutms.gpic.gd.cn/", desc: "资质查询" },
                     { name: "安标国家矿用产品安全标志中心", url: "https://www.aqbz.org/?ref=https://szsyw.cn#/home", desc: "资质查询" },
                     { name: "电信业务市场综合管理信息系统", url: "https://tsm.miit.gov.cn/dxxzsp/?ref=https://szsyw.cn", desc: "资质查询" },
                     { name: "新闻总署从业机构和产品查询", url: "https://www.nppa.gov.cn/bsfw/cyjghcpcx/?ref=https://szsyw.cn", desc: "资质查询" },
@@ -430,7 +435,8 @@ const websiteData = [
                     { name: "温度换算", url: "https://1000tool.com/unit/temperature", desc: "计算器" },
                     { name: "生日年龄计算器", url: "https://toolwa.com/age/", desc: "计算器" },
                     { name: "在线育儿补贴计算器", url: "https://uutool.cn/children-allowance/", desc: "计算器" },
-                    { name: "劳法计算器", url: "https://web.laofa.com/calculator/?src=www.jspoo.com", desc: "计算器" }
+                    { name: "劳法计算器", url: "https://web.laofa.com/calculator/?src=www.jspoo.com", desc: "计算器" },
+                    { name: "Bypass", url: "https://www.bypass.cn/", desc: "分流抢票" }
                   
                 ]
             },
