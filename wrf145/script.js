@@ -7,6 +7,7 @@ const websiteData = [
                 websites: [
                     { name: "ISO官网", url: "https://www.iso.org/iso-update.html", desc: "标准每月发布的报告" },
                     { name: "IATF", url: "https://www.iatfglobaloversight.org/", desc: "国际汽车工作组" },
+                    { name: "VDA", url: "https://www.vda.de/en", desc: "德国汽车工业协会" },
                     { name: "IEC", url: "https://webstore.iec.ch/", desc: "电工电子领域国际标准" },
                     { name: "IPC", url: "https://www.ipc.org.cn/standards", desc: "国际电子工业联接协会" },
                     { name: "IMDRF", url: "https://www.imdrf.org/", desc: "国际医疗器械监管机构论坛" },
@@ -242,7 +243,6 @@ const websiteData = [
                 websites: [
                     { name: "全国认证认可信息公共服务平台", url: "http://cx.cnca.cn/CertECloud/index/index/page", desc: "认证资质查询" },
                     { name: "CNAS", url: "https://www.cnas.org.cn/?ref=https://szsyw.cn", desc: "中国合格评定国家认可委员会" },
-                    { name: "CQC", url: "https://www.cqc.com.cn/www/index.html", desc: "中国质量认证中心" },
                     { name: "全国排污许可证管理信息平台", url: "https://permit.mee.gov.cn/permitExt/outside/PageQueryServlet?pageno=1&type=Law", desc: "排污许可证" },
                     { name: "高新技术企业认定工作网", url: "http://www.innocom.gov.cn/?ref=https://szsyw.cn", desc: "资质查询" },
                     { name: "深i企", url: "https://www.szsiq.com/#/specialized?temp=1770014537978", desc: "专精特新中小企业查询（仅限深圳企业）" },
@@ -269,7 +269,14 @@ const websiteData = [
                     { name: "保险中介许可", url: "https://xkz.nfra.gov.cn/zj/?ref=https://szsyw.cn", desc: "资质查询" },
                     { name: "保险许可证", url: "https://xkz.nfra.gov.cn/bx/?ref=https://szsyw.cn", desc: "资质查询" },
                     { name: "金融许可证", url: "https://xkz.nfra.gov.cn/jr/?ref=https://szsyw.cn", desc: "资质查询" },
-                    { name: "中食药监管信息查询平台", url: "http://www.cfdacx.com/?ref=https://szsyw.cn", desc: "资质查询" } 
+                    { name: "中食药监管信息查询平台", url: "http://www.cfdacx.com/?ref=https://szsyw.cn", desc: "资质查询" },
+                    { name: "SGS", url: "https://www.sgs.com/en", desc: "认证机构" },
+                    { name: "CQM", url: "https://www.cqm.com.cn/", desc: "方圆认证机构" },
+                    { name: "BCC", url: "http://www.bcc.com.cn/", desc: "新世纪认证机构" },
+                    { name: "nqa", url: "https://www.nqa.com/en-us", desc: "恩可埃认证机构" },
+                    { name: "TUVRheinland", url: "https://www.tuv.com/greater-china/cn/", desc: "莱茵认证机构" },
+                    { name: "intertek", url: "：https://www.intertek.com.cn/", desc: "天祥认证机构" },
+                    { name: "CQC", url: "https://www.cqc.com.cn/www/index.html", desc: "中国质量认证中心" }
                 ]
             },
           
