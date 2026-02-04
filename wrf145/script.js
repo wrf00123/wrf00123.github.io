@@ -24,6 +24,8 @@ const websiteData = [
                     { name: "GRS标准", url: "https://textileexchange.org/recycled-claim-global-recycled-standard/", desc: "全球回收标准" }, 
                     { name: "GRI标准", url: "https://www.globalreporting.org", desc: "GRI标准下载" },
                     { name: "SASB标准", url: "https://www.sasb.org", desc: "SASB标准下载" },
+                    { name: "ANSI", url: "https://www.ansi.org/", desc: "美国国家标准化组织" },
+                    { name: "IEEE", url: "https://www.ieee.org/", desc: "美国电气电子工程学会" },
                     { name: "FDA（注册）", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm/", desc: "美国医疗器械注册查询" },
                     { name: "最新的医疗器械指南文件", url: "https://www.fda.gov/medical-devices/guidance-documents-medical-devices-and-radiation-emitting-products/recent-final-medical-device-guidance-documents", desc: "美国FDA" },
                     { name: "历史发布的医疗器械相关指南文件", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/guidance-documents-medical-devices-and-radiation-emitting-products", desc: "美国FDA" },
