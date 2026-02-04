@@ -275,7 +275,7 @@ const websiteData = [
                     { name: "BCC", url: "http://www.bcc.com.cn/", desc: "新世纪认证机构" },
                     { name: "nqa", url: "https://www.nqa.com/en-us", desc: "恩可埃认证机构" },
                     { name: "TUVRheinland", url: "https://www.tuv.com/greater-china/cn/", desc: "莱茵认证机构" },
-                    { name: "intertek", url: "：https://www.intertek.com.cn/", desc: "天祥认证机构" },
+                    { name: "intertek", url: "https://www.intertek.com.cn/", desc: "天祥认证机构" },
                     { name: "CQC", url: "https://www.cqc.com.cn/www/index.html", desc: "中国质量认证中心" }
                 ]
             },
