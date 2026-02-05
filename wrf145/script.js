@@ -5,6 +5,10 @@ const websiteData = [
                 title: "国际标准",
                 icon: "fa-search",
                 websites: [
+                    { name: "ISO标准", url: "https://www.sacinfo.cn/s/std?p.p1=ISO", desc: "标准查询" },
+                    { name: "ISO标准2", url: "https://std.samr.gov.cn/gj/std?op=ISO", desc: "标准查询" },
+                    { name: "IEC标准", url: "https://www.sacinfo.cn/s/std?p.p1=IEC", desc: "标准查询" },
+                    { name: "IEC标准2", url: "https://std.samr.gov.cn/gj/std?op=IEC", desc: "标准查询" },
                     { name: "ISO官网", url: "https://www.iso.org/iso-update.html", desc: "标准每月发布的报告" },
                     { name: "IATF", url: "https://www.iatfglobaloversight.org/", desc: "国际汽车工作组" },
                     { name: "VDA", url: "https://www.vda.de/en", desc: "德国汽车工业协会" },
@@ -13,8 +17,6 @@ const websiteData = [
                     { name: "IMDRF", url: "https://www.imdrf.org/", desc: "国际医疗器械监管机构论坛" },
                     { name: "ITU", url: "https://www.itu.int/en/ITU-T/Pages/default.aspx", desc: "全球电信标准化" },
                     { name: "IAF", url: "https://iaf.nu/en/home/", desc: "国际认证论坛" },
-                    { name: "MDSAP（日本、巴西、澳大利亚）", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-international-regulations-english-australia-brazil-canada-japan-and-usa", desc: "MDSAP五国的QMS相关法规" },
-                    { name: "MDSAP标准", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-audit-procedures-and-forms", desc: "MDSAP Audit Procedures and Forms | FDA" },
                     { name: "REACH清单", url: "https://echa.europa.eu/candidate-list-table", desc: "REACH查询" },
                     { name: "ZDHC", url: "https://www.roadmaptozero.com/mrsl?locale=zh_cn#CG", desc: "限用清单/程序/指南/实施方法" },
                     { name: "EUL", url: "https://www.who.int/teams/regulation-prequalification/eul/", desc: "WHO白名单" },
@@ -24,30 +26,7 @@ const websiteData = [
                     { name: "GRS标准", url: "https://textileexchange.org/recycled-claim-global-recycled-standard/", desc: "全球回收标准" }, 
                     { name: "GRI标准", url: "https://www.globalreporting.org", desc: "GRI标准下载" },
                     { name: "SASB标准", url: "https://www.sasb.org", desc: "SASB标准下载" },
-                    { name: "IEEE", url: "https://www.ieee.org/", desc: "美国电气电子工程学会" },
-                    { name: "FDA（注册）", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm/", desc: "美国医疗器械注册查询" },
-                    { name: "最新的医疗器械指南文件", url: "https://www.fda.gov/medical-devices/guidance-documents-medical-devices-and-radiation-emitting-products/recent-final-medical-device-guidance-documents", desc: "美国FDA" },
-                    { name: "历史发布的医疗器械相关指南文件", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/guidance-documents-medical-devices-and-radiation-emitting-products", desc: "美国FDA" },
-                    { name: "医疗器械数据库", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/medical-device-databases", desc: "美国FDA" },
-                    { name: "510(k) Premarket Notification", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMN/pmn.cfm", desc: "美国FDA" },
-                    { name: "产品分类数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpcd/classification.cfm", desc: "美国FDA" },
-                    { name: "CDRH学习", url: "https://www.fda.gov/training-and-continuing-education/cdrh-learn美国FDA", desc: "美国FDA" },
-                    { name: "FDA认可标准数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfStandards/search.cfm", desc: "美国FDA" },
-                    { name: "自由信息法案", url: "https://www.fda.gov/regulatory-information/freedom-information", desc: "美国FDA" },
-                    { name: "UDI", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/unique-device-identification-system-udi-system#ruleguidance", desc: "美国FDA" },
-                    { name: "UNECE", url: "https://unece.org/ghs-rev4-2011", desc: "GHS全球化学品统一分类和标签制度" },
-                    { name: "FDA账号注册与登录", url: "https://www.access.fda.gov/oaa/logonFlow.htm?execution=e1s1", desc: "美国FDA" },
-                    { name: "FDA法规简介", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance", desc: "美国FDA" },
-                    { name: "FDA MDSAP", url: "https://www.fda.gov/medical-devices/cdrh-international-affairs/medical-device-single-audit-program-mdsap", desc: "美国FDA" },
-                    { name: "MDR信息上报", url: "https://www.fda.gov/medical-devices/medical-device-safety/reporting-allegations-regulatory-misconduct", desc: "美国FDA" },
-                    { name: "召回数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRES/res.cfm", desc: "美国FDA" },
-                    { name: "GUDID数据库", url: "https://accessgudid.nlm.nih.gov/", desc: "美国FDA" },
-                    { name: "联邦公报", url: "https://www.federalregister.gov/", desc: "美国联邦政府的官方日报" },
-                    { name: "CFR", url: "https://www.ecfr.gov/", desc: "美国联邦政府规章制度汇编" },
-                    { name: "医药与食品联邦法规", url: "https://www.ecfr.gov/current/title-21", desc: "美国CFR" },
-                    { name: "OSHA的国家认可测试实验室 (NRTL) 计划", url: "https://www.osha.gov/nationally-recognized-testing-laboratory-program", desc: "美国劳工部" },
-                    { name: "ASQ", url: "https://asq.org/", desc: "美国质量协会" },
-                    { name: "ASTM标准", url: "https://store.astm.org/products-services/standards-and-publications/standards.html", desc: "美国材料实验协会" },
+                    { name: "UNECE", url: "https://unece.org/ghs-rev4-2011", desc: "GHS全球化学品统一分类和标签制度" }, 
                     { name: "EMA", url: "https://www.ema.europa.eu/en/homepage", desc: "欧洲药品管理总局" },
                     { name: "EN标准", url: "https://www.cencenelec.eu/", desc: "EN欧洲标准" },
                     { name: "欧盟EUR-Lex（MDR_IVDR）", url: "https://eur-lex.europa.eu/homepage.html", desc: "EU 2017/745下载" },
@@ -63,31 +42,6 @@ const websiteData = [
                     { name: "MEDDEV指南", url: "https://ec.europa.eu/health/md_sector/current_directives_en", desc: "MEDDEV更新的医疗器械指南文件" },
                     { name: "东盟ASEAN官网", url: "https://asean.org/", desc: "关注医疗器械法规的变化" },
                     { name: "ASEAN DOCS", url: "https://docs.asean.org/SitePages/DocumentSearch.aspx", desc: "指南文件检索" },
-                    { name: "加拿大卫生局（注册）", url: "https://health-products.canada.ca/mdall-limh/prepareSearch?type=active", desc: "加拿大医疗器械注册查询" },
-                    { name: "加拿大法规SOR/98-282", url: "https://lois-laws.justice.gc.ca/eng/regulations/SOR-98-282/index.html", desc: "SOR/98-282法规下载" },
-                    { name: "加拿大MDR", url: "https://laws-lois.justice.gc.ca/eng/regulations/", desc: "关注加拿大MDR医疗器械法规的变化" },
-                    { name: "加拿大医疗器械最新消息", url: "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/what-new.html", desc: "关注加拿大医疗器械相关的最新动态" },
-                    { name: "日本PMDA（注册）", url: "https://www.pmda.go.jp/review-services/drug-reviews/foreign-mfr/0003.html", desc: "医疗器械注册查询" },
-                    { name: "日本法规翻译", url: "https://www.japaneselawtranslation.go.jp/en/laws", desc: "关注日本医疗器械法规的变化" },
-                    { name: "厚生劳动省官网", url: "https://www.mhlw.go.jp/english/index.html", desc: "药品和医疗器械" },
-                    { name: "英国医疗器械监管", url: "https://www.gov.uk/topic/medicines-medical-devices-blood/medical-devices-regulation-safety", desc: "关注英国医疗器械相关的最新动态" },
-                    { name: "英国医疗器械指南", url: "https://www.gov.uk/government/collections/new-guidance-and-information-for-industry-from-the-mhra", desc: "关注英国医疗器械相关的最新动态" },
-                    { name: "UKAS", url: "https://www.ukas.com/", desc: "英国皇家认可委员会" },
-                    { name: "TGA法规", url: "https://www.legislation.gov.au/Search/Therapeutic%20Goods", desc: "澳大利亚TGA法规" },
-                    { name: "TGA", url: "https://www.tga.gov.au/resources", desc: "所有指南文件的检索" },
-                    { name: "TAG公告", url: "https://www.tga.gov.au/resources/publication/publications", desc: "公告" },
-                    { name: "TAG", url: "https://www.tga.gov.au/news/news", desc: "最新资讯发布" },
-                    { name: "TAG征求意见稿", url: "https://www.tga.gov.au/resources/consultation", desc: "征求意见稿" },
-                    { name: "ANVISA官网", url: "https://www.gov.br/anvisa/pt-br", desc: "巴西" },
-                    { name: "第三方咨询机构Emergo", url: "https://www.emergobyul.com/resources/regulations-brazil", desc: "巴西Resolution-RDC-16-2013（BGMP）GMP要求" },
-                    { name: "Basic UDI-DI生成", url: "https://www.gs1.org/services/gmn-generator", desc: "" },
-                    { name: "德国MPG", url: "https://www.gesetze-im-internet.de/mpg/", desc: "德国医疗器械" },
-                    { name: "德国Bfarm", url: "https://www.bfarm.de/EN/News/News-from-the-divisions/Medical-devices-news/_node.html", desc: "德国主管当局信息更新" },
-                    { name: "MDA", url: "https://www.mda.gov.my/", desc: "马来西亚医疗器械法规及指南文件" },
-                    { name: "食品和药品安全部官网", url: "https://www.mfds.go.kr/eng/index.do", desc: "韩国食品和药品" },
-                    { name: "瑞士联邦法律", url: "https://www.fedlex.admin.ch/eli/cc/2020/552/en", desc: "瑞士法规" },
-                    { name: "瑞士卫生部", url: "https://www.swissmedic.ch/swissmedic/en/home/news.html", desc: "关注瑞士医疗器械法规变化" },
-                    { name: "菲律宾FDA官网", url: "https://www.fda.gov.ph/", desc: "关注菲律宾医疗器械法规的变化" },
                     { name: "CE认证", url: "https://europa.eu/youreurope/index_en.htm", desc: "产品认证" },
                     { name: "TCFD", url: "https://www.tcfdhub.org", desc: "气候相关财务信息披露工作组（TCFD）建议案" },
                     { name: "IIRC", url: "https://integratedreporting.org", desc: "国际综合报告委员会（IIRC）框架" },
@@ -204,14 +158,82 @@ const websiteData = [
                     { name: "中国食品工业协会", url: "https://www.cnfia.cn/archives/20486", desc: "标准下载" }
                 ]
             },
-          {
+ {
                 id: 6,
+                title: "各国标准",
+                icon: "fa-solid fa-scale-balanced",
+                websites: [
+                    { name: "德国标准", url: "https://www.sacinfo.cn/s/std?p.p1=DIN", desc: "标准查询" },  
+                    { name: "法国标准", url: "https://www.sacinfo.cn/s/std?p.p1=AFNOR", desc: "标准查询" },
+                    { name: "西班牙标准", url: "https://www.sacinfo.cn/s/std?p.p1=AENOR", desc: "标准查询" },
+                    { name: "白俄罗斯标准", url: "https://www.sacinfo.cn/s/std?p.p1=BELST", desc: "标准查询" },
+                    { name: "俄罗斯标准", url: "https://www.sacinfo.cn/s/std?p.p1=GOSTR", desc: "标准查询" },
+                    { name: "日本标准", url: "https://www.sacinfo.cn/s/std?p.p1=JIS", desc: "标准查询" },
+                    { name: "韩国标准", url: "https://www.sacinfo.cn/s/std?p.p1=KS", desc: "标准查询" },
+                    { name: "MDSAP（日本、巴西、澳大利亚）", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-international-regulations-english-australia-brazil-canada-japan-and-usa", desc: "MDSAP五国的QMS相关法规" },
+                    { name: "MDSAP标准", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-audit-procedures-and-forms", desc: "MDSAP Audit Procedures and Forms | FDA" },
+ { name: "IEEE", url: "https://www.ieee.org/", desc: "美国电气电子工程学会" },
+                    { name: "FDA（注册）", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm/", desc: "美国医疗器械注册查询" },
+                    { name: "最新的医疗器械指南文件", url: "https://www.fda.gov/medical-devices/guidance-documents-medical-devices-and-radiation-emitting-products/recent-final-medical-device-guidance-documents", desc: "美国FDA" },
+                    { name: "历史发布的医疗器械相关指南文件", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/guidance-documents-medical-devices-and-radiation-emitting-products", desc: "美国FDA" },
+                    { name: "医疗器械数据库", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/medical-device-databases", desc: "美国FDA" },
+                    { name: "510(k) Premarket Notification", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMN/pmn.cfm", desc: "美国FDA" },
+                    { name: "产品分类数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpcd/classification.cfm", desc: "美国FDA" },
+                    { name: "CDRH学习", url: "https://www.fda.gov/training-and-continuing-education/cdrh-learn美国FDA", desc: "美国FDA" },
+                    { name: "FDA认可标准数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfStandards/search.cfm", desc: "美国FDA" },
+                    { name: "自由信息法案", url: "https://www.fda.gov/regulatory-information/freedom-information", desc: "美国FDA" },
+                    { name: "UDI", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/unique-device-identification-system-udi-system#ruleguidance", desc: "美国FDA" },
+                    { name: "FDA账号注册与登录", url: "https://www.access.fda.gov/oaa/logonFlow.htm?execution=e1s1", desc: "美国FDA" },
+                    { name: "FDA法规简介", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance", desc: "美国FDA" },
+                    { name: "FDA MDSAP", url: "https://www.fda.gov/medical-devices/cdrh-international-affairs/medical-device-single-audit-program-mdsap", desc: "美国FDA" },
+                    { name: "MDR信息上报", url: "https://www.fda.gov/medical-devices/medical-device-safety/reporting-allegations-regulatory-misconduct", desc: "美国FDA" },
+                    { name: "召回数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRES/res.cfm", desc: "美国FDA" },
+                    { name: "GUDID数据库", url: "https://accessgudid.nlm.nih.gov/", desc: "美国FDA" },
+                    { name: "联邦公报", url: "https://www.federalregister.gov/", desc: "美国联邦政府的官方日报" },
+                    { name: "CFR", url: "https://www.ecfr.gov/", desc: "美国联邦政府规章制度汇编" },
+                    { name: "医药与食品联邦法规", url: "https://www.ecfr.gov/current/title-21", desc: "美国CFR" },
+                    { name: "OSHA的国家认可测试实验室 (NRTL) 计划", url: "https://www.osha.gov/nationally-recognized-testing-laboratory-program", desc: "美国劳工部" },
+                    { name: "ASQ", url: "https://asq.org/", desc: "美国质量协会" },
+                    { name: "ASTM标准", url: "https://store.astm.org/products-services/standards-and-publications/standards.html", desc: "美国材料实验协会" },
+                    { name: "加拿大卫生局（注册）", url: "https://health-products.canada.ca/mdall-limh/prepareSearch?type=active", desc: "加拿大医疗器械注册查询" },
+                    { name: "加拿大法规SOR/98-282", url: "https://lois-laws.justice.gc.ca/eng/regulations/SOR-98-282/index.html", desc: "SOR/98-282法规下载" },
+                    { name: "加拿大MDR", url: "https://laws-lois.justice.gc.ca/eng/regulations/", desc: "关注加拿大MDR医疗器械法规的变化" },
+                    { name: "加拿大医疗器械最新消息", url: "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/what-new.html", desc: "关注加拿大医疗器械相关的最新动态" },
+                    { name: "日本PMDA（注册）", url: "https://www.pmda.go.jp/review-services/drug-reviews/foreign-mfr/0003.html", desc: "医疗器械注册查询" },
+                    { name: "日本法规翻译", url: "https://www.japaneselawtranslation.go.jp/en/laws", desc: "关注日本医疗器械法规的变化" },
+                    { name: "厚生劳动省官网", url: "https://www.mhlw.go.jp/english/index.html", desc: "药品和医疗器械" },
+                    { name: "英国医疗器械监管", url: "https://www.gov.uk/topic/medicines-medical-devices-blood/medical-devices-regulation-safety", desc: "关注英国医疗器械相关的最新动态" },
+                    { name: "英国医疗器械指南", url: "https://www.gov.uk/government/collections/new-guidance-and-information-for-industry-from-the-mhra", desc: "关注英国医疗器械相关的最新动态" },
+                    { name: "UKAS", url: "https://www.ukas.com/", desc: "英国皇家认可委员会" },
+                    { name: "TGA法规", url: "https://www.legislation.gov.au/Search/Therapeutic%20Goods", desc: "澳大利亚TGA法规" },
+                    { name: "TGA", url: "https://www.tga.gov.au/resources", desc: "所有指南文件的检索" },
+                    { name: "TAG公告", url: "https://www.tga.gov.au/resources/publication/publications", desc: "公告" },
+                    { name: "TAG", url: "https://www.tga.gov.au/news/news", desc: "最新资讯发布" },
+                    { name: "TAG征求意见稿", url: "https://www.tga.gov.au/resources/consultation", desc: "征求意见稿" },
+                    { name: "ANVISA官网", url: "https://www.gov.br/anvisa/pt-br", desc: "巴西" },
+                    { name: "第三方咨询机构Emergo", url: "https://www.emergobyul.com/resources/regulations-brazil", desc: "巴西Resolution-RDC-16-2013（BGMP）GMP要求" },
+                    { name: "Basic UDI-DI生成", url: "https://www.gs1.org/services/gmn-generator", desc: "" },
+                    { name: "德国MPG", url: "https://www.gesetze-im-internet.de/mpg/", desc: "德国医疗器械" },
+                    { name: "德国Bfarm", url: "https://www.bfarm.de/EN/News/News-from-the-divisions/Medical-devices-news/_node.html", desc: "德国主管当局信息更新" },
+                    { name: "MDA", url: "https://www.mda.gov.my/", desc: "马来西亚医疗器械法规及指南文件" },
+                    { name: "食品和药品安全部官网", url: "https://www.mfds.go.kr/eng/index.do", desc: "韩国食品和药品" },
+                    { name: "瑞士联邦法律", url: "https://www.fedlex.admin.ch/eli/cc/2020/552/en", desc: "瑞士法规" },
+                    { name: "瑞士卫生部", url: "https://www.swissmedic.ch/swissmedic/en/home/news.html", desc: "关注瑞士医疗器械法规变化" },
+                    { name: "菲律宾FDA官网", url: "https://www.fda.gov.ph/", desc: "关注菲律宾医疗器械法规的变化" },
+
+                ]
+            },
+
+          {
+                id: 7,
                 title: "其他标准",
                 icon: "fa-search",
                 websites: [
                     { name: "企业标准信息公共服务平台", url: "https://www.qybz.org.cn/", desc: "标准下载" },
                     { name: "国家统计局", url: "https://www.stats.gov.cn/", desc: "标准" },
                     { name: "ANSI", url: "https://www.ansi.org/", desc: "美国国家标准化组织" },
+                    { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" },
+                    { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" },
                     { name: "DIN", url: "https://www.din.de/en", desc: "德国标准学会" },
                     { name: "BSI", url: "https://www.bsigroup.com/", desc: "英国标准学会" },
                     { name: "SA/NZSO", url: "https://www.standards.org.au/", desc: "澳大利亚/新西兰标准学会" },
@@ -234,8 +256,6 @@ const websiteData = [
                     { name: "协筑资源", url: "https://www.webfree.net/home", desc: "建筑标准下载" },
                     { name: "标准下载网2", url: "https://www.315368.com/", desc: "标准下载" },
                     { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" },
-                    { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" },
-                    { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" },
                     { name: "CAQ", url: "https://www.caq.org.cn/", desc: "中国质量协会" },
                     { name: "中国企业诚信网", url: "http://211.161.2.172:8088/cms/credit/index.jsp", desc: "其他" },
                     { name: "CQAF", url: "：http://www.cqaf.org/?lang=cn", desc: "中国质量保证论坛" },
@@ -244,7 +264,7 @@ const websiteData = [
                 ]
             },
           {
-                id: 7,
+                id: 8,
                 title: "资质查询",
                 icon: "fa-ellipsis-h",
                 websites: [
@@ -288,7 +308,7 @@ const websiteData = [
             },
           
           {
-                id: 8,
+                id: 9,
                 title: "程序开发",
                 icon: "fa-bolt",
                 websites: [
@@ -311,7 +331,7 @@ const websiteData = [
                 ]
             },
             {
-                id: 9,
+                id: 10,
                 title: "办公工具",
                 icon: "fa-bolt",
                 websites: [
@@ -373,7 +393,7 @@ const websiteData = [
                 ]
             },
           {
-                id: 10,
+                id: 11,
                 title: "效率工具",
                 icon: "fa-bolt",
                 websites: [
@@ -455,7 +475,7 @@ const websiteData = [
                 ]
             },
             {
-                id: 11,
+                id: 12,
                 title: "专业软件",
                 icon: "fa-cogs",
                 websites: [
@@ -489,7 +509,7 @@ const websiteData = [
                 ]
             },
             {
-                id: 12,
+                id: 13,
                 title: "模板下载",
                 icon: "fa-download",
                 websites: [
@@ -552,7 +572,7 @@ const websiteData = [
                 ]
             },
           {
-                id: 13,
+                id: 14,
                 title: "图库",
                 icon: "fa-globe",
                 websites: [
@@ -569,7 +589,7 @@ const websiteData = [
                   { name: "菜鸟图标", url: "https://icon.sucai999.com/", desc: "图标" }                ]
             },
             {
-                id: 14,
+                id: 15,
                 title: "常用网站",
                 icon: "fa-globe",
                 websites: [
@@ -596,7 +616,7 @@ const websiteData = [
                 ]
             },
             {
-                id: 15,
+                id: 16,
                 title: "AI模型",
                 icon: "fa-microchip",
                 websites: [
@@ -640,7 +660,7 @@ const websiteData = [
                 ]
             },
             {
-                id: 16,
+                id: 17,
                 title: "国内法规",
                 icon: "fa-ellipsis-h",
                 websites: [
@@ -668,7 +688,7 @@ const websiteData = [
                 ]
             },
           {
-                id: 17,
+                id: 18,
                 title: "合同范本",
                 icon: "fa-book",
                 websites: [
@@ -688,7 +708,7 @@ const websiteData = [
                 ]
             },
             {
-                id: 18,
+                id: 19,
                 title: "学教程",
                 icon: "fa-book",
                 websites: [
@@ -703,7 +723,7 @@ const websiteData = [
                 ]
             },
             {
-                id: 19,
+                id: 20,
                 title: "学习网站",
                 icon: "fa-graduation-cap",
                 websites: [
@@ -751,7 +771,7 @@ const websiteData = [
                 ]
             },
           {
-                id: 20,
+                id: 21,
                 title: "资源网站",
                 icon: "fa-ellipsis-h",
                 websites: [
@@ -777,7 +797,7 @@ const websiteData = [
                 ]
             },
           {
-                id: 21,
+                id: 22,
                 title: "科普网站",
                 icon: "fa-ellipsis-h",
                 websites: [
@@ -797,7 +817,7 @@ const websiteData = [
                 ]
             },
           {
-                id: 22,
+                id: 23,
                 title: "有趣网站",
                 icon: "fa-ellipsis-h",
                 websites: [
@@ -829,7 +849,7 @@ const websiteData = [
                 ]
             },
           {
-                id: 23,
+                id: 24,
                 title: "邮箱",
                 icon: "fa-ellipsis-h",
                 websites: [
@@ -855,7 +875,7 @@ const websiteData = [
                 ]
             },
            {
-                id: 24,
+                id: 25,
                 title: "采购平台",
                 icon: "fa-ellipsis-h",
                 websites: [
@@ -885,7 +905,7 @@ const websiteData = [
                 ]
             },
           {
-                id: 25,
+                id: 26,
                 title: "招聘平台",
                 icon: "fa-ellipsis-h",
                 websites: [
@@ -902,7 +922,7 @@ const websiteData = [
             },
           
           {
-                id: 26,
+                id: 27,
                 title: "其他",
                 icon: "fa-ellipsis-h",
                 websites: [
