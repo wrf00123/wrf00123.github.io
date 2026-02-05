@@ -24,7 +24,6 @@ const websiteData = [
                     { name: "GRS标准", url: "https://textileexchange.org/recycled-claim-global-recycled-standard/", desc: "全球回收标准" }, 
                     { name: "GRI标准", url: "https://www.globalreporting.org", desc: "GRI标准下载" },
                     { name: "SASB标准", url: "https://www.sasb.org", desc: "SASB标准下载" },
-                    { name: "ANSI", url: "https://www.ansi.org/", desc: "美国国家标准化组织" },
                     { name: "IEEE", url: "https://www.ieee.org/", desc: "美国电气电子工程学会" },
                     { name: "FDA（注册）", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm/", desc: "美国医疗器械注册查询" },
                     { name: "最新的医疗器械指南文件", url: "https://www.fda.gov/medical-devices/guidance-documents-medical-devices-and-radiation-emitting-products/recent-final-medical-device-guidance-documents", desc: "美国FDA" },
@@ -212,6 +211,12 @@ const websiteData = [
                 websites: [
                     { name: "企业标准信息公共服务平台", url: "https://www.qybz.org.cn/", desc: "标准下载" },
                     { name: "国家统计局", url: "https://www.stats.gov.cn/", desc: "标准" },
+                    { name: "ANSI", url: "https://www.ansi.org/", desc: "美国国家标准化组织" },
+                    { name: "DIN", url: "https://www.din.de/en", desc: "德国标准学会" },
+                    { name: "BSI", url: "https://www.bsigroup.com/", desc: "英国标准学会" },
+                    { name: "SA/NZSO", url: "https://www.standards.org.au/", desc: "澳大利亚/新西兰标准学会" },
+                    { name: "KATS", url: "https://www.kats.go.kr/main.do", desc: "韩国标准学会" },
+                    { name: "CEN", url: "https://www.cencenelec.eu/about-cen/", desc: "欧洲标淮学会" },
                     { name: "中关村材料试验技术联盟", url: "https://www.ccs.org.cn/ccswz/special?columnid=201900002000000016&id=0", desc: "标准" },
                     { name: "食典通", url: "https://www.sdtdata.com/fx/fcv1/tsLibIndex", desc: "GB/NY/LS/SC/QB标准下载" },
                     { name: "中国就业培训技术指导中心", url: "https://chinajob.mohrss.gov.cn/ywpd/pxjd/rmzt/zyjnbz/zcwj/", desc: "标准下载" },
@@ -798,6 +803,7 @@ const websiteData = [
                 websites: [
                     { name: "各种测试", url: "https://www.zxgj.cn/?src=www.jspoo.com", desc: "测试" },
                     { name: "在线空调", url: "https://toolwa.com/ac/", desc: "模拟" },
+                    { name: "win12网页版", url: "https://tjy-gitnub.github.io/win12/desktop.html", desc: "模拟" },
                     { name: "XP系统模拟器", url: "https://hackspoof.tonghei.com/windows-xp-simulator/", desc: "模拟" },
                     { name: "wins98系统模拟器", url: "https://www.windows93.net/#!/", desc: "模拟" },
                     { name: "抛硬币", url: "https://uutool.cn/coin/", desc: "模拟" },
