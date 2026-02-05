@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大方县佳佳超市 - 美团闪电仓 | 30分钟快送超市</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ffc107; /* 美团黄 */
+            --primary-dark: #ff9800;
+            --secondary-color: #4CAF50;
+            --dark-color: #333;
+            --light-color: #f8f9fa;
+            --gray-color: #6c757d;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #fff;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* 头部样式 */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            color: var(--primary-color);
+            font-size: 28px;
+        }
+        
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+        
+        .logo-subtext {
+            font-size: 14px;
+            color: var(--gray-color);
+            margin-top: 2px;
+        }
+        
+        .mobile-toggle {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        nav a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 600;
+            font-size: 16px;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        nav a:hover {
+            color: var(--primary-color);
+        }
+        
+        nav a.active {
+            color: var(--primary-color);
+        }
+        
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+        
+        .cta-button {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            border: none;
+            padding: 10px 24px;
+            border-radius: var(--border-radius);
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 3px 6px rgba(255, 193, 7, 0.3);
+        }
+        
+        .cta-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(255, 193, 7, 0.4);
+        }
+        
+        /* 英雄区域 */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+        
+        .highlight {
+            color: var(--primary-color);
+        }
+        
+        .tagline {
+            display: inline-block;
+            background-color: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid var(--primary-color);
+            padding: 12px 20px;
+            margin: 30px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            text-align: left;
+        }
+        
+        /* 商品分类 */
+        .section-title {
+            text-align: center;
+            margin: 60px 0 40px;
+            font-size: 2rem;
+            color: var(--dark-color);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+        
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 80px;
+        }
+        
+        .category-card {
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            text-align: center;
+            padding: 25px 20px;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.12);
+        }
+        
+        .category-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .category-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+        
+        /* 特色服务 */
+        .features {
+            background-color: var(--light-color);
+            padding: 60px 0;
+            margin: 40px 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        /* 下单指引 */
+        .order-steps {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 50px 0 80px;
+            gap: 20px;
+        }
+        
+        .step {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            border-radius: 50%;
+            line-height: 40px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        /* 位置信息 */
+        .location {
+            background-color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 60px;
+        }
+        
+        .location-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .info-card {
+            background-color: var(--light-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        /* 底部 */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-logo {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .footer-links h4 {
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-links h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .footer-links ul {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color);
+            padding-left: 5px;
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+        
+        .social-icons a:hover {
+            background-color: var(--primary-color);
+            color: var(--dark-color);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .categories {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+            }
+            
+            nav {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background-color: white;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+                padding: 20px;
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: var(--transition);
+                z-index: 999;
+            }
+            
+            nav.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            nav li {
+                margin-bottom: 15px;
+            }
+            
+            .hero {
+                padding: 60px 0;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .cta-button {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            .order-steps {
+                flex-direction: column;
+            }
+            
+            .location {
+                padding: 25px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            
+            .section-title {
+                font-size: 1.6rem;
+            }
+            
+            .category-card {
+                padding: 20px 15px;
+            }
+            
+            .categories {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部导航 -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div>
+                    <div class="logo-text">大方县佳佳超市</div>
+                    <div class="logo-subtext">美团闪电仓 · 30分钟快送</div>
+                </div>
+            </div>
+            
+            <div class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            
+            <nav id="mainNav">
+                <ul>
+                    <li><a href="#home" class="active">首页</a></li>
+                    <li><a href="#categories">商品分类</a></li>
+                    <li><a href="#features">特色服务</a></li>
+                    <li><a href="#location">门店信息</a></li>
+                    <li><a href="#contact">联系我们</a></li>
+                </ul>
+            </nav>
+            
+            <a href="https://waimai.meituan.com" target="_blank" class="cta-button" id="orderNowBtn">
+                <i class="fas fa-shopping-cart"></i> 立即下单
+            </a>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>佳佳超市 <span class="highlight">美团闪电仓</span></h1>
+            <p>线上下单，线下极速配送，30分钟内送达您手中！水饮、酒类、零食、日用品一站式购齐，满足您即时购物需求。</p>
+            
+            <div class="tagline">
+                <h3><i class="fas fa-bolt highlight"></i> 闪电配送承诺</h3>
+                <p>24小时营业 | 3公里内30分钟送达 | 正品保障 | 售后无忧</p>
+            </div>
+            
+            <a href="https://waimai.meituan.com" target="_blank" class="cta-button" style="font-size: 1.1rem; padding: 15px 30px;">
+                <i class="fab fa-meetup"></i> 打开美团外卖下单
+            </a>
+        </div>
+    </section>
+
+    <!-- 商品分类 -->
+    <section class="container" id="categories">
+        <h2 class="section-title">热门商品分类</h2>
+        <div class="categories">
+            <!-- 水 -->
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-tint"></i>
+                </div>
+                <h3>饮用水</h3>
+                <p>矿泉水、纯净水、苏打水、进口水等</p>
+            </div>
+            
+            <!-- 饮料 -->
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-wine-bottle"></i>
+                </div>
+                <h3>饮料</h3>
+                <p>碳酸饮料、果汁、茶饮、功能饮料等</p>
+            </div>
+            
+            <!-- 槟榔 -->
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h3>槟榔</h3>
+                <p>多种品牌槟榔，满足不同口味需求</p>
+            </div>
+            
+            <!-- 酒类 -->
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-glass-cheers"></i>
+                </div>
+                <h3>酒类</h3>
+                <p>啤酒、白酒、红酒、洋酒、调酒饮品</p>
+            </div>
+            
+            <!-- 面食 -->
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h3>面食速食</h3>
+                <p>方便面、挂面、速食米粉、自热火锅等</p>
+            </div>
+            
+            <!-- 冷冻商品 -->
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-snowflake"></i>
+                </div>
+                <h3>冷冻食品</h3>
+                <p>速冻水饺、汤圆、冰淇淋、冷冻点心</p>
+            </div>
+            
+            <!-- 文具 -->
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-pencil-alt"></i>
+                </div>
+                <h3>文具用品</h3>
+                <p>笔、笔记本、办公用品、学习工具</p>
+            </div>
+            
+            <!-- 更多商品 -->
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-shopping-basket"></i>
+                </div>
+                <h3>更多商品</h3>
+                <p>零食、日用品、急用物品等2000+商品</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 特色服务 -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">为什么选择佳佳闪电仓</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>闪电配送</h3>
+                    <p>美团骑手优先配送，3公里内30分钟送达，急您所需</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>24小时营业</h3>
+                    <p>深夜急需？凌晨想买？我们全天候为您服务</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3>正品保障</h3>
+                    <p>所有商品正规渠道采购，品质保证</p>
+                </div>
+                
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                    <h3>优惠不断</h3>
+                    <p>新人专享优惠、满减活动、会员折扣天天有</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 下单指引 -->
+    <section class="container">
+        <h2 class="section-title">如何下单</h2>
+        <div class="order-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>打开美团/美团外卖</h3>
+                <p>搜索"佳佳超市闪电仓"或扫描二维码进入店铺</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>选购商品</h3>
+                <p>浏览商品分类，将所需商品加入购物车</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>确认订单</h3>
+                <p>填写配送地址，选择配送时间，提交订单</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>等待收货</h3>
+                <p>骑手接单后快速配送，30分钟内送达您手中</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 位置信息 -->
+    <section class="container" id="location">
+        <h2 class="section-title">门店信息</h2>
+        <div class="location">
+            <h3><i class="fas fa-map-marker-alt highlight"></i> 佳佳超市（美团闪电仓店）</h3>
+            <div class="location-info">
+                <div class="info-card">
+                    <h4><i class="fas fa-map-pin"></i> 地址</h4>
+                    <p>XX市XX区XX街道XX号XX大厦1层</p>
+                    <p>（配送范围：周边3公里）</p>
+                </div>
+                
+                <div class="info-card">
+                    <h4><i class="fas fa-clock"></i> 营业时间</h4>
+                    <p>24小时营业，全年无休</p>
+                    <p>闪电仓配送时间：08:00-24:00</p>
+                </div>
+                
+                <div class="info-card">
+                    <h4><i class="fas fa-phone"></i> 联系客服</h4>
+                    <p>店铺电话：138-XXXX-XXXX</p>
+                    <p>美团客服：101-097-77</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <a href="https://apis.map.qq.com/uri/v1/uri-generator?coord=39.90469,116.40717&referer=myapp" target="_blank" class="cta-button">
+                    <i class="fas fa-map-marked-alt"></i> 查看地图位置
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部 -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-about">
+                    <div class="footer-logo">佳佳超市</div>
+                    <p>美团闪电仓合作伙伴，致力于为周边3公里居民提供最快捷、最便利的购物体验。线上下单，线下极速配送，满足您即时性购物需求。</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                        <a href="#"><i class="fas fa-qrcode"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>快速链接</h4>
+                    <ul>
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#categories">商品分类</a></li>
+                        <li><a href="#features">特色服务</a></li>
+                        <li><a href="#location">门店信息</a></li>
+                        <li><a href="https://waimai.meituan.com" target="_blank">美团外卖</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>热门商品</h4>
+                    <ul>
+                        <li><a href="#">饮用水</a></li>
+                        <li><a href="#">饮料</a></li>
+                        <li><a href="#">槟榔</a></li>
+                        <li><a href="#">酒类</a></li>
+                        <li><a href="#">冷冻食品</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>联系我们</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> 138-XXXX-XXXX</li>
+                        <li><i class="fas fa-map-marker-alt"></i> XX市XX区XX街道XX号</li>
+                        <li><i class="fas fa-clock"></i> 24小时营业</li>
+                        <li><i class="fas fa-truck"></i> 配送时间：08:00-24:00</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>本网站仅作宣传展示，实际交易请通过美团/淘宝闪购/京东平台完成</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobileToggle').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+            this.querySelector('i').classList.toggle('fa-bars');
+            this.querySelector('i').classList.toggle('fa-times');
+        });
+        
+        // 导航链接点击后关闭移动菜单
+        document.querySelectorAll('#mainNav a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.getElementById('mainNav').classList.remove('active');
+                document.getElementById('mobileToggle').querySelector('i').classList.remove('fa-times');
+                document.getElementById('mobileToggle').querySelector('i').classList.add('fa-bars');
+            });
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                if(this.getAttribute('href') === '#') return;
+                
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // 商品分类卡片悬停效果增强
+        document.querySelectorAll('.category-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+        
+        // 模拟美团跳转（实际使用时替换为真实链接）
+        document.getElementById('orderNowBtn').addEventListener('click', function(e) {
+            // 这里可以添加统计代码
+            console.log('用户点击了立即下单按钮');
+            // 实际应跳转到美团店铺页面
+            // window.location.href = 'https://waimai.meituan.com/shop/你的店铺ID';
+        });
+        
+        // 页面滚动时更新导航激活状态
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section[id], footer[id]');
+            const navLinks = document.querySelectorAll('#mainNav a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if(scrollY >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if(link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+        
+        // 页面加载完成后执行
+        window.addEventListener('DOMContentLoaded', function() {
+            // 添加动画效果
+            setTimeout(() => {
+                document.querySelector('.hero').style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
