@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>大方县佳佳超市 - 美团闪电仓 | 30分钟快送超市</title>
+    <title>佳佳超市 - 美团闪电仓 | 30分钟快送超市</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -140,41 +140,123 @@
             box-shadow: 0 5px 12px rgba(255, 193, 7, 0.4);
         }
         
+        /* 地图按钮样式 */
+        .map-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .map-button {
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+            border: 2px solid #dee2e6;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            min-width: 160px;
+            justify-content: center;
+        }
+        
+        .map-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .gaode-map {
+            border-color: #0080ff;
+            color: #0080ff;
+        }
+        
+        .gaode-map:hover {
+            background-color: #0080ff;
+            color: white;
+        }
+        
+        .baidu-map {
+            border-color: #2932e1;
+            color: #2932e1;
+        }
+        
+        .baidu-map:hover {
+            background-color: #2932e1;
+            color: white;
+        }
+        
+        .tencent-map {
+            border-color: #00a1d6;
+            color: #00a1d6;
+        }
+        
+        .tencent-map:hover {
+            background-color: #00a1d6;
+            color: white;
+        }
+        
         /* 英雄区域 */
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
             background-size: cover;
             background-position: center;
             color: white;
-            padding: 80px 0;
+            padding: 100px 0;
             text-align: center;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+            z-index: 1;
+        }
+        
+        .hero > .container {
+            position: relative;
+            z-index: 2;
         }
         
         .hero h1 {
-            font-size: 2.8rem;
-            margin-bottom: 20px;
+            font-size: 3rem;
+            margin-bottom: 25px;
             line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
         
         .hero p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 30px;
-            opacity: 0.9;
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 35px;
+            opacity: 0.95;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
         
         .highlight {
             color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
         }
         
         .tagline {
             display: inline-block;
-            background-color: rgba(255, 193, 7, 0.2);
-            border-left: 4px solid var(--primary-color);
-            padding: 12px 20px;
-            margin: 30px 0;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
-            text-align: left;
+            background-color: rgba(255, 193, 7, 0.25);
+            border: 2px solid var(--primary-color);
+            padding: 15px 25px;
+            margin: 40px 0;
+            border-radius: var(--border-radius);
+            text-align: center;
+            backdrop-filter: blur(5px);
         }
         
         /* 商品分类 */
@@ -213,11 +295,13 @@
             transition: var(--transition);
             text-align: center;
             padding: 25px 20px;
+            border: 1px solid rgba(0,0,0,0.05);
         }
         
         .category-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 12px 20px rgba(0,0,0,0.12);
+            border-color: var(--primary-color);
         }
         
         .category-icon {
@@ -398,7 +482,7 @@
         /* 响应式设计 */
         @media (max-width: 992px) {
             .hero h1 {
-                font-size: 2.2rem;
+                font-size: 2.5rem;
             }
             
             .categories {
@@ -442,11 +526,16 @@
             }
             
             .hero {
-                padding: 60px 0;
+                padding: 80px 0;
             }
             
             .hero h1 {
-                font-size: 1.8rem;
+                font-size: 2.2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+                padding: 0 15px;
             }
             
             .cta-button {
@@ -461,11 +550,25 @@
             .location {
                 padding: 25px;
             }
+            
+            .map-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .map-button {
+                width: 100%;
+                max-width: 280px;
+            }
         }
         
         @media (max-width: 480px) {
             .hero h1 {
-                font-size: 1.6rem;
+                font-size: 1.8rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
             }
             
             .section-title {
@@ -491,7 +594,7 @@
                     <i class="fas fa-bolt"></i>
                 </div>
                 <div>
-                    <div class="logo-text">大方县佳佳超市</div>
+                    <div class="logo-text">佳佳超市</div>
                     <div class="logo-subtext">美团闪电仓 · 30分钟快送</div>
                 </div>
             </div>
@@ -582,6 +685,15 @@
                 <p>方便面、挂面、速食米粉、自热火锅等</p>
             </div>
             
+            <!-- 各类零食 -->
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-cookie-bite"></i>
+                </div>
+                <h3>各类零食</h3>
+                <p>薯片、饼干、坚果、巧克力、糖果等</p>
+            </div>
+            
             <!-- 冷冻商品 -->
             <div class="category-card">
                 <div class="category-icon">
@@ -606,7 +718,7 @@
                     <i class="fas fa-shopping-basket"></i>
                 </div>
                 <h3>更多商品</h3>
-                <p>零食、日用品、急用物品等2000+商品</p>
+                <p>日用品、急用物品等2000+商品任您选购</p>
             </div>
         </div>
     </section>
@@ -637,7 +749,7 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <h3>正品保障</h3>
-                    <p>所有商品正规渠道采购，品质保证</p>
+                    <p>所有商品正规渠道采购，假一赔十，品质保证</p>
                 </div>
                 
                 <div class="feature">
@@ -706,9 +818,21 @@
                 </div>
             </div>
             
-            <div style="margin-top: 30px; text-align: center;">
-                <a href="https://apis.map.qq.com/uri/v1/uri-generator?coord=39.90469,116.40717&referer=myapp" target="_blank" class="cta-button">
-                    <i class="fas fa-map-marked-alt"></i> 查看地图位置
+            <div class="map-buttons">
+                <a href="https://surl.amap.com/1mQQ5Me1fclW" class="map-button gaode-map" id="gaodeMapBtn" target="_blank">
+                    <i class="fas fa-map-marked-alt"></i> 高德地图
+                </a>
+                <a href="#" class="map-button baidu-map" id="baiduMapBtn">
+                    <i class="fas fa-map"></i> 百度地图
+                </a>
+                <a href="#" class="map-button tencent-map" id="tencentMapBtn">
+                    <i class="fas fa-map-signs"></i> 腾讯地图
+                </a>
+            </div>
+            
+            <div style="margin-top: 40px; text-align: center;">
+                <a href="https://waimai.meituan.com" target="_blank" class="cta-button">
+                    <i class="fas fa-shopping-cart"></i> 立即前往美团下单
                 </a>
             </div>
         </div>
@@ -743,11 +867,12 @@
                 <div class="footer-links">
                     <h4>热门商品</h4>
                     <ul>
-                        <li><a href="#">饮用水</a></li>
-                        <li><a href="#">饮料</a></li>
-                        <li><a href="#">槟榔</a></li>
-                        <li><a href="#">酒类</a></li>
-                        <li><a href="#">冷冻食品</a></li>
+                        <li><a href="#categories">饮用水</a></li>
+                        <li><a href="#categories">饮料</a></li>
+                        <li><a href="#categories">槟榔</a></li>
+                        <li><a href="#categories">酒类</a></li>
+                        <li><a href="#categories">各类零食</a></li>
+                        <li><a href="#categories">冷冻食品</a></li>
                     </ul>
                 </div>
                 
@@ -763,7 +888,8 @@
             </div>
             
             <div class="copyright">
-                <p>本网站仅作宣传展示，实际交易请通过美团/淘宝闪购/京东平台完成</p>
+                <p>© 2023 佳佳超市（美团闪电仓）版权所有 | 本网站仅作宣传展示，实际交易请通过美团平台完成</p>
+                <p style="margin-top: 10px;">ICP备案号：京ICP备XXXXXX号 | 食品经营许可证：JYXXXXXXX</p>
             </div>
         </div>
     </footer>
@@ -820,6 +946,20 @@
             console.log('用户点击了立即下单按钮');
             // 实际应跳转到美团店铺页面
             // window.location.href = 'https://waimai.meituan.com/shop/你的店铺ID';
+        });
+        
+        // 百度地图按钮点击事件
+        document.getElementById('baiduMapBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('百度地图链接待添加，后续您可以将href属性替换为实际的百度地图URL');
+            // 实际使用时，将href替换为：https://api.map.baidu.com/marker?location=纬度,经度&title=佳佳超市&content=地址信息&output=html&src=yourWebsite
+        });
+        
+        // 腾讯地图按钮点击事件
+        document.getElementById('tencentMapBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('腾讯地图链接待添加，后续您可以将href属性替换为实际的腾讯地图URL');
+            // 实际使用时，将href替换为：https://apis.map.qq.com/uri/v1/marker?marker=coord:纬度,经度;title:佳佳超市;addr:地址信息&referer=yourAppKey
         });
         
         // 页面滚动时更新导航激活状态
