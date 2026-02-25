@@ -172,7 +172,7 @@ const websiteData = [
                     { name: "韩国标准", url: "https://www.sacinfo.cn/s/std?p.p1=KS", desc: "标准查询" },
                     { name: "MDSAP（日本、巴西、澳大利亚）", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-international-regulations-english-australia-brazil-canada-japan-and-usa", desc: "MDSAP五国的QMS相关法规" },
                     { name: "MDSAP标准", url: "https://www.fda.gov/medical-devices/medical-device-single-audit-program-mdsap/mdsap-audit-procedures-and-forms", desc: "MDSAP Audit Procedures and Forms | FDA" },
- { name: "IEEE", url: "https://www.ieee.org/", desc: "美国电气电子工程学会" },
+                    { name: "IEEE", url: "https://www.ieee.org/", desc: "美国电气电子工程学会" },
                     { name: "FDA（注册）", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRL/rl.cfm/", desc: "美国医疗器械注册查询" },
                     { name: "最新的医疗器械指南文件", url: "https://www.fda.gov/medical-devices/guidance-documents-medical-devices-and-radiation-emitting-products/recent-final-medical-device-guidance-documents", desc: "美国FDA" },
                     { name: "历史发布的医疗器械相关指南文件", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/guidance-documents-medical-devices-and-radiation-emitting-products", desc: "美国FDA" },
@@ -535,6 +535,7 @@ const websiteData = [
                     { name: "时光图书馆", url: "https://atimebook.com/", desc: "书籍下载" },
                     { name: "SaltyLeo", url: "https://tstrs.me/search", desc: "书籍下载" },
                     { name: "书格", url: "https://www.shuge.org/", desc: "书籍下载" },
+                    { name: "Libgen", url: "https://libgen.ee/index.html", desc: "书籍下载" },
                     { name: "读书阁", url: "https://duzhege.cn/", desc: "电子杂志下载" },
                     { name: "文捕", url: "https://www.blog-keeper.com/", desc: "文章解析工具" },
                     { name: "知识星球", url: "https://wx.zsxq.com/login", desc: "资料下载" },
@@ -586,7 +587,8 @@ const websiteData = [
                   { name: "大图居", url: "https://www.datuju.com/bizhi/", desc: "电脑壁纸" },
                   { name: "哲风壁纸", url: "https://haowallpaper.com/", desc: "电脑壁纸" },
                   { name: "恋风壁纸", url: "https://www.luvbree.com/", desc: "电脑壁纸（不登录免5/天，登录免15/天）" },
-                  { name: "菜鸟图标", url: "https://icon.sucai999.com/", desc: "图标" }                ]
+                  { name: "菜鸟图标", url: "https://icon.sucai999.com/", desc: "图标" }                
+                ]
             },
             {
                 id: 15,
@@ -599,6 +601,7 @@ const websiteData = [
                   { name: "有道翻译", url: "https://fanyi.youdao.com/#/TextTranslate", desc: "在线翻译" },
                   { name: "谷歌翻译", url: "https://translate.google.com/", desc: "在线翻译" },
                   { name: "沉浸式翻译", url: "https://immersivetranslate.com/docs/installation/", desc: "在线插件翻译" },
+                  { name: "ViiTor Translate", url: "https://www.viitor.info/", desc: "在线视频实时翻译" },
                   { name: "问卷星", url: "https://www.wjx.cn/newwjx/manage/myquestionnaires.aspx?randomt=1744110951", desc: "问卷调查" },
                   { name: "知乎", url: "https://www.zhihu.com/", desc: "搜索" },
                   { name: "百度一下", url: "https://www.baidu.com/index.php?tn=75144485_2_dg&ch=1", desc: "搜索" },
