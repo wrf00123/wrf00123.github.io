@@ -17,11 +17,7 @@ const websiteData = [
                     { name: "CDP", url: "https://www.cdp.net/zh", desc: "碳信息披露项目(官网" },
                     { name: "CDSB", url: "https://www.cdsb.net/", desc: "气候披露标准委员会" },
                     { name: "ISSB", url: "https://www.ifrs.org/", desc: "国际可持续发展准则委员会" },
-                    { name: "小绿典", url: "https://dljs123.com/#/search/criteria", desc: "标准下载" },
-                    { name: "食品伙伴网", url: "http://down.foodmate.net/wap/", desc: "食品标准下载" },
-                    { name: "标准图集学习交流", url: "https://jzxx.vip/search/pan_view_search.html", desc: "标准下载" },
-                    { name: "化学品安全法规标准信息平台", url: "https://law.chemicalsafety.org.cn/", desc: "化学品标准下载" },
-                    { name: "协筑资源", url: "https://www.webfree.net/home", desc: "建筑标准下载" }
+                    { name: "化学品安全法规标准信息平台", url: "https://law.chemicalsafety.org.cn/", desc: "化学品标准下载" }
                 ]
             },
             {
@@ -58,8 +54,7 @@ const websiteData = [
                     { name: "时间瓶子", url: "https://timebottle.toolooz.com/", desc: "时间小工具" },
                     { name: "Microsoft SAM TTS", url: "https://samtts.com/", desc: "文字转语音" },
                     { name: "gantt-chart", url: "https://gantt.vicsdf.com/", desc: "甘特图生成" },
-                    { name: "中国传统色", url: "https://noneko.cn/", desc: "色系查询" },
-                    { name: "鼠标测试", url: "https://www.setupcheck.tech/zh/tools/mouse", desc: "电脑硬件测试" }
+                    { name: "中国传统色", url: "https://noneko.cn/", desc: "色系查询" }
                 ]
             },
             {
@@ -70,14 +65,12 @@ const websiteData = [
                     { name: "格式工厂", url: "https://www.jinzhoutool.com/bing189107598/gszhgc.html?jx=s6.p569917310.g1180877375523224.k73805272990168.c73805046769292&msclkid=b5aec0a6f768170e05daa812f93eb59d", desc: "格式转换" },
                     { name: "ev录屏", url: "https://www.sootool.net/nexus/bi1/evluping.shtml?msclkid=1ea8e3bd237c12b4823d8b092c630dd1", desc: "录屏" },
                     { name: "Everything", url: "https://www.voidtools.com/zh-cn/downloads/", desc: "文件检索" },
-                    { name: "FastStone Capture", url: "https://www.faststonecapture.cn/", desc: "截长图" },
-                    { name: "小旺AI截图", url: "https://www.xiaowang.com/", desc: "截长图" },
                     { name: "PixPin", url: "https://pixpin.cn/", desc: "截长图" },
+                    { name: "FastStone Capture", url: "https://www.faststonecapture.cn/", desc: "截长图" },
                     { name: "Fengling", url: "https://fengling.nocmt.com/", desc: "剪贴板同步" },
                     { name: "方方格子", url: "http://www.ffcell.com/", desc: "excel插件" },
                     { name: "51PPT模板", url: "https://www.51pptmoban.com/ppt-soft/", desc: "PPT插件" },
-                    { name: "Office Tool Plus", url: "https://otp.landian.vip/zh-cn/#google_vignette", desc: "一键部署Office" },
-                    { name: "机查查", url: "https://devink.techartlife.com/zh/", desc: "机查查" }
+                    { name: "Office Tool Plus", url: "https://otp.landian.vip/zh-cn/#google_vignette", desc: "一键部署Office" }
                 ]
             },
             {
@@ -88,13 +81,7 @@ const websiteData = [
                     { name: "微软officePLUS", url: "https://www.officeplus.cn/", desc: "ppt/word/excel" },
                     { name: "优品PPT", url: "https://www.ypppt.com/", desc: "ppt/ppt元素/课件/字体" },
                     { name: "爱PPT", url: "https://www.2ppt.com/", desc: "ppt" },
-                    { name: "第1PPT", url: "https://www.1ppt.com/tags/419/", desc: "ppt/ppt元素/字体/音效/课件" }, 
-                    { name: "枣知网", url: "https://www.51zaozhi.com/", desc: "ppt/word/excel" },
-                    { name: "GitCode", url: "https://gitcode.com/Open-source-documentation-tutorial", desc: "开源文档下载" },
-                    { name: "知识星球", url: "https://wx.zsxq.com/login", desc: "资料下载" },
-                    { name: "百度文库", url: "https://wenku.baidu.com/?fr=brandad_2&_wkts_=1755328356957", desc: "资料下载" },
-                    { name: "腾讯文档", url: "https://docs.qq.com/desktop/?nlc=1", desc: "资料下载" },
-                    { name: "仪器信息网", url: "https://www.instrument.com.cn/", desc: "资料下载" }
+                    { name: "第1PPT", url: "https://www.1ppt.com/tags/419/", desc: "ppt/ppt元素/字体/音效/课件" }
                 ]
             },
             {
@@ -129,8 +116,8 @@ const websiteData = [
                     { name: "秘塔AI搜索", url: "https://metaso.cn/", desc: "在线AI" },
                     { name: "飞书多维表格", url: "https://acnkgpefayvj.feishu.cn/base", desc: "在线AI" },
                     { name: "天工AI", url: "https://www.tiangong.cn/", desc: "在线AI" },
-                    { name: "ChatGPT", url: "https://chatgpt.com", desc: "AI软件" },
-                    { name: "文小言", url: "http://www.wenxiaoyan.com/pc", desc: "AI软件" }
+                    { name: "文小言", url: "https://yiyan.baidu.com/", desc: "在线AI" },
+                    { name: "ChatGPT", url: "https://chatgpt.com", desc: "AI软件" }
                 ]
             },
             {
@@ -214,9 +201,7 @@ const websiteData = [
                     { name: "Ries", url: "https://ries.ai/zh/learn-english", desc: "英语学习" },
                     { name: "LetMeEnglish.com", url: "https://letmeenglish.com/", desc: "英语学习" },
                     { name: "English Daily", url: "https://englishdaily.ai/", desc: "英语学习" },
-                    { name: "英语小说网", url: "https://yingyuxiaoshuo.com/", desc: "英语小说" },
-                    { name: "小故事铺", url: "https://storynook.cn/", desc: "小故事" },
-                    { name: "网上厨房", url: "https://www.xiaochushuo.com/", desc: "菜谱查询" }
+                    { name: "英语小说网", url: "https://yingyuxiaoshuo.com/", desc: "英语小说" }
                 ]
             },
           {
