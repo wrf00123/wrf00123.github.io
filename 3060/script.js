@@ -157,6 +157,22 @@ const websiteData = [
             },
             {
                 id: 8,
+                title: "国内医疗器械合规要求",
+                icon: "fa-bolt",
+                websites: [
+                    { name: "医疗器械注册人委托生产监督管理的公告", url: "https://www.nmpa.gov.cn/xxgk/fgwj/xzhgfxwj/20240403170020128.html", desc: "医疗器械法规" },
+                    { name: "医疗器械监督管理条例", url: "https://www.nmpa.gov.cn/xxgk/fgwj/flxzhfg/20250416172904188.html", desc: "医疗器械法规" },
+                    { name: "医疗器械委托生产质量协议编制指南", url: "https://www.nmpa.gov.cn/ylqx/ylqxggtg/20220324170135111.html", desc: "医疗器械法规" },
+                    { name: "医疗器械跨区域委托生产协同监管工作的意见", url: "https://www.nmpa.gov.cn/xxgk/fgwj/gzwj/gzwjylqx/20220402144923121.html", desc: "医疗器械法规" },
+                    { name: "《医疗器械生产质量管理规范》", url: "https://www.nmpa.gov.cn/yaowen/ypjgyw/ylqxyw/20251104174018114.html", desc: "医疗器械法规" },
+                    { name: "医疗器械生产监督管理办法", url: "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/fgs/art/2023/art_fc2666aec99f4b5d996faa13c4aed7a3.html", desc: "医疗器械法规" },
+                    { name: "医疗器械说明书和标签管理规定", url: "https://www.samr.gov.cn/zw/zfxxgk/fdzdgknr/bgt/art/2023/art_0b21c1f7edae42d1a1653a98d28ea99b.html", desc: "医疗器械法规" },
+                    { name: "全面深化药品医疗器械监管改革促进医药产业高质量发展的意见", url: "https://www.nmpa.gov.cn/xxgk/fgwj/qita/20250103170940152.html", desc: "医疗器械法规" },
+                    { name: "医疗器械生产经营分级监管工作的指导意见", url: "https://www.nmpa.gov.cn/xxgk/fgwj/gzwj/gzwjylqx/20220909171207137.html", desc: "医疗器械法规" },
+                ]
+            },
+            {
+                id: 9,
                 title: "法规（国外）",
                 icon: "fa-tasks",
                 websites: [
@@ -174,7 +190,7 @@ const websiteData = [
                 ]
             },
             {
-                id: 9,
+                id: 10,
                 title: "学教程",
                 icon: "fa-cloud",
                 websites: [
@@ -189,7 +205,7 @@ const websiteData = [
                 ]
             },
             {
-                id: 10,
+                id: 11,
                 title: "学习网站",
                 icon: "fa-bolt",
                 websites: [
@@ -203,15 +219,8 @@ const websiteData = [
                     { name: "English Daily", url: "https://englishdaily.ai/", desc: "英语学习" },
                     { name: "英语小说网", url: "https://yingyuxiaoshuo.com/", desc: "英语小说" }
                 ]
-            },
-          {
-                id: 11,
-                title: "其他",
-                icon: "fa-bolt",
-                websites: [
-                    { name: "天下老照片", url: "http://www.laozhaopian5.com/", desc: "老照片" },
-                ]
             }
+          
         ];// DOM元素
 const searchInput = document.getElementById('searchInput');
 const websitesGrid = document.getElementById('websitesGrid');
