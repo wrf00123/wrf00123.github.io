@@ -422,6 +422,7 @@ const websiteData = [
                     { name: "Clarity", url: "https://clarity.microsoft.com/demo/projects/view/3t0wlogvdz/dashboard?date=Last%203%20days", desc: "网站使用统计工具" },
                     { name: "Tiny Wow", url: "https://tinywow.com/", desc: "工具汇集" },
                     { name: "SVG Repo", url: "https://www.svgrepo.com/", desc: "图标工具" },
+                    { name: "filecompress", url: "https://filecompress.org/zh-cn/documents-tools/compress-xlsx", desc: "excel文件体积压缩" },
                     { name: "imgdiet", url: "https://www.imgdiet.com/zh-CN", desc: "图片压缩工具" },
                     { name: "极速图片压缩器", url: "https://www.zgcoder.com/tic/", desc: "图片压缩工具" },
                     { name: "Free Tinypng", url: "https://free.tinypng.site/", desc: "图片压缩工具" },
