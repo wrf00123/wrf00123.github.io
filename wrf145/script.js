@@ -502,6 +502,8 @@ const websiteData = [
                     { name: "FastStone Capture", url: "https://www.faststonecapture.cn/", desc: "截长图" },
                     { name: "小旺AI截图", url: "https://www.xiaowang.com/", desc: "截长图" },
                     { name: "PixPin", url: "https://pixpin.cn/", desc: "截长图" },
+                    { name: "Minitab入门手册", url: "https://www.minitab.com/zh-cn/support/documents/", desc: "手册下载" },
+                    { name: "Minitab操作步骤概述", url: "https://support.minitab.com/zh-cn/minitab/help-and-how-to/", desc: "操作步骤概述" },
                     { name: "鹰迅办公", url: "https://www.inxunoffice.com/", desc: "批量文档处理" },
                     { name: "我的ABC软件工具箱", url: "https://www.wodeabc.com/", desc: "批量文档处理" },
                     { name: "7-Zip", url: "https://www.7-zip.org/", desc: "解压" },
