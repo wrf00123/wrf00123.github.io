@@ -370,7 +370,7 @@ const websiteData = [
                     { name: "PDF24 Tools", url: "https://tools.pdf24.org/zh/", desc: "PDF工具" },
                     { name: "Stirling PDF", url: "https://stirlingpdf.io/?lang=zh_CN", desc: "PDF工具" },
                     { name: "超级PDF", url: "https://xpdf.cn/", desc: "PDF工具" },
-                    { name: "EPUB.to", url: "https://www.epub.to/pdf/?lang=zh", desc: "EPUB转PDF" },
+                    { name: "FreeConvert", url: "https://www.freeconvert.com/zh", desc: "EPUB转PDF" },
                     { name: "在线HEIC转PDF", url: "https://heictopdf.run/zh", desc: "HEIC转PDF" },
                     { name: "ScanNerd", url: "https://scannerd.co/zh", desc: "扫描成PDF" },
                     { name: "CDKM", url: "https://cdkm.com/", desc: "文件格式转换" },
