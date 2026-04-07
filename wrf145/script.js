@@ -250,6 +250,7 @@ const websiteData = [
                     { name: "OECD", url: "https://www.oecd.org/zh/publications/12182cb3-zh.html", desc: "经合组织跨国企业负责任商业行为准则-ESG相关标准" },
                     { name: "ISO26000", url: "https://www.iso.org/iso-26000-social-responsibility.html", desc: "社会责任指南-ESG相关标准" },
                     { name: "IIRC", url: "https://integratedreporting.org", desc: "国际综合报告框架-ESG相关标准" }, 
+                    { name: "IETP", url: "https://www.ethicalsupplychain.org/resource/factory/audit-checklist", desc: "IETP社会责任合规标准-ICTI审厂" },           
                     { name: "ANSI", url: "https://www.ansi.org/", desc: "美国国家标准化组织" },
                     { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" },
                     { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" },
