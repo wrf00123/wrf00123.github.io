@@ -249,7 +249,7 @@ const websiteData = [
                     { name: "IFRS S1可持续发展相关财务信息披露的一般要求", url: "https://www.ifrs.org/issued-standards/ifrs-sustainability-standards-navigator/ifrs-s1-general-requirements/", desc: "IFRS S1可持续发展相关财务信息披露的一般要求-ESG相关标准" },     
                     { name: "OECD", url: "https://www.oecd.org/zh/publications/12182cb3-zh.html", desc: "经合组织跨国企业负责任商业行为准则-ESG相关标准" },
                     { name: "ISO26000", url: "https://www.iso.org/iso-26000-social-responsibility.html", desc: "社会责任指南-ESG相关标准" },
-                    { name: "IIRC", url: "https://integratedreporting.org", desc: "国际综合报告委员会（IIRC）框架-ESG相关标准" }, 
+                    { name: "IIRC", url: "https://integratedreporting.org", desc: "国际综合报告框架-ESG相关标准" }, 
                     { name: "ANSI", url: "https://www.ansi.org/", desc: "美国国家标准化组织" },
                     { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" },
                     { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" },
