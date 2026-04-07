@@ -244,6 +244,7 @@ const websiteData = [
                 websites: [
                     { name: "企业标准信息公共服务平台", url: "https://www.qybz.org.cn/", desc: "标准下载" },
                     { name: "国家统计局", url: "https://www.stats.gov.cn/", desc: "标准" },
+                    { name: "ESG标准", url: "https://ohesg.com/", desc: "标准" },
                     { name: "ANSI", url: "https://www.ansi.org/", desc: "美国国家标准化组织" },
                     { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" },
                     { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" },
