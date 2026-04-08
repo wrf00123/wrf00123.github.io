@@ -227,6 +227,11 @@ const websiteData = [
                     { name: "瑞士联邦法律", url: "https://www.fedlex.admin.ch/eli/cc/2020/552/en", desc: "瑞士法规" },
                     { name: "瑞士卫生部", url: "https://www.swissmedic.ch/swissmedic/en/home/news.html", desc: "关注瑞士医疗器械法规变化" },
                     { name: "菲律宾FDA官网", url: "https://www.fda.gov.ph/", desc: "关注菲律宾医疗器械法规的变化" },
+                    { name: "越南政府官方网站", url: "https://chinhphu.vn/", desc: "法律法令" },
+                    { name: "荷兰政府官方网站", url: "https://www.overheid.nl/", desc: "法律法令" },
+                    { name: "印度政府官方网站", url: "https://www.india.gov.in/", desc: "法律法令" },
+                    { name: "挪威的法律信息网站", url: "https://lovdata.no/", desc: "法律法令" },
+                    { name: "韩国政府官方网站", url: "https://plus.gov.kr/", desc: "法律法令" }
 
                 ]
             },
