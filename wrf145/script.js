@@ -243,6 +243,7 @@ const websiteData = [
                 websites: [
                     { name: "企业标准信息公共服务平台", url: "https://www.qybz.org.cn/", desc: "标准下载" },
                     { name: "国家统计局", url: "https://www.stats.gov.cn/", desc: "标准" },
+                    { name: "联合国全球契约组织", url: "https://cn.unglobalcompact.org/index.html", desc: "全球契约组织" },
                     { name: "ESG标准", url: "https://ohesg.com/", desc: "标准" },
                     { name: "CDP", url: "https://cdp.net/zh/disclose/question-bank", desc: "碳信息披露项目-ESG相关标准" },
                     { name: "GRI标准", url: "https://www.globalreporting.org", desc: "GRI标准下载-ESG相关标准" }, 
@@ -261,7 +262,7 @@ const websiteData = [
                     { name: "SLCP 审计", url: "https://slcp.zendesk.com/hc/en-us/articles/6808698730780-Download-Data-Collection-Tool-which-questions-are-included-in-the-Tool", desc: "SLCP审计清单工具-ESG评级相关" }, 
                     { name: "PSCI审计", url: "https://pscinitiative.org/resource?resource=1", desc: "PSCI原则-ESG评级相关" },
                     { name: "EcoVadis审计", url: "https://ecovadis.cn/", desc: "EcoVadis审计-ESG评级相关" },  
-                     { name: "TfS 审计", url: "https://www.tfs-initiative.com/how-we-do-it/audit#documents", desc: "TfS 审计清单-ESG评级相关" },       
+                    { name: "TfS 审计", url: "https://www.tfs-initiative.com/how-we-do-it/audit#documents", desc: "TfS 审计清单-ESG评级相关" },       
                     { name: "ANSI", url: "https://www.ansi.org/", desc: "美国国家标准化组织" },
                     { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" },
                     { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" },
