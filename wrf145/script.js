@@ -243,7 +243,9 @@ const websiteData = [
                 websites: [
                     { name: "企业标准信息公共服务平台", url: "https://www.qybz.org.cn/", desc: "标准下载" },
                     { name: "国家统计局", url: "https://www.stats.gov.cn/", desc: "标准" },
-                    { name: "联合国全球契约组织", url: "https://cn.unglobalcompact.org/index.html", desc: "全球契约组织" },
+                    { name: "UNGC", url: "https://cn.unglobalcompact.org/index.html", desc: "联合国全球契约组织" },
+                    { name: "ILO", url: "https://normlex.ilo.org/dyn/nrmlx_en/f?p=NORMLEXPUB:12000:0::NO:::", desc: "国际劳工组织-劳工标准" },
+                    { name: "ILO公约全文", url: "https://ohesg.com/", desc: "ILO公约全文" },
                     { name: "ESG标准", url: "https://ohesg.com/", desc: "标准" },
                     { name: "CDP", url: "https://cdp.net/zh/disclose/question-bank", desc: "碳信息披露项目-ESG相关标准" },
                     { name: "GRI标准", url: "https://www.globalreporting.org", desc: "GRI标准下载-ESG相关标准" }, 
@@ -863,6 +865,7 @@ const websiteData = [
                 icon: "fa-ellipsis-h",
                 websites: [
                     { name: "各种测试", url: "https://www.zxgj.cn/?src=www.jspoo.com", desc: "测试" },
+                    { name: "SBTI测试", url: "https://sbti.11ai.cn/#:~:text=SBTI%E4%BA%BA%E6%A0%BC%E6%B5%8B%E8%AF%95%E5%AE%98%E7%BD%91%E4%B8%BA%E4%BD%A0%E6%8F%90%E4%BE%9B%E5%85%8D%E8%B4%B9%E3%80%81%E5%BF%AB%E9%80%9F%E3%80%81%E9%AB%98%E7%B2%BE%E5%87%86%E7%9A%84%E6%80%A7%E6%A0%BC%E6%B5%8B%E8%AF%84%E6%9C%8D%E5%8A%A1%EF%BC%8C%E6%97%A0%E9%9C%80%E5%A4%8D%E6%9D%82%E6%AD%A5%E9%AA%A4%EF%BC%8C%E6%89%93%E5%BC%80%E5%85%A5%E5%8F%A3%E5%8D%B3%E5%8F%AF%E5%BC%80%E5%A7%8B%E6%B5%8B%E8%AF%95%E3%80%82,%E5%B9%B3%E5%8F%B0%E7%BB%93%E5%90%88%E7%8E%B0%E4%BB%A3%E5%BF%83%E7%90%86%E5%AD%A6%E4%B8%8E%E5%B9%B4%E8%BD%BB%E7%BE%A4%E4%BD%93%E7%89%B9%E7%82%B9%EF%BC%8C%E6%89%93%E9%80%A0%E8%BD%BB%E6%9D%BE%E6%98%93%E6%87%82%E7%9A%84%E6%80%A7%E6%A0%BC%E8%A7%A3%E8%AF%BB%E6%8A%A5%E5%91%8A%EF%BC%8C%E6%94%AF%E6%8C%81%E7%BB%93%E6%9E%9C%E4%BF%9D%E5%AD%98%E3%80%81%E7%A4%BE%E4%BA%A4%E5%88%86%E4%BA%AB%E4%B8%8E%E4%BA%BA%E6%A0%BC%E5%8C%B9%E9%85%8D%E5%8A%9F%E8%83%BD%E3%80%82%20%E6%97%A0%E8%AE%BA%E6%98%AF%E8%87%AA%E6%88%91%E8%AE%A4%E7%9F%A5%E3%80%81%E6%81%8B%E7%88%B1%E4%BA%A4%E5%8F%8B%E8%BF%98%E6%98%AF%E8%81%8C%E5%9C%BA%E6%B2%9F%E9%80%9A%EF%BC%8CSBTI%E9%83%BD%E8%83%BD%E4%B8%BA%E4%BD%A0%E6%8F%90%E4%BE%9B%E6%9C%89%E8%B6%A3%E5%8F%88%E5%AE%9E%E7%94%A8%E7%9A%84%E5%8F%82%E8%80%83%EF%BC%8C%E6%88%90%E4%B8%BA%E6%96%B0%E4%B8%80%E4%BB%A3%E5%B9%B4%E8%BD%BB%E4%BA%BA%E6%9C%80%E7%88%B1%E7%9A%84%E6%80%A7%E6%A0%BC%E6%8E%A2%E7%B4%A2%E7%A5%9E%E5%99%A8%E3%80%82", desc: "测试" },  
                     { name: "在线空调", url: "https://toolwa.com/ac/", desc: "模拟" },
                     { name: "win12网页版", url: "https://tjy-gitnub.github.io/win12/desktop.html", desc: "模拟" },
                     { name: "XP系统模拟器", url: "https://hackspoof.tonghei.com/windows-xp-simulator/", desc: "模拟" },
