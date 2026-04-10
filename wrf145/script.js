@@ -241,6 +241,7 @@ const websiteData = [
                 icon: "fa-search",
                 websites: [
                     { name: "企业标准信息公共服务平台", url: "https://www.qybz.org.cn/", desc: "标准下载" },
+                    { name: "特种设备安全检查局", url: "https://www.samr.gov.cn/tzsbj/zcfg/aqjsgf/index.html", desc: "安全技术规范" },
                     { name: "国家统计局", url: "https://www.stats.gov.cn/", desc: "标准" },
                     { name: "UNGC", url: "https://cn.unglobalcompact.org/index.html", desc: "联合国全球契约组织" },
                     { name: "ILO", url: "https://normlex.ilo.org/dyn/nrmlx_en/f?p=NORMLEXPUB:12000:0::NO:::", desc: "国际劳工组织-劳工标准" },
