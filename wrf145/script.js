@@ -52,8 +52,7 @@ const websiteData = [
                     { name: "CE认证", url: "https://europa.eu/youreurope/index_en.htm", desc: "产品认证" },
                     { name: "FCC认证", url: "https://www.fcc.gov/", desc: "产品认证" },
                     { name: "UL Solutions", url: "https://www.ul.com/", desc: "产品认证" },
-                    { name: "UL认证", url: "https://www.shopulstandards.com/", desc: "UL标准" },
-                    { name: "TCFD", url: "https://www.tcfdhub.org", desc: "气候相关财务信息披露工作组（TCFD）建议案" }
+                    { name: "UL认证", url: "https://www.shopulstandards.com/", desc: "UL标准" }
                 ]
             },
           {
