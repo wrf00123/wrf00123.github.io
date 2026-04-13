@@ -191,7 +191,6 @@ const websiteData = [
                     { name: "UDI", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/unique-device-identification-system-udi-system#ruleguidance", desc: "美国FDA" },
                     { name: "FDA账号注册与登录", url: "https://www.access.fda.gov/oaa/logonFlow.htm?execution=e1s1", desc: "美国FDA" },
                     { name: "FDA法规简介", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance", desc: "美国FDA" },
-                    { name: "FDA MDSAP", url: "https://www.fda.gov/medical-devices/cdrh-international-affairs/medical-device-single-audit-program-mdsap", desc: "美国FDA" },
                     { name: "MDR信息上报", url: "https://www.fda.gov/medical-devices/medical-device-safety/reporting-allegations-regulatory-misconduct", desc: "美国FDA" },
                     { name: "召回数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfRES/res.cfm", desc: "美国FDA" },
                     { name: "GUDID数据库", url: "https://accessgudid.nlm.nih.gov/", desc: "美国FDA" },
@@ -304,7 +303,8 @@ const websiteData = [
                 icon: "fa-ellipsis-h",
                 websites: [
                     { name: "全国认证认可信息公共服务平台", url: "http://cx.cnca.cn/CertECloud/index/index/page", desc: "认证资质查询" },
-                    { name: "CNAS", url: "https://www.cnas.org.cn/?ref=https://szsyw.cn", desc: "中国合格评定国家认可委员会" },
+                    { name: "CNAS", url: "https://www.cnas.org.cn/rkgf/rzjgrk/index.html", desc: "中国合格评定国家认可委员会-认证规则" },
+                    { name: "GLOBAC", url: "https://globalaccreditationcooperationincorporated.org/", desc: "全球认可合作组织" },
                     { name: "全国排污许可证管理信息平台", url: "https://permit.mee.gov.cn/permitExt/outside/PageQueryServlet?pageno=1&type=Law", desc: "排污许可证" },
                     { name: "高新技术企业认定工作网", url: "http://www.innocom.gov.cn/?ref=https://szsyw.cn", desc: "资质查询" },
                     { name: "深i企", url: "https://www.szsiq.com/#/specialized?temp=1770014537978", desc: "专精特新中小企业查询（仅限深圳企业）" },
