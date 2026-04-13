@@ -245,7 +245,7 @@ const websiteData = [
                     { name: "国家统计局", url: "https://www.stats.gov.cn/", desc: "标准" },
                     { name: "UNGC", url: "https://cn.unglobalcompact.org/index.html", desc: "联合国全球契约组织" },
                     { name: "ILO", url: "https://normlex.ilo.org/dyn/nrmlx_en/f?p=NORMLEXPUB:12000:0::NO:::", desc: "国际劳工组织-劳工标准" },
-                    { name: "ILO公约全文", url: "https://ohesg.com/", desc: "ILO公约全文" },
+                    { name: "ILO公约全文", url: "https://cn.fsc.org/cn-zh/ilohexinlaogongyaoqiuxiangguanfalufagui/ilogongyuequanwen", desc: "ILO公约全文" },
                     { name: "ESG标准", url: "https://ohesg.com/", desc: "标准" },
                     { name: "CDP", url: "https://cdp.net/zh/disclose/question-bank", desc: "碳信息披露项目-ESG相关标准" },
                     { name: "GRI标准", url: "https://www.globalreporting.org", desc: "GRI标准下载-ESG相关标准" }, 
