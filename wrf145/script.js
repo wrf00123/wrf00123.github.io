@@ -213,7 +213,7 @@ const websiteData = [
                     { name: "TAG公告", url: "https://www.tga.gov.au/resources/publication/publications", desc: "公告" },
                     { name: "TAG", url: "https://www.tga.gov.au/news/news", desc: "最新资讯发布" },
                     { name: "TAG征求意见稿", url: "https://www.tga.gov.au/resources/consultation", desc: "征求意见稿" },
-                    { name: "ANVISA官网", url: "https://www.gov.br/anvisa/pt-br", desc: "巴西" },
+                    { name: "ANVISA", url: "https://anvisalegis.datalegis.net/action/ActionDatalegis.php?acao=abrirLegislacao&cod_modulo=134&cod_menu=1696", desc: "国家卫生监测局-巴西" },
                     { name: "第三方咨询机构Emergo", url: "https://www.emergobyul.com/resources/regulations-brazil", desc: "巴西Resolution-RDC-16-2013（BGMP）GMP要求" },
                     { name: "Basic UDI-DI生成", url: "https://www.gs1.org/services/gmn-generator", desc: "" },
                     { name: "德国MPG", url: "https://www.gesetze-im-internet.de/mpg/", desc: "德国医疗器械" },
