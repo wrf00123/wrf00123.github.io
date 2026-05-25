@@ -272,6 +272,7 @@ const websiteData = [
                     { name: "EcoVadis审计", url: "https://ecovadis.cn/", desc: "EcoVadis审计-ESG评级相关" },  
                     { name: "TfS 审计", url: "https://www.tfs-initiative.com/how-we-do-it/audit#documents", desc: "TfS 审计清单-ESG评级相关" },       
                     { name: "ANSI", url: "https://www.ansi.org/", desc: "美国国家标准化组织" },
+                    { name: "ESDA", url: "https://www.esda.org/store/standards/?category=1", desc: "静电放电协会" },      
                     { name: "uspto", url: "https://www.uspto.gov/", desc: "美国专利及商标局" },
                     { name: "ASTM", url: "https://www.astm.org/", desc: "美国材料与试验协会" },
                     { name: "DIN", url: "https://www.din.de/en", desc: "德国标准学会" },
