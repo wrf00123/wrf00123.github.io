@@ -52,7 +52,12 @@ const websiteData = [
                     { name: "FSC认证", url: "https://connect.fsc.org/document-centre", desc: "森林认证标准" },
                     { name: "ESCP", url: "https://www.ethicalsupplychain.org/zh/resource/factory/audit-checklist", desc: "供应链责任规范标准" },
                     { name: "ICS", url: "https://ics-asso.org/resources/#1617967310959-18ea5aee-152a", desc: "合规与可持续发展倡议" },
- { name: "", url: "", desc: "标准" },
+                    { name: "NATRUE", url: "https://natrue.org/our-standard/documents/", desc: "天然有机化妆品认证标准" },
+                    { name: "Fairtrade", url: "https://www.fairtrade.net/en/why-fairtrade/how-we-do-it/standards/who-we-have-standards-for.html", desc: "公平贸易认证标准" },
+                    { name: "BCI", url: "https://bettercotton.org/what-we-do/defining-better-our-standard/", desc: "良好棉花倡议" },
+                             { name: "", url: "", desc: "标准" },
+                             { name: "", url: "", desc: "标准" },
+                             { name: "", url: "", desc: "标准" },
                              { name: "", url: "", desc: "标准" },
                 ]
             },
