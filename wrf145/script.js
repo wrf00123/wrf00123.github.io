@@ -59,9 +59,7 @@ const websiteData = [
                     { name: "ISCC", url: "https://iscc-system.org/certification/iscc-documents/", desc: "国际可持续性和碳认证标准" },
                     { name: "Common Criteria", url: "https://www.commoncriteriaportal.org/cc/index.cfm", desc: "信息技术安全评估标准" },
                     { name: "SLCP", url: "https://slcp.zendesk.com/hc/en-us/articles/6894013905692-Download-Verifier-Guidance-how-do-I-verify-a-facility-s-answer-to-a-Tool-question", desc: "社会劳工整合标准" },
-                             { name: "", url: "", desc: "标准" },
-                             { name: "", url: "", desc: "标准" },
-                             { name: "", url: "", desc: "标准" },
+                             
                 ]
             },
           {
@@ -199,6 +197,7 @@ const websiteData = [
                     { name: "产品分类数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpcd/classification.cfm", desc: "美国FDA" },
                     { name: "CDRH学习", url: "https://www.fda.gov/training-and-continuing-education/cdrh-learn美国FDA", desc: "美国FDA" },
                     { name: "FDA认可标准数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfStandards/search.cfm", desc: "美国FDA" },
+                    { name: "QMSR", url: "https://www.fda.gov/medical-devices/postmarket-requirements-devices/quality-management-system-regulation-qmsr", desc: "美国FDA|质量管理体系法规" },
                     { name: "自由信息法案", url: "https://www.fda.gov/regulatory-information/freedom-information", desc: "美国FDA" },
                     { name: "UDI", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/unique-device-identification-system-udi-system#ruleguidance", desc: "美国FDA" },
                     { name: "FDA账号注册与登录", url: "https://www.access.fda.gov/oaa/logonFlow.htm?execution=e1s1", desc: "美国FDA" },
