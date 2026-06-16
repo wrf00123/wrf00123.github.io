@@ -6,7 +6,9 @@ const websiteData = [
                 icon: "fa-search",
                 websites: [
                     { name: "ISO官网", url: "https://www.iso.org/iso-update.html", desc: "国际标准化组织" },
+                    { name: "ISO", url: "https://www.iso.org/obp/ui/en#home", desc: "在线浏览平台（OBP）ISO查询术语" },
                     { name: "IEC官网", url: "https://webstore.iec.ch/", desc: "电工电子领域国际标准" },
+                    { name: "IEC", url: "https://www.electropedia.org/", desc: "IEC电工电子词典" },
                     { name: "IATF", url: "https://www.iatfglobaloversight.org/", desc: "国际汽车工作组" },
                     { name: "IPC", url: "https://www.ipc.org.cn/standards", desc: "国际电子工业联接协会" },
                     { name: "UKCA", url: "https://www.gov.uk/guidance/placing-ukca-or-ce-marked-products-on-the-market-in-great-britain", desc: "UKCA标志" },
