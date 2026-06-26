@@ -407,6 +407,7 @@ const websiteData = [
                     { name: "国家/地区/品牌查询", url: "https://wrf00123.github.io/tool2.html", desc: "查询程序" },
                     { name: "部门编号查询", url: "https://wrf00123.github.io/tool7.html", desc: "查询程序" },
                     { name: "图片转pdf", url: "https://wrf00123.github.io/tool22.html", desc: "查询程序" },
+                    { name: "图片添加水印", url: "https://wrf00123.github.io/tool24.html", desc: "文字和图片水印" },
                     { name: "图片压缩", url: "https://wrf00123.github.io/tool23.html", desc: "转格式" },
                     { name: "电子签名", url: "https://wrf00123.github.io/tool20.html", desc: "工具" },
                     { name: "电子章", url: "https://wrf00123.github.io/tool21.html", desc: "工具" },   
