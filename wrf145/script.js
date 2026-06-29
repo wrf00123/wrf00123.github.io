@@ -415,6 +415,7 @@ const websiteData = [
                     { name: "电子公章", url: "https://wrf00123.github.io/tool21.html", desc: "工具" }, 
                     { name: "电子章", url: "https://wrf00123.github.io/tool26.html", desc: "多类型印章" }, 
                     { name: "图书账号", url: "https://wrf00123.github.io/tool16.html", desc: "图书账号" },
+                    { name: "计时器", url: "https://wrf00123.github.io/tool28.html", desc: "工具" },
                     { name: "时间计划小程序", url: "https://wrf00123.github.io/tool8.html", desc: "日期计划程序" },
                     { name: "时光计算器", url: "https://wrf00123.github.io/tool4.html", desc: "日期计算" },
                     { name: "RGB调色板", url: "https://wrf00123.github.io/tool13.html", desc: "调色板" },
