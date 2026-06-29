@@ -408,6 +408,7 @@ const websiteData = [
                     { name: "部门编号查询", url: "https://wrf00123.github.io/tool7.html", desc: "查询程序" },
                     { name: "文件批量重命名工具", url: "https://wrf00123.github.io/tool27.html", desc: "工具" },
                     { name: "图片转pdf", url: "https://wrf00123.github.io/tool22.html", desc: "工具" },
+                    { name: "pdf转图片", url: "https://wrf00123.github.io/tool29.html", desc: "工具" },
                     { name: "图片拼接", url: "https://wrf00123.github.io/tool25.html", desc: "工具" },
                     { name: "图片添加水印", url: "https://wrf00123.github.io/tool24.html", desc: "文字和图片水印" },
                     { name: "图片压缩", url: "https://wrf00123.github.io/tool23.html", desc: "转格式" },
