@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标识自动生成打印工具</title>
+    <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #eef2f7;
+            padding: 30px 15px;
+        }
+
+        .main-wrap {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            text-align: center;
+            font-size: 26px;
+            color: #1f2937;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        /* 控制面板卡片美化 */
+        .control-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 26px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            margin-bottom: 30px;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 18px;
+        }
+
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-item label {
+            font-size: 14px;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .form-item input,
+        .form-item select {
+            height: 42px;
+            padding: 0 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border 0.2s;
+        }
+
+        .form-item input:focus,
+        .form-item select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .btn-row {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 14px;
+            margin-top: 10px;
+        }
+
+        button {
+            height: 44px;
+            padding: 0 24px;
+            border-radius: 8px;
+            border: none;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-refresh {
+            background-color: #3b82f6;
+            color: #fff;
+        }
+        .btn-refresh:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-export {
+            background-color: #0891b2;
+            color: #fff;
+        }
+        .btn-export:hover {
+            background-color: #0e7490;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* A4预览区域 */
+        .preview-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 30px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+
+        .preview-title {
+            font-size: 16px;
+            color: #374151;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .preview-wrapper {
+            margin: 0 auto;
+            background: #fff;
+            position: relative;
+            box-shadow: 0 0 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .preview-wrapper.portrait {
+            width: 210mm;
+            height: 297mm;
+        }
+
+        .preview-wrapper.landscape {
+            width: 297mm;
+            height: 210mm;
+        }
+
+        .sign-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12mm;
+        }
+
+        .sign-item {
+            width: 90%;
+            height: 44%;
+            border: 1.2px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .cut-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            border-top: 1.2px dashed #ff3333;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+        .cut-line.hidden {
+            display: none;
+        }
+
+        @media print {
+            .control-card {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrap">
+        <h2 class="page-title">标识打印生成工具（A4每页2个）</h2>
+
+        <!-- 控制面板 -->
+        <div class="control-card">
+            <div class="control-grid">
+                <div class="form-item">
+                    <label>标识文本</label>
+                    <input type="text" id="signText" placeholder="请输入标识内容" value="">
+                </div>
+
+                <div class="form-item">
+                    <label>字体</label>
+                    <select id="fontFamily">
+                        <option value="仿宋">仿宋</option>
+                        <option value="Source Han Sans CN" selected>思源黑体</option>
+                        <option value="微软雅黑">微软雅黑</option>
+                        <option value="宋体">宋体</option>
+                    </select>
+                </div>
+
+                <div class="form-item">
+                    <label>字体大小 (px，最大220)</label>
+                    <input type="number" id="fontSize" value="80" min="12" max="220">
+                </div>
+
+                <div class="form-item">
+                    <label>字体颜色</label>
+                    <input type="color" id="fontColor" value="#000000">
+                </div>
+
+                <div class="form-item">
+                    <label>纸张方向</label>
+                    <select id="pageOrientation">
+                        <option value="portrait">纵向 A4</option>
+                        <option value="landscape">横向 A4</option>
+                    </select>
+                </div>
+
+                <div class="form-item">
+                    <label>中间裁剪虚线</label>
+                    <select id="cutLineStatus">
+                        <option value="show">显示虚线</option>
+                        <option value="hide">隐藏虚线</option>
+                    </select>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn-refresh" onclick="updatePreview()">实时刷新预览</button>
+                    <button class="btn-export" onclick="exportPDF()">导出PDF文件</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预览区域 -->
+        <div class="preview-card">
+            <div class="preview-title">A4纸张预览效果</div>
+            <div id="previewWrapper" class="preview-wrapper portrait">
+                <div id="cutLine" class="cut-line"></div>
+                <div class="sign-container">
+                    <div id="sign1" class="sign-item"></div>
+                    <div id="sign2" class="sign-item"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentText = "";
+        let currentFont = "Source Han Sans CN";
+        let currentSize = 80;
+        let currentColor = "#000000";
+        let currentOrientation = "portrait";
+        let cutLineVisible = true;
+
+        function updatePreview() {
+            currentText = document.getElementById('signText').value;
+            currentFont = document.getElementById('fontFamily').value;
+            currentSize = document.getElementById('fontSize').value;
+            currentColor = document.getElementById('fontColor').value;
+            currentOrientation = document.getElementById('pageOrientation').value;
+            cutLineVisible = document.getElementById('cutLineStatus').value === 'show';
+
+            const wrapper = document.getElementById('previewWrapper');
+            wrapper.className = 'preview-wrapper ' + currentOrientation;
+
+            const cutLine = document.getElementById('cutLine');
+            cutLine.className = cutLineVisible ? 'cut-line' : 'cut-line hidden';
+
+            const s1 = document.getElementById('sign1');
+            const s2 = document.getElementById('sign2');
+            s1.innerText = currentText;
+            s2.innerText = currentText;
+            s1.style.fontFamily = currentFont;
+            s2.style.fontFamily = currentFont;
+            s1.style.fontSize = currentSize + 'px';
+            s2.style.fontSize = currentSize + 'px';
+            s1.style.color = currentColor;
+            s2.style.color = currentColor;
+        }
+
+        async function exportPDF() {
+            const btn = event.target;
+            const oldTxt = btn.innerText;
+            btn.innerText = "正在生成PDF...";
+            btn.disabled = true;
+            try {
+                await new Promise(r => setTimeout(r, 300));
+                window.scrollTo(0, 0);
+                const dom = document.getElementById('previewWrapper');
+                const canvas = await html2canvas(dom, {
+                    scale: 3,
+                    useCORS: true,
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0,
+                    letterRendering: true
+                });
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: currentOrientation,
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                const img = canvas.toDataURL('image/png', 1);
+                const w = currentOrientation === 'portrait' ? 210 : 297;
+                const h = currentOrientation === 'portrait' ? 297 : 210;
+                pdf.addImage(img, 'PNG', 0, 0, w, h);
+                pdf.save(`标识打印文件.pdf`);
+                alert("PDF导出完成！");
+            } catch (e) {
+                console.error(e);
+                alert("导出失败：" + e.message + "\n建议使用Chrome/Edge浏览器，保证网络正常加载库文件");
+            } finally {
+                btn.innerText = oldTxt;
+                btn.disabled = false;
+            }
+        }
+
+        window.addEventListener('load', updatePreview);
+    </script>
+</body>
+</html>
