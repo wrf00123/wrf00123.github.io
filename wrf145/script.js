@@ -409,6 +409,7 @@ const websiteData = [
                     { name: "文件批量重命名工具", url: "https://wrf00123.github.io/tool27.html", desc: "工具" },
                     { name: "标识打印生成工具", url: "https://wrf00123.github.io/tool30.html", desc: "工具" },
                     { name: "限高标识生成器", url: "https://wrf00123.github.io/tool31.html", desc: "工具" },
+                    { name: "车间限高标识生成器", url: "https://wrf00123.github.io/tool32.html", desc: "工具-带条纹" },
                     { name: "图片转pdf", url: "https://wrf00123.github.io/tool22.html", desc: "工具" },
                     { name: "pdf转图片", url: "https://wrf00123.github.io/tool29.html", desc: "工具" },
                     { name: "图片拼接", url: "https://wrf00123.github.io/tool25.html", desc: "工具" },
