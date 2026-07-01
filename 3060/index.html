@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网址收藏库</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部栏 -->
+        <header class="header">
+            <h1><i class="fas fa-compass"></i> 网址收藏库</h1>
+            
+            <!-- 搜索框 -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索网址名称或用途...">
+            </div>
+            
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 网址卡片区域 -->
+        <main id="bookmarksContainer">
+            <!-- 分类和卡片将通过JavaScript动态生成 -->
+        </main>
+
+        <!-- 底部菜单栏 -->
+        <nav class="bottom-menu" id="bottomMenu">
+            <!-- 菜单项将通过JavaScript动态生成 -->
+        </nav>
+
+        <!-- 更多菜单弹出 -->
+        <div class="more-menu" id="moreMenu">
+            <div class="more-menu-header">
+                <div class="more-menu-title">所有分类</div>
+                <div class="more-menu-search-container">
+                    <i class="fas fa-search more-menu-search-icon"></i>
+                    <input type="text" class="more-menu-search" id="moreMenuSearch" placeholder="搜索分类或网址...">
+                </div>
+            </div>
+            <div class="more-menu-categories" id="moreCategories">
+                <!-- 更多分类将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
