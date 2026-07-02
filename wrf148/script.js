@@ -364,6 +364,12 @@ const websiteData = [{
         { name: "CNAS", url: "https://www.cnas.org.cn/rkgf/rzjgrk/index.html", desc: "中国合格评定国家认可委员会-认证规则" },
         { name: "GLOBAC", url: "https://globalaccreditationcooperationincorporated.org/",  desc: "全球认可合作组织" },
         { name: "APAC", url: "https://www.apac-accreditation.org/", desc: "亚太认可合作组织" },
+        { name: "国家社会保险公共服务平台", url: "https://si.12333.gov.cn/index.jhtml#/index", desc: "查社保" },     
+        { name: "食品安全抽检公布结果查询系统", url: "https://spcjsac.gsxt.gov.cn/", desc: "查食品抽检" },
+        { name: "国家税务总局全国增值税发票查验平台", url: "https://spcjsac.gsxt.gov.cn/", desc: "查发票" },
+        { name: "中国专利公布公告", url: "http://epub.cnipa.gov.cn/", desc: "查专利" },
+        { name: "中国及多国专利审查信息查询", url: "https://tysf.cponline.cnipa.gov.cn/am/#/user/login", desc: "查专利" }, 
+        { name: "中国招标投标公共服务平台", url: "http://cebpubservice.cn/", desc: "查招标" },        
         { name: "全国排污许可证管理信息平台", url: "https://permit.mee.gov.cn/permitExt/outside/PageQueryServlet?pageno=1&type=Law", desc: "排污许可证" },
         { name: "高新技术企业认定工作网", url: "http://www.innocom.gov.cn/?ref=https://szsyw.cn", desc: "资质查询" },
         { name: "深i企", url: "https://www.szsiq.com/#/specialized?temp=1770014537978", desc: "专精特新中小企业查询（仅限深圳企业）" },
@@ -502,6 +508,7 @@ const websiteData = [{
         { name: "部门编号查询", url: "https://wrf00123.github.io/tool7.html", desc: "查询程序" },
         { name: "文件批量重命名工具", url: "https://wrf00123.github.io/tool27.html", desc: "工具" },
         { name: "码上扫描", url: "https://wrf00123.github.io/tool33.html", desc: "扫码工具" },
+        { name: "名片设计器", url: "https://wrf00123.github.io/tool34.html", desc: "工具" },       
         { name: "标识打印生成工具", url: "https://wrf00123.github.io/tool30.html", desc: "工具" },
         { name: "限高标识生成器", url: "https://wrf00123.github.io/tool31.html", desc: "工具" },
         { name: "车间限高标识生成器", url: "https://wrf00123.github.io/tool32.html", desc: "工具-带条纹" },
@@ -851,6 +858,7 @@ const websiteData = [{
         { name: "123云盘", url: "https://www.123pan.com/", desc: "网盘" },
         { name: "夸克网盘", url: "https://pan.quark.cn/", desc: "网盘" },
         { name: "阿里云盘", url: "https://www.alipan.com/", desc: "网盘" },
+        { name: "12306", url: "https://www.12306.cn/index/", desc: "中国铁路" },     
     ]
 }, {
     id: 22,
@@ -912,6 +920,8 @@ const websiteData = [{
     title: "学习网站",
     icon: "fa-book-open",
     websites: [
+        { name: "中国高等教育学生信息网", url: "https://www.chsi.com.cn/", desc: "学信网" },
+        { name: "中国知网", url: "https://www.cnki.net/", desc: "学术文献" },
         { name: "麦肯锡中国", url: "https://www.mckinsey.com.cn/", desc: "麦肯锡季刊/行业研究报告/管理案例" },
         { name: "世界经理人", url: "https://www.ceconline.com/", desc: "商业管理资讯/经理人社区/职业发展" },
         { name: "OBPM", url: "http://www.obpm.org/download.html#", desc: "流程管理开放平台" },
@@ -1036,6 +1046,7 @@ const websiteData = [{
     title: "其他",
     icon: "fa-ellipsis-h",
     websites: [
+        { name: "全国房价行情", url: "https://m.creprice.cn/", desc: "查询" },
         { name: "天下老照片", url: "http://www.laozhaopian5.com/", desc: "老照片" },
         { name: "影视", url: "https://yinghezhinan.com/sites/zaixian/", desc: "影视" },
     ]
