@@ -666,6 +666,7 @@ const websiteData = [{
         { name: "国家/地区/品牌查询", url: "https://wrf00123.github.io/tool2.html", desc: "查询程序" },
         { name: "部门编号查询", url: "https://wrf00123.github.io/tool7.html", desc: "查询程序" },
         { name: "文件批量重命名工具", url: "https://wrf00123.github.io/tool27.html", desc: "工具" },
+        { name: "码上扫描", url: "https://wrf00123.github.io/tool33.html", desc: "扫码工具" },
         { name: "标识打印生成工具", url: "https://wrf00123.github.io/tool30.html", desc: "工具" },
         { name: "限高标识生成器", url: "https://wrf00123.github.io/tool31.html", desc: "工具" },
         { name: "车间限高标识生成器", url: "https://wrf00123.github.io/tool32.html", desc: "工具-带条纹" },
