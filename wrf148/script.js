@@ -877,7 +877,7 @@ const websiteData = [{
         { name: "讯飞输入法", url: "https://srf.xunfei.cn/index.html#/", desc: "输入法" },
         { name: "百度输入法", url: "https://shurufa.baidu.com/default", desc: "输入法" },
         { name: "微信输入法", url: "https://z.weixin.qq.com/", desc: "输入法" },
-        { name: "WPS", url: "https://z.weixin.qq.com/", desc: "文字处理" },
+        { name: "WPS", url: "https://www.wps.cn/", desc: "文字处理" },
         { name: "水豚鼠标助手", url: "https://shuitunapp.com/?ref=https://szsyw.cn", desc: "屏幕演示" },
         { name: "Fengling", url: "https://fengling.nocmt.com/", desc: "剪贴板同步" },
         { name: "方方格子", url: "http://www.ffcell.com/", desc: "excel插件" },
@@ -887,6 +887,13 @@ const websiteData = [{
         { name: "Office Tool Plus", url: "https://otp.landian.vip/zh-cn/#google_vignette",
             desc: "一键部署Office" },
         { name: "机查查", url: "https://devink.techartlife.com/zh/", desc: "机查查" },
+        { name: "电脑系统office激活", url: "https://github.com/massgravel/Microsoft-Activation-Scripts",
+            desc: "电脑系统" },
+        { name: "极简系统", url: "https://www.sysmini.com/", desc: "电脑系统" },
+        { name: "MSDN系统", url: "https://www.xitongku.com/?src=www.jspoo.com", desc: "电脑系统" },
+        { name: "HelloWindows.cn", url: "https://hellowindows.cn/", desc: "电脑系统" },
+        { name: "动系统", url: "https://www.dongxitong.com/", desc: "电脑系统" },
+        { name: "山己几子木", url: "https://msdn.sjjzm.com/win11.html?src=www.jspoo.com", desc: "电脑系统" },
     ]
 }, {
     id: 19,
@@ -947,13 +954,7 @@ const websiteData = [{
         { name: "快手视频解析", url: "https://kuaishou-video-download.com/zh", desc: "短视频下载" },
         { name: "小红书视频解析", url: "https://www.xhs-download.org/zh", desc: "短视频下载" },
         { name: "考拉解析", url: "http://www.zanqianba.com/", desc: "短视频下载" },
-        { name: "电脑系统office激活", url: "https://github.com/massgravel/Microsoft-Activation-Scripts",
-            desc: "电脑系统" },
-        { name: "极简系统", url: "https://www.sysmini.com/", desc: "电脑系统" },
-        { name: "MSDN系统", url: "https://www.xitongku.com/?src=www.jspoo.com", desc: "电脑系统" },
-        { name: "HelloWindows.cn", url: "https://hellowindows.cn/", desc: "电脑系统" },
-        { name: "动系统", url: "https://www.dongxitong.com/", desc: "电脑系统" },
-        { name: "山己几子木", url: "https://msdn.sjjzm.com/win11.html?src=www.jspoo.com", desc: "电脑系统" },
+        
     ]
 }, {
     id: 20,
