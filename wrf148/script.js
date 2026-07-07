@@ -94,7 +94,15 @@ const websiteData = [{
         { name: "国家市场监督管理总局", url: "https://www.samr.gov.cn/", desc: "国家市场监督管理总局" },
         { name: "国家税务总局", url: "https://www.chinatax.gov.cn/", desc: "国家税务总局" },
         { name: "国家知识产权局", url: "http://www.cnipa.gov.cn/", desc: "国家知识产权局" },
-        { name: "国家企业信用信息公示系统", url: "http://www.gsxt.gov.cn/", desc: "企业工商/行政处罚/经营异常/违法查询" },
+        { name: "国家能源局", url: "https://www.nea.gov.cn/", desc: "" },
+        { name: "国家国防科技工业局", url: "https://www.sastind.gov.cn/", desc: "" },
+        { name: "国家烟草专卖局", url: "www.tobacco.gov.cn", desc: "" },
+        { name: "国家移民管理局", url: "https://www.nia.gov.cn/", desc: "" },
+        { name: "国家铁路局", url: "https://www.nra.gov.cn/", desc: "" },
+        { name: "中国民用航空局", url: "https://www.caac.gov.cn/index.html", desc: "" },
+        { name: "国家航天局", url: "https://www.cnsa.gov.cn/", desc: "" },
+        { name: "国家信访局", url: "https://www.gjxfj.gov.cn/gjxfj/index.htm", desc: "" },
+        { name: "国家宗教事务局", url: "https://www.sara.gov.cn/", desc: "" },
         { name: "中央人民政府", url: "https://www.gov.cn/", desc: "中央人民政府" },
         { name: "司法部", url: "http://www.moj.gov.cn/", desc: "司法部" },
         { name: "财政部", url: "http://www.mof.gov.cn/", desc: "财政部" },
@@ -408,6 +416,7 @@ const websiteData = [{
         { name: "CNAS", url: "https://www.cnas.org.cn/rkgf/rzjgrk/index.html", desc: "中国合格评定国家认可委员会-认证规则" },
         { name: "GLOBAC", url: "https://globalaccreditationcooperationincorporated.org/",  desc: "全球认可合作组织" },
         { name: "APAC", url: "https://www.apac-accreditation.org/", desc: "亚太认可合作组织" },
+        { name: "国家企业信用信息公示系统", url: "http://www.gsxt.gov.cn/", desc: "企业工商/行政处罚/经营异常/违法查询" },
         { name: "国家社会保险公共服务平台", url: "https://si.12333.gov.cn/index.jhtml#/index", desc: "查社保" },   
         { name: "国家医保服务平台", url: "https://fuwu.nhsa.gov.cn/nationalHallSt/#/home?code=174000&message=serverUrl%20is%20null&gbFlag=true", desc: "国家医疗保障局" },       
         { name: "食品安全抽检公布结果查询系统", url: "https://spcjsac.gsxt.gov.cn/", desc: "查食品抽检" },
@@ -417,7 +426,10 @@ const websiteData = [{
         { name: "中国保护知识产权网", url: "https://ipr.mofcom.gov.cn/index.shtml", desc: "查知识产权" },    
         { name: "中国招标投标公共服务平台", url: "http://cebpubservice.cn/", desc: "查招标" },
         { name: "全国投资项目在线审批监管平台", url: "https://new.tzxm.gov.cn/", desc: "查投资项目" },
-        { name: "国家政务服务平台", url: "https://gjzwfw.www.gov.cn/", desc: "查询" },    
+        { name: "国家政务服务平台", url: "https://gjzwfw.www.gov.cn/", desc: "查询" }, 
+        { name: "中国记者网", url: "https://press.nppa.gov.cn/presscard/select/", desc: "记者证信息查询" }, 
+        { name: "中国互联网联合辟谣平台", url: "https://www.piyao.org.cn/jrpy/index.htm", desc: "辟谣查询" }, 
+        { name: "中央网信办", url: "https://www.12377.cn/jbcx.html?tab=6", desc: "举报查询" },     
         { name: "全国排污许可证管理信息平台", url: "https://permit.mee.gov.cn/permitExt/outside/PageQueryServlet?pageno=1&type=Law", desc: "排污许可证" },
         { name: "高新技术企业认定工作网", url: "http://www.innocom.gov.cn/?ref=https://szsyw.cn", desc: "资质查询" },
         { name: "深i企", url: "https://www.szsiq.com/#/specialized?temp=1770014537978", desc: "专精特新中小企业查询（仅限深圳企业）" },
@@ -469,6 +481,8 @@ const websiteData = [{
         { name: "最高人民法院公报", url: "http://gongbao.court.gov.cn/?ref=https://szsyw.cn", desc: "最高人民法院公报" },
         { name: "国家法律法规数据库", url: "https://flk.npc.gov.cn/index", desc: "国家法律法规数据库" },
         { name: "国家规章库", url: "https://www.gov.cn/zhengce/xxgk/gjgzk/index.htm?searchWord=", desc: "国家规章库" },
+        { name: "中央网络安全和信息化委员会办公室", url: "https://www.cac.gov.cn/wxzw/zcfg/A093703index_1.htm", desc: "网络安全政策法规" },   
+        { name: "中华人民共和国最高人民检察院", url: "https://www.spp.gov.cn/", desc: "" },
         { name: "智慧普法平台", url: "http://legalinfo.moj.gov.cn/", desc: "中国普法网" },
         { name: "中国法律服务网", url: "https://www.12348.gov.cn/#/homepage", desc: "中国法网" },
         { name: "HSE.zone", url: "https://www.hse.zone/index.html", desc: "法律法规更新平台" },
@@ -480,7 +494,34 @@ const websiteData = [{
         { name: "证券期货法规数据库系统", url: "https://neris.csrc.gov.cn/falvfagui/?ref=https://szsyw.cn", desc: "证券期货法规数据库系统" },
 
     ]
-}, {
+},
+          {
+    id: 31,
+    title: "其他国家平台",
+    icon: "fa-gavel",
+    websites: [
+        { name: "中国人大网", url: "http://www.npc.gov.cn/npc/index.html", desc: "" },
+        { name: "中国政协网", url: "http://www.cppcc.gov.cn/", desc: "" },
+        { name: "中国共青团网", url: "https://www.gqt.org.cn/", desc: "" },
+        { name: "中华全国总工会", url: "https://www.acftu.org/", desc: "" },
+        { name: "中国机构编制网", url: "https://www.scopsr.gov.cn/", desc: "" },
+        { name: "中共中央台湾工作办公室", url: "https://www.gwytb.gov.cn/", desc: "" },
+        { name: "中共中央对外联络部", url: "https://www.idcpc.gov.cn/", desc: "" },
+        { name: "中共中央统一战线工作部", url: "https://www.zytzb.gov.cn/", desc: "" },
+        { name: "中央纪委国家监委", url: "https://www.ccdi.gov.cn/", desc: "" },
+        { name: "国务院发展研究中心", url: "https://www.drc.gov.cn/default.aspx", desc: "" },
+        { name: "中国工程院", url: "https://www.cae.cn/", desc: "" },
+        { name: "中国社会科学网", url: "https://www.cssn.cn/", desc: "" },
+        { name: "中国科学院", url: "https://www.cas.cn/", desc: "" },
+        { name: "中国海洋信息网", url: "https://www.nmdis.org.cn/", desc: "" },
+        { name: "中华人民共和国海关总署", url: "http://www.customs.gov.cn/", desc: "" },
+        { name: "国务院参事室", url: "http://www.counsellor.gov.cn/", desc: "" },
+        { name: "国家新闻出版署", url: "https://www.nppa.gov.cn/", desc: "" },
+
+    ]
+},           
+                     
+         {
     id: 12,
     title: "合同范本",
     icon: "fa-file-contract",
@@ -576,6 +617,7 @@ const websiteData = [{
         { name: "单位换算器", url: "https://wrf00123.github.io/tool14.html", desc: "单位换算器" },
         { name: "html导出", url: "https://wrf00123.github.io/tool5.html", desc: "html工具" },
         { name: "txt导出", url: "https://wrf00123.github.io/tool17.html", desc: "txt工具" },
+        { name: "灵签宝", url: "https://wrf00123.github.io/tool35.html", desc: "占卜" },
         { name: "不良影响演示", url: "https://wrf00123.github.io/tool10.html", desc: "演示工具" },
         { name: "生日祝福", url: "https://wrf00123.github.io/tool18.html", desc: "演示工具" },
     ]
@@ -1124,8 +1166,8 @@ const websiteData = [{
 //  分类分组（一级 → 二级）
 // ========================================================================
 const groupMap = {
-    '标准': [1, 2, 3, 4, 5, 6, 7, 8, 9,30],
-    '商务': [10, 11, 12, 13, 14],
+    '标准': [1, 2, 3, 4, 5, 6, 7, 8, 9, 30],
+    '商务': [10, 11, 31, 12, 13, 14],
     '工具': [15, 16, 17, 18],
     '资源': [19, 20, 21, 22, 23],
     '学习': [24, 25, 26, 27],
