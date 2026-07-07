@@ -601,7 +601,7 @@ const websiteData = [{
         { name: "标识打印生成工具", url: "https://wrf00123.github.io/tool30.html", desc: "工具" },
         { name: "限高标识生成器", url: "https://wrf00123.github.io/tool31.html", desc: "工具" },
         { name: "车间限高标识生成器", url: "https://wrf00123.github.io/tool32.html", desc: "工具-带条纹" },
-        { name: "上岗证生成器", url: "https://wrf00123.github.io/tool39.html", desc: "工具" },{ name: "上岗证生成器", url: "https://wrf00123.github.io/tool39.html", desc: "工具" },
+        { name: "上岗证生成器", url: "https://wrf00123.github.io/tool39.html", desc: "工具" },
         { name: "文本去重", url: "https://wrf00123.github.io/tool37.html", desc: "工具" },
         { name: "提词器Pro", url: "https://wrf00123.github.io/tool38.html", desc: "工具" },        
         { name: "图片转pdf", url: "https://wrf00123.github.io/tool22.html", desc: "工具" },
