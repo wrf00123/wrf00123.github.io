@@ -62,6 +62,7 @@ const websiteData = [{
         { name: "体育标准化信息平台", url: "http://125.35.8.38/tybz/home/standard", desc: "标准" },
         { name: "国家工程建设标准化信息网", url: "https://www.ccsn.org.cn/", desc: "GB/GBT/GBJ标准下载" },
         { name: "国务院政策文件库", url: "https://sousuo.www.gov.cn/zcwjk/policyDocumentLibrary?q=&t=zhengcelibrary&orpro=", desc: "中华人民共和国中央人民政府" },
+        { name: "中央人民政府", url: "https://www.gov.cn/", desc: "中央人民政府" },
         { name: "国家行政法规库", url: "https://www.gov.cn/zhengce/xzfgk/", desc: "中华人民共和国中央人民政府" },
         { name: "中国电力企业联合会", url: "https://dls.cec.org.cn/zhongdianlianbiaozhun/", desc: "TCEC标准下载" },
         { name: "中国物流与采购联合会", url: "http://wlbz.chinawuliu.com.cn/bzxmjh/", desc: "WB标准下载" },
@@ -72,8 +73,7 @@ const websiteData = [{
         { name: "海关总署技贸措施网", url: "http://www.tbtsps.cn", desc: "GB/GBT/GBZ/GA/GAT/DB/LDT/WST/DAT/YYT/T../RBT/DL../HJ/JBT/QCT标准下载" },
         { name: "中国海关企业进出口信用信息", url: "http://credit.customs.gov.cn/ccppwebserver/pages/ccpp/html/ccppindex.html", desc: "中国海关企业进出口信用信息公示平台" },
         { name: "资本市场标准网", url: "http://www.csisc.cn/zbscbzw/c100208/yfb_gb_list.shtml#bzyfb", desc: "JR标准下载" },
-        { name: "水利部国际合作与科技司", url: "http://gjkj.mwr.gov.cn/jsjd1/bzh/bzhfbgg/index.htm", desc: "SL标准" },
-        { name: "国家国际发展合作署", url: "http://www.cidca.gov.cn/", desc: "" },    
+        { name: "水利部国际合作与科技司", url: "http://gjkj.mwr.gov.cn/jsjd1/bzh/bzhfbgg/index.htm", desc: "SL标准" },    
         { name: "国家体育总局", url: "https://www.sport.gov.cn/gdnps/", desc: "" },   
         { name: "国家金融监督管理总局", url: "https://www.nfra.gov.cn/cn/view/pages/zhengwuxinxi/zhengfuxinxi.html?signIndex=0#1", desc: "" },       
         { name: "国家文物局", url: "http://www.ncha.gov.cn/col/col2423/index.html", desc: "WWT标准下载" },
@@ -102,7 +102,9 @@ const websiteData = [{
         { name: "国家航天局", url: "https://www.cnsa.gov.cn/", desc: "" },
         { name: "国家信访局", url: "https://www.gjxfj.gov.cn/gjxfj/index.htm", desc: "" },
         { name: "国家宗教事务局", url: "https://www.sara.gov.cn/", desc: "" },
-        { name: "中央人民政府", url: "https://www.gov.cn/", desc: "中央人民政府" },
+        { name: "国家消防救援局", url: "https://www.119.gov.cn/", desc: "" },
+        { name: "国家密码管理局", url: "http://www.nca.gov.cn/", desc: "" },
+        { name: "国家核安全局", url: "https://nnsa.mee.gov.cn/", desc: "" },
         { name: "司法部", url: "http://www.moj.gov.cn/", desc: "司法部" },
         { name: "财政部", url: "http://www.mof.gov.cn/", desc: "财政部" },
         { name: "外交部", url: "https://www.fmprc.gov.cn/", desc: "外交部" },
@@ -126,6 +128,11 @@ const websiteData = [{
         { name: "文化和旅游部", url: "https://zwgk.mct.gov.cn/zfxxgkml/447/471/index_3081.html", desc: "WHT/LBT标准下载" },
         { name: "中共中央对外联络部", url: "https://www.idcpc.gov.cn/", desc: "" },
         { name: "中共中央统一战线工作部", url: "https://www.zytzb.gov.cn/", desc: "" },
+        { name: "中华人民共和国国防部", url: "http://www.mod.gov.cn/", desc: "" },
+        { name: "中华人民共和国水利部", url: "http://www.mwr.gov.cn/", desc: "" },
+        { name: "国家民族事务委员会", url: "https://www.neac.gov.cn/", desc: "" },
+        { name: "国务院侨务办公室", url: "https://www.gqb.gov.cn/", desc: "" },
+        { name: "国家国际发展合作署", url: "http://www.cidca.gov.cn/", desc: "" },
         
     ]
 }, {
@@ -517,7 +524,13 @@ const websiteData = [{
         { name: "中华人民共和国海关总署", url: "http://www.customs.gov.cn/", desc: "" },
         { name: "国务院参事室", url: "http://www.counsellor.gov.cn/", desc: "" },
         { name: "国家新闻出版署", url: "https://www.nppa.gov.cn/", desc: "" },
-
+        { name: "中华全国妇女联合会", url: "https://www.women.org.cn/", desc: "" },
+        { name: "中华全国归国华侨联合会", url: "https://www.chinaql.org/", desc: "" },
+        { name: "中国科学技术协会", url: "https://www.cast.org.cn/", desc: "" },
+        { name: "中国文艺网", url: "https://www.cflac.org.cn/", desc: "" },
+        { name: "中国作家网", url: "https://www.chinawriter.com.cn/", desc: "" },
+        { name: "中华全国工商业联合会", url: "https://www.acfic.org.cn/", desc: "" },
+       
     ]
 },           
                      
@@ -966,6 +979,7 @@ const websiteData = [{
         { name: "乐于分享网", url: "https://fffxx.com/page/2", desc: "软件分享" },
         { name: "开源精选", url: "https://www.ossnav.com/", desc: "软件/工具分享" },
         { name: "资源库", url: "https://biiii.com/", desc: "资源合集" },
+        { name: "BigeTools", url: "https://bigezhang.com/tools?category=image", desc: "资源合集" },
         { name: "图钉办公", url: "https://www.tudingyy.com/", desc: "资源合集" },
         { name: "FMHY", url: "https://fmhy.net/", desc: "资源合集" },
         { name: "优设导航", url: "https://hao.uisdc.com/", desc: "资源合集" },
