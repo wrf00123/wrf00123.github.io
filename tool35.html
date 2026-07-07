@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>灵签宝 - 求运势·做决定·测吉凶</title>
+    <style>
+        :root {
+            --bg: #1a0a0a;
+            --gold: #d4a853;
+            --gold-light: #f0d68a;
+            --red: #b5343a;
+            --red-dark: #7a1f22;
+            --cream: #fdf5e6;
+            --brown: #3d1f0a;
+            --card-bg: #1e1111;
+            --text: #e8d5b7;
+            --text-light: #c4a882;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --gold-grad: linear-gradient(135deg, #d4a853, #f0d68a, #b8963f, #e8c97a);
+            --red-grad: linear-gradient(135deg, #b5343a, #d4454a, #8b1a1f);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'STSong', 'Songti SC', 'Noto Serif SC', 'KaiTi', 'STKaiti', 'SimSun', 'serif';
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(212, 168, 83, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(180, 50, 40, 0.06) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 5 L35 25 L55 30 L35 35 L30 55 L25 35 L5 30 L25 25 Z' fill='rgba(212,168,83,0.03)'/%3E%3C/svg%3E");
+            min-height: 100vh;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* 粒子背景 */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+            opacity: 0;
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            5% {
+                opacity: 0.7;
+            }
+            40% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 100vh;
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            padding: 20px 16px 8px;
+            position: relative;
+        }
+        .header .logo-icon {
+            font-size: 52px;
+            display: block;
+            animation: gentleBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 4px 12px rgba(212, 168, 83, 0.5));
+        }
+        @keyframes gentleBounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-12px);
+            }
+            50% {
+                transform: translateY(0);
+            }
+            70% {
+                transform: translateY(-6px);
+            }
+        }
+        .header h1 {
+            font-size: 2rem;
+            background: var(--gold-grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            letter-spacing: 3px;
+            margin: 4px 0;
+        }
+        .header .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            letter-spacing: 2px;
+        }
+
+        /* 卡片 */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(212, 168, 83, 0.25);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gold-grad);
+            opacity: 0.6;
+            border-radius: 20px 20px 0 0;
+        }
+        .card:hover {
+            border-color: rgba(212, 168, 83, 0.5);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 40px rgba(212, 168, 83, 0.05);
+        }
+
+        /* 功能网格 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .feature-btn {
+            background: linear-gradient(180deg, rgba(212, 168, 83, 0.1) 0%, rgba(212, 168, 83, 0.03) 100%);
+            border: 1px solid rgba(212, 168, 83, 0.3);
+            border-radius: 16px;
+            padding: 20px 14px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            color: var(--text);
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-btn:hover {
+            border-color: var(--gold);
+            background: rgba(212, 168, 83, 0.18);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        .feature-btn:active {
+            transform: scale(0.96);
+            transition: transform 0.1s;
+        }
+        .feature-btn .icon {
+            font-size: 2.2rem;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .feature-btn .label {
+            font-size: 0.95rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .feature-btn .desc {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+        }
+        .feature-btn.full-width {
+            grid-column: 1 / -1;
+        }
+        .feature-btn.accent {
+            border-color: rgba(212, 68, 74, 0.5);
+            background: linear-gradient(180deg, rgba(180, 50, 40, 0.2) 0%, rgba(180, 50, 40, 0.05) 100%);
+        }
+        .feature-btn.accent:hover {
+            border-color: #d4454a;
+            background: rgba(180, 50, 40, 0.3);
+        }
+
+        /* 签筒选择区 */
+        .tube-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .tube-chip {
+            padding: 8px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            border: 1px solid rgba(212, 168, 83, 0.3);
+            background: transparent;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            white-space: nowrap;
+            letter-spacing: 1px;
+        }
+        .tube-chip.active {
+            background: var(--gold-grad);
+            color: #1a0a0a;
+            border-color: transparent;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(212, 168, 83, 0.4);
+        }
+        .tube-chip:hover {
+            border-color: var(--gold);
+            background: rgba(212, 168, 83, 0.15);
+        }
+        .tube-chip.active:hover {
+            background: var(--gold-grad);
+        }
+
+        /* 摇签区域 */
+        .shake-area {
+            text-align: center;
+            padding: 20px 0;
+            position: relative;
+        }
+        .shake-tube {
+            font-size: 6rem;
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.1s;
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+            position: relative;
+            user-select: none;
+        }
+        .shake-tube.shaking {
+            animation: shake 0.6s ease-in-out;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: rotate(0deg) translateY(0);
+            }
+            10% {
+                transform: rotate(-8deg) translateY(-15px);
+            }
+            20% {
+                transform: rotate(8deg) translateY(-5px);
+            }
+            30% {
+                transform: rotate(-12deg) translateY(-20px);
+            }
+            40% {
+                transform: rotate(12deg) translateY(-8px);
+            }
+            50% {
+                transform: rotate(-6deg) translateY(-18px);
+            }
+            60% {
+                transform: rotate(6deg) translateY(-3px);
+            }
+            70% {
+                transform: rotate(-15deg) translateY(-22px);
+            }
+            80% {
+                transform: rotate(10deg) translateY(-10px);
+            }
+            90% {
+                transform: rotate(-3deg) translateY(-5px);
+            }
+        }
+        .shake-hint {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            margin-top: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* 签文结果 */
+        .result-card {
+            background: linear-gradient(180deg, rgba(30, 17, 17, 0.98) 0%, rgba(40, 20, 15, 0.95) 100%);
+            border: 2px solid rgba(212, 168, 83, 0.5);
+            border-radius: 20px;
+            padding: 24px 20px;
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out;
+            box-shadow: 0 0 40px rgba(212, 168, 83, 0.15);
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .result-level {
+            display: inline-block;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .level-best {
+            background: #d4a853;
+            color: #1a0a0a;
+            box-shadow: 0 0 25px rgba(212, 168, 83, 0.5);
+        }
+        .level-good {
+            background: #c49b4a;
+            color: #1a0a0a;
+            box-shadow: 0 0 18px rgba(196, 155, 74, 0.4);
+        }
+        .level-mid {
+            background: #8b7d6b;
+            color: #fff;
+            box-shadow: 0 0 12px rgba(139, 125, 107, 0.3);
+        }
+        .level-bad {
+            background: #6b4a4a;
+            color: #f0d0d0;
+            box-shadow: 0 0 12px rgba(107, 74, 74, 0.3);
+        }
+        .level-worst {
+            background: #4a3030;
+            color: #e0c0c0;
+            box-shadow: 0 0 10px rgba(74, 48, 48, 0.3);
+        }
+        .result-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--gold);
+            margin: 8px 0;
+            letter-spacing: 3px;
+        }
+        .result-poem {
+            font-style: italic;
+            color: #e8d5b7;
+            line-height: 2;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin: 10px 0;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        .result-interpretation {
+            text-align: left;
+            color: #c4a882;
+            line-height: 1.8;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            padding: 8px 0;
+            border-top: 1px dashed rgba(212, 168, 83, 0.2);
+        }
+
+        /* 运势卡片 */
+        .fortune-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            border: 1px solid rgba(212, 168, 83, 0.15);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .fortune-card:hover {
+            border-color: var(--gold);
+            background: rgba(212, 168, 83, 0.08);
+        }
+        .fortune-card .f-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+        .fortune-card .f-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .fortune-card .f-name {
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        .fortune-card .f-stars {
+            color: var(--gold);
+            font-size: 0.85rem;
+        }
+        .fortune-card .f-advice {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 按钮 */
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-gold {
+            background: var(--gold-grad);
+            color: #1a0a0a;
+            box-shadow: 0 4px 20px rgba(212, 168, 83, 0.35);
+        }
+        .btn-gold:hover {
+            box-shadow: 0 6px 28px rgba(212, 168, 83, 0.55);
+            transform: translateY(-2px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+        }
+        .btn-outline:hover {
+            background: rgba(212, 168, 83, 0.1);
+        }
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+        .btn:active {
+            transform: scale(0.95);
+            transition: transform 0.1s;
+        }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        /* 决定输入 */
+        .decision-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(212, 168, 83, 0.15);
+            border: 1px solid rgba(212, 168, 83, 0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+        .option-tag .remove-tag {
+            cursor: pointer;
+            color: #d4454a;
+            font-weight: bold;
+            font-size: 1rem;
+            line-height: 1;
+        }
+        .option-tags-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        input[type="text"] {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(212, 168, 83, 0.3);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 25px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            outline: none;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        input[type="text"]:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(212, 168, 83, 0.2);
+        }
+        input[type="text"]::placeholder {
+            color: rgba(200, 180, 150, 0.4);
+        }
+
+        /* 决策结果动画 */
+        .decision-result {
+            text-align: center;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            from {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .decision-result .big-emoji {
+            font-size: 5rem;
+            display: block;
+        }
+        .decision-result .chosen {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: var(--gold-grad);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 3px;
+        }
+
+        /* 历史记录 */
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 168, 83, 0.1);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 6px;
+        }
+        .history-item:hover {
+            border-color: var(--gold);
+            background: rgba(212, 168, 83, 0.06);
+        }
+        .history-item .h-level {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+        }
+
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s;
+            padding: 20px;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        .modal {
+            background: #1e1111;
+            border: 2px solid rgba(212, 168, 83, 0.5);
+            border-radius: 20px;
+            padding: 24px 20px;
+            max-width: 450px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            animation: fadeInUp 0.3s ease-out;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 5;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2a1a10;
+            color: var(--gold);
+            padding: 10px 24px;
+            border-radius: 25px;
+            border: 1px solid rgba(212, 168, 83, 0.5);
+            z-index: 200;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+            animation: toastIn 0.3s ease-out, toastOut 0.3s 1.8s ease-in forwards;
+            pointer-events: none;
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-15px);
+            }
+        }
+
+        /* 骰子 */
+        .dice-container {
+            perspective: 500px;
+            display: inline-block;
+        }
+        .dice-rolling {
+            font-size: 5rem;
+            animation: diceRoll 0.8s ease-out;
+            display: inline-block;
+        }
+        @keyframes diceRoll {
+            0% {
+                transform: rotateX(0) rotateY(0) rotateZ(0) scale(0.5);
+            }
+            30% {
+                transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg) scale(1.3);
+            }
+            60% {
+                transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg) scale(0.9);
+            }
+            100% {
+                transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg) scale(1);
+            }
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(212, 168, 83, 0.3);
+            border-radius: 4px;
+        }
+
+        @media (max-width: 400px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .feature-btn {
+                padding: 14px 10px;
+            }
+            .feature-btn .icon {
+                font-size: 1.6rem;
+            }
+            .feature-btn .label {
+                font-size: 0.8rem;
+            }
+            .shake-tube {
+                font-size: 4.5rem;
+            }
+            .result-number {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles"></div>
+
+    <!-- 应用容器 -->
+    <div class="app-container" id="appContainer">
+        <!-- 头部 -->
+        <div class="header">
+            <span class="logo-icon">🏮</span>
+            <h1>灵 签 宝</h1>
+            <p class="subtitle">求运势 · 做决定 · 测吉凶</p>
+        </div>
+
+        <!-- 主内容区 -->
+        <div id="mainContent"></div>
+    </div>
+
+    <!-- Toast容器 -->
+    <div id="toastContainer"></div>
+
+    <script>
+        (function() {
+            // ==================== 数据定义 ====================
+
+            // 签文等级
+            const LEVELS = {
+                '上上签': { cls: 'level-best', emoji: '🌟', weight: 8 },
+                '上签': { cls: 'level-good', emoji: '✨', weight: 15 },
+                '中上签': { cls: 'level-good', emoji: '💫', weight: 18 },
+                '中签': { cls: 'level-mid', emoji: '🔸', weight: 25 },
+                '中下签': { cls: 'level-bad', emoji: '⚠️', weight: 18 },
+                '下签': { cls: 'level-bad', emoji: '🌧️', weight: 10 },
+                '下下签': { cls: 'level-worst', emoji: '💧', weight: 6 },
+            };
+
+            // 观音灵签库
+            const guanyinQian = [
+                { id: 1, level: '上上签', poem: '日出扶桑万里明，\n祥云瑞气满门庭。\n所求遂意皆如愿，\n百事亨通福自生。',
+                    interpretation: '此签大吉，如旭日东升，光芒万丈。凡事有贵人相助，所求之事皆能顺利达成。事业上有新的机遇出现，财运亨通，宜积极进取。感情方面，单身者有望遇到良缘，已有伴侣者感情和睦。健康无忧，诸事顺遂。',
+                    advice: '把握当下良机，勇敢前行，切莫犹豫。', keywords: '机遇、贵人、顺利' },
+                { id: 2, level: '上签', poem: '春风吹绿柳梢头，\n好事多磨终有收。\n耐心守得云开日，\n自有佳音到画楼。',
+                    interpretation: '此签虽为上签，但暗示好事多磨。只要保持耐心，坚持不懈，最终定能收获好的结果。目前可能遇到一些阻碍或延迟，但这是暂时的。建议保持信心，不要轻易放弃。',
+                    advice: '坚持就是胜利，耐心等待时机成熟。', keywords: '坚持、耐心、终成' },
+                { id: 3, level: '中上签', poem: '一轮明月照乾坤，\n半是阴来半是明。\n莫道前程多险阻，\n吉人自有好前程。',
+                    interpretation: '此签表示事情有转机，虽然目前半明半暗，但总体向好。遇到困难时有化解之道，不必过分担忧。保持乐观心态，前方自有光明。适合在此期间稳步推进计划。',
+                    advice: '保持乐观，困境中蕴含转机。', keywords: '转机、希望、稳步' },
+                { id: 4, level: '中签', poem: '浮云遮月暂时暗，\n风过云开依旧明。\n凡事三思而后行，\n平安二字值千金。',
+                    interpretation: '此签为中平之签，提醒凡事需谨慎。暂时的困难如同浮云，终会散去。做决定前多思考，不要冲动行事。平安稳定比冒险求胜更为重要。适合保守行事，不宜激进。',
+                    advice: '谨慎行事，平安是福，三思后行。', keywords: '谨慎、平稳、三思' },
+                { id: 5, level: '中下签', poem: '山路崎岖步步行，\n风霜雨雪伴征程。\n虽有荆棘拦道路，\n拨开迷雾见分明。',
+                    interpretation: '此签暗示前路有阻，需要付出比平时更多的努力。可能会遇到一些挑战和困难，但只要坚定信念，逐一克服，就能看到曙光。不宜同时进行太多事务，专注一处更容易突破。',
+                    advice: '专注一处，逐个击破困难。', keywords: '挑战、专注、坚持' },
+                { id: 6, level: '上上签', poem: '金鳞闪耀跃龙门，\n一举成名天下闻。\n时来运转皆如意，\n福禄双全喜满门。',
+                    interpretation: '此签极为吉利！如同鲤鱼跃龙门，象征重大突破和飞跃。事业或学业上将有显著成就，可能获得晋升、录取或重大机会。财运极佳，可适当进行投资或拓展。感情甜蜜，家庭和睦。',
+                    advice: '大胆追求目标，这是属于你的高光时刻。', keywords: '成功、飞跃、大喜' },
+                { id: 7, level: '上签', poem: '花开富贵满堂红，\n瑞气盈门万事通。\n若问前程何处好，\n东南方向有春风。',
+                    interpretation: '此签吉祥，主富贵荣华。近期运势上升，尤其在财运方面表现突出。如果有投资或创业计划，东南方位或相关方向可能更有利。人际关系和谐，可能得到长辈或领导的赏识。',
+                    advice: '关注东南方位的机会，宜积极社交。', keywords: '富贵、财运、人脉' },
+                { id: 8, level: '下签', poem: '风急浪高夜未宁，\n孤舟一叶海中行。\n劝君暂把雄心敛，\n等待风平再启程。',
+                    interpretation: '此签提醒近期运势较低，不宜冒进。如同狂风巨浪中的小船，需要暂时收敛锋芒。重大决策暂缓，投资需谨慎。感情上可能有波折，宜多沟通。健康方面注意休息，避免过度劳累。',
+                    advice: '韬光养晦，静待时机，切勿冲动。', keywords: '等待、收敛、休息' },
+                { id: 9, level: '中签', poem: '云淡风轻日正和，\n扁舟一叶泛清波。\n随缘且过寻常日，\n不必强求福自多。',
+                    interpretation: '此签主张随缘自在。运势平稳，没有大起大落。适合维持现状，享受平静的生活。不必刻意追求什么，顺其自然反而会有意外之喜。适合修身养性，调整心态。',
+                    advice: '随遇而安，享受当下，顺其自然。', keywords: '随缘、平静、知足' },
+                { id: 10, level: '上上签', poem: '紫气东来万象新，\n祥光普照满园春。\n所求必应皆如意，\n福寿绵长百事欣。',
+                    interpretation: '此签极为吉祥！紫气东来是最祥瑞的征兆，所有心愿皆有实现的可能。整体运势极佳，无论是事业、财运还是感情都处于上升期。健康运良好，精神状态饱满。适合开启新计划。',
+                    advice: '趁势而上，开启新篇章。', keywords: '大吉、新机、如愿' },
+                { id: 11, level: '中上签', poem: '梅花香自苦寒来，\n宝剑锋从磨砺出。\n若能吃得苦中苦，\n终为人上显英姿。',
+                    interpretation: '此签鼓励通过努力获得成功。虽有些辛苦，但每一分付出都会有回报。适合此时刻苦钻研、提升自我。事业上需要踏实努力，但前景光明。学生考试运佳，勤奋者必有所成。',
+                    advice: '勤奋努力，苦尽甘来。', keywords: '努力、成长、收获' },
+                { id: 12, level: '下下签', poem: '浓云蔽日暗无光，\n路险山高水又长。\n凡事小心须谨慎，\n平安度过待春光。',
+                    interpretation: '此签警示运势处于低谷。各方面都可能遇到阻碍，需格外小心谨慎。不宜进行重大投资或决策，出行注意安全。感情上可能有误会需及时化解。这段时间以保守为主，保护好自己。',
+                    advice: '以守为主，小心为上，等待转机。', keywords: '低谷、谨慎、保守' },
+                { id: 13, level: '中签', poem: '半江瑟瑟半江红，\n得失盈亏自古同。\n看淡浮名心自静，\n无求品高乐无穷。',
+                    interpretation: '此签教导看淡得失。运势有起有落，不必过于计较一时之得失。心态平和反而能吸引好运。适合调整心态，减少欲望。工作上保持平常心，反而能发挥更好。',
+                    advice: '淡泊明志，宁静致远。', keywords: '平和、淡泊、知足' },
+                { id: 14, level: '上签', poem: '双星照临喜气浓，\n良缘天赐正相逢。\n花开并蒂连理结，\n琴瑟和鸣乐未穷。',
+                    interpretation: '此签主姻缘大吉。单身者桃花运旺盛，可能遇到命中注定的良缘。已有伴侣者感情更加深厚，适合谈婚论嫁。家庭关系和睦，有添丁之喜的可能。合作事宜也颇为顺利。',
+                    advice: '敞开心扉，迎接美好缘分。', keywords: '姻缘、桃花、和合' },
+                { id: 15, level: '中下签', poem: '镜花水月总成空，\n幻梦一场醒无踪。\n脚踏实地方为本，\n莫被虚华误了功。',
+                    interpretation: '此签警示勿被虚幻所迷惑。有些事情看似美好，实则如镜花水月。投资需谨慎，警惕虚假信息或骗局。感情上需辨别真心与假意。建议务实为主，不要好高骛远。',
+                    advice: '务实求真，远离虚幻诱惑。', keywords: '警惕、务实、辨别' },
+                { id: 16, level: '上上签', poem: '龙凤呈祥瑞气飘，\n天降洪福乐逍遥。\n万事如意皆顺遂，\n前程似锦步步高。',
+                    interpretation: '此签为签中之王！龙凤呈祥是最高的祥瑞，所有方面都将顺遂。事业蒸蒸日上，财运滚滚而来，感情甜蜜幸福，健康安泰。适合开展任何新计划，成功率极高。',
+                    advice: '万事俱备，大胆前行，享受好运。', keywords: '大吉大利、万事亨通' },
+            ];
+
+            // 月老灵签库
+            const yuelaoQian = [
+                { id: 101, level: '上上签', poem: '千里姻缘一线牵，\n月老红绳早已连。\n良辰美景今朝至，\n比翼双飞共百年。',
+                    interpretation: '此签主姻缘天定，极为吉祥。无论单身还是已有伴侣，都预示着美好的感情发展。单身者即将遇到那个对的人，已有伴侣者感情升华，可考虑步入婚姻。缘分已到，珍惜眼前人。',
+                    advice: '缘分就在身边，勇敢把握。', keywords: '良缘、天定、幸福' },
+                { id: 102, level: '上签', poem: '花开并蒂两心同，\n情意绵绵似酒浓。\n莫因小事伤和气，\n恩爱相守乐融融。',
+                    interpretation: '此签表示感情发展良好，双方心意相通。但需注意日常相处中的小摩擦，不要因小事影响感情。多包容对方，关系会更加稳固。适合共同规划未来。',
+                    advice: '珍惜彼此，多包容多沟通。', keywords: '和谐、包容、甜蜜' },
+                { id: 103, level: '中签', poem: '桃花灼灼映面红，\n真假难分雾里中。\n静待花开时节到，\n真心自现两情浓。',
+                    interpretation: '此签提醒在感情中需保持清醒。桃花虽多，但需辨别是否真心。不要急于投入，给彼此一些时间了解。真正适合的人会在恰当的时间出现。已有伴侣者需增进了解。',
+                    advice: '慢下来，用心感受，辨别真心。', keywords: '辨别、等待、真心' },
+                { id: 104, level: '下签', poem: '情路坎坷步难行，\n风吹雨打叶飘零。\n劝君暂把心收起，\n修身养性待天晴。',
+                    interpretation: '此签暗示感情运势较低。可能遇到感情困扰或矛盾，心情低落。建议暂时将注意力转移到自我提升上，感情之事不宜强求。给自己一些空间，等心情平复后再做决定。',
+                    advice: '先爱自己，再谈感情，静待花开。', keywords: '调整、自爱、等待' },
+                { id: 105, level: '中上签', poem: '红豆生南国，春来发几枝。\n愿君多采撷，此物最相思。',
+                    interpretation: '此签借古诗表达美好的情感寓意。感情正处于萌芽或发展阶段，需要用心呵护。主动表达心意，可能会有美好的回应。适合表白或加深感情交流。思念之情有望得到回应。',
+                    advice: '主动表达，用心经营，美好将至。', keywords: '表白、主动、甜蜜' },
+                { id: 106, level: '上上签', poem: '鸳鸯戏水两相依，\n并蒂莲开花满池。\n天作之合今朝定，\n白头偕老永不离。',
+                    interpretation: '此签极为吉祥！预示着一段稳定而长久的感情关系。非常适合谈婚论嫁，婚姻将幸福美满。已有伴侣者感情坚如磐石。家庭和睦，夫妻恩爱。这是月老最好的祝福。',
+                    advice: '这是缔结良缘的最佳时机。', keywords: '婚姻、长久、美满' },
+                { id: 107, level: '中下签', poem: '落花有意水无情，\n空付痴心梦难成。\n劝君莫再空等待，\n天涯何处无芳英。',
+                    interpretation: '此签暗示单方面的感情难以如愿。如果长期付出没有得到回应，可能需要重新审视这段关系。放手也是一种智慧，前方还有更适合的人在等待。不必执着于一个不珍惜你的人。',
+                    advice: '适时放手，更好的缘分在前方。', keywords: '放下、新生、释怀' },
+                { id: 108, level: '上签', poem: '春满桃花朵朵开，\n佳人有约入梦来。\n良缘就在不远处，\n月下老人笑满怀。',
+                    interpretation: '此签吉祥，桃花运即将到来。单身者近期可能通过社交活动认识心仪对象。已有伴侣者感情升温，适合约会增进感情。保持开放的心态，多参加活动，缘分自然降临。',
+                    advice: '多出门社交，缘分不期而至。', keywords: '桃花、社交、机会' },
+            ];
+
+            // 关帝灵签库（事业前程）
+            const guandiQian = [
+                { id: 201, level: '上上签', poem: '青龙出海势冲天，\n事业腾飞在眼前。\n贵人相助逢机遇，\n平步青云上九天。',
+                    interpretation: '此签大吉！事业上将有重大突破。如同青龙出海，气势磅礴。可能获得晋升、重要项目或新的职业机遇。贵人运强，可能遇到赏识你的领导或合作伙伴。大胆展现自己的能力。',
+                    advice: '抓住机遇，展现才华，前途无量。', keywords: '晋升、机遇、贵人' },
+                { id: 202, level: '上签', poem: '稳坐中军帐，运筹帷幄中。\n步步为营进，功成自然丰。',
+                    interpretation: '此签建议稳扎稳打。事业发展需要策略和耐心，一步一个脚印。适合做长远规划，不要急于求成。当前的努力正在积累，成果将在适当时候显现。团队合作尤为重要。',
+                    advice: '稳中求进，善用策略，厚积薄发。', keywords: '策略、稳步、规划' },
+                { id: 203, level: '中签', poem: '半壁江山已可观，\n再图进取莫迟延。\n审时度势知进退，\n功名自有好音传。',
+                    interpretation: '此签表示已有一定基础，可以进一步拓展。但需审时度势，选择合适的时机和方向。不宜盲目扩张，应根据实际情况调整策略。事业上保持积极但理性的态度。',
+                    advice: '在现有基础上稳步拓展，量力而行。', keywords: '拓展、审慎、进取' },
+                { id: 204, level: '下签', poem: '逆水行舟用力撑，\n一篙松劲退千寻。\n此时不宜轻举妄动，\n守成待变是良箴。',
+                    interpretation: '此签提醒事业上遇到阻力。如同逆水行舟，不進则退。当前不宜进行重大变动或投资。保持现有成果，等待更好的时机。注意职场人际关系，避免冲突。',
+                    advice: '保守为主，守住阵地，等待转机。', keywords: '守成、谨慎、等待' },
+                { id: 205, level: '中上签', poem: '宝剑出鞘露锋芒，\n才华终得展所长。\n莫愁前路无知己，\n天下谁人不识君。',
+                    interpretation: '此签鼓励自信展现才华。你的能力将被看见和认可。适合主动争取机会，展示专业能力。可能获得上级或同行的赞赏。求职者有望获得理想职位。信心是成功的关键。',
+                    advice: '自信展示，你的光芒会被看见。', keywords: '自信、展现、认可' },
+                { id: 206, level: '上上签', poem: '大鹏展翅九万里，\n扶摇直上入云霄。\n功成名就今朝始，\n锦绣前程步步高。',
+                    interpretation: '此签极为吉利！事业将迎来飞跃式发展。如同大鹏展翅，前程不可限量。创业者可能获得突破性进展，职场人士有望连升数级。财运也随之旺盛。这是事业的黄金时期。',
+                    advice: '大胆追求事业梦想，这是你的腾飞时刻。', keywords: '腾飞、成功、飞跃' },
+                { id: 207, level: '中下签', poem: '路遇岔口费思量，\n左右为难心彷徨。\n且听智者一席话，\n柳暗花明见曙光。',
+                    interpretation: '此签表示面临选择困难。事业上可能有多个方向需要抉择。建议咨询有经验的前辈或导师，他们的建议会很有帮助。不要独自纠结，集思广益能帮你找到方向。',
+                    advice: '寻求智者建议，不要独自纠结。', keywords: '选择、咨询、方向' },
+            ];
+
+            // 财神灵签库
+            const caishenQian = [
+                { id: 301, level: '上上签', poem: '财源滚滚似江流，\n金玉满堂富贵楼。\n生意兴隆通四海，\n利达三江永无休。',
+                    interpretation: '此签大吉！财运极旺。无论是正财还是偏财都有不错的表现。投资可能获得丰厚回报，生意红火。适合拓展业务或进行理财规划。但也要注意合理分配，避免过于挥霍。',
+                    advice: '财运亨通，但也需理性理财。', keywords: '财运、丰收、富贵' },
+                { id: 302, level: '上签', poem: '勤劳致富是良方，\n点滴积攒成大洋。\n稳步经营财自聚，\n何须冒险求偏方。',
+                    interpretation: '此签强调勤劳致富。财运稳定增长，通过踏实工作获得的收入最为可靠。不建议投机取巧或高风险投资。细水长流，财富会逐渐积累。适合做稳健的理财规划。',
+                    advice: '勤劳为本，稳健理财，细水长流。', keywords: '勤劳、稳健、积累' },
+                { id: 303, level: '中签', poem: '财来财去如流水，\n左手进时右手出。\n守财当如守城邑，\n精打细算福方足。',
+                    interpretation: '此签提醒注意财务管理。可能收入尚可但支出也大，存不住钱。需要审视消费习惯，做好预算。投资方面宜保守，避免不必要的开支。学会精打细算很重要。',
+                    advice: '开源节流，做好财务规划。', keywords: '节流、预算、管理' },
+                { id: 304, level: '下下签', poem: '乌云遮月暗沉沉，\n财路不通枉费心。\n此时不宜投大本，\n守紧荷包待阳春。',
+                    interpretation: '此签警示财运低迷。不宜进行大额投资或冒险性财务决策。可能有意外支出，需提前做好准备。这段时间以保守为主，避免借贷。等待运势好转再做打算。',
+                    advice: '保守理财，守住钱袋，等待时机。', keywords: '保守、谨慎、等待' },
+                { id: 305, level: '中上签', poem: '和气生财古有言，\n广结善缘福自绵。\n合作共赢财源广，\n众人拾柴火焰燃。',
+                    interpretation: '此签提示合作生财。通过人际关系和合作能带来更好的财运。适合寻找靠谱的合作伙伴，或通过团队协作创造价值。人脉即是财脉，多交朋友，机会自然增多。',
+                    advice: '广结善缘，合作共赢，和气生财。', keywords: '合作、人脉、共赢' },
+                { id: 306, level: '上上签', poem: '金蟾献瑞吐金钱，\n招财进宝福满园。\n偏财正财皆如意，\n富贵荣华享天年。',
+                    interpretation: '此签极为吉祥！金蟾吐钱象征财运爆棚。正财偏财皆旺，可能有意外之财。适合进行投资，中奖运也不错。但切记不可贪心，见好就收。感恩财运的同时也宜做些善事。',
+                    advice: '财运爆棚，感恩惜福，见好就收。', keywords: '暴富、偏财、感恩' },
+            ];
+
+            // 所有签库
+            const allQianLibraries = {
+                'guanyin': { name: '观音灵签', icon: '🙏', desc: '综合运势·万事皆问', data: guanyinQian, color: '#e8c97a' },
+                'yuelao': { name: '月老灵签', icon: '💕', desc: '姻缘感情·桃花运势', data: yuelaoQian, color: '#f4a0a0' },
+                'guandi': { name: '关帝灵签', icon: '⚔️', desc: '事业前程·功名成就', data: guandiQian, color: '#c9a87c' },
+                'caishen': { name: '财神灵签', icon: '💰', desc: '财运亨通·招财进宝', data: caishenQian, color: '#f0d68a' },
+            };
+
+            // 每日运势数据
+            const fortuneTypes = [
+                { key: 'overall', name: '综合运势', icon: '🌈', desc: '整体运势概览' },
+                { key: 'career', name: '事业运', icon: '💼', desc: '工作事业前程' },
+                { key: 'wealth', name: '财运', icon: '🪙', desc: '正财偏财运势' },
+                { key: 'love', name: '感情运', icon: '💝', desc: '姻缘桃花感情' },
+                { key: 'health', name: '健康运', icon: '💪', desc: '身体健康状况' },
+            ];
+
+            // ==================== 状态管理 ====================
+            const state = {
+                currentView: 'home', // home | fortune | decision | divination | history
+                activeLibrary: 'guanyin',
+                shakeCount: 0,
+                isShaking: false,
+                lastResult: null,
+                decisionOptions: [],
+                diceResult: null,
+                history: [],
+            };
+
+            // 从localStorage加载历史
+            function loadHistory() {
+                try {
+                    const saved = localStorage.getItem('lingqianbao_history');
+                    if (saved) state.history = JSON.parse(saved);
+                } catch (e) {
+                    state.history = [];
+                }
+            }
+
+            function saveHistory() {
+                try {
+                    // 只保留最近100条
+                    if (state.history.length > 100) state.history = state.history.slice(-100);
+                    localStorage.setItem('lingqianbao_history', JSON.stringify(state.history));
+                } catch (e) {}
+            }
+
+            function addHistory(entry) {
+                state.history.unshift({
+                    ...entry,
+                    timestamp: Date.now(),
+                    dateStr: new Date().toLocaleString('zh-CN', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
+                });
+                saveHistory();
+            }
+
+            // ==================== 工具函数 ====================
+            function $(selector) { return document.querySelector(selector); }
+
+            function $$(selector) { return document.querySelectorAll(selector); }
+
+            function showToast(msg, duration = 2000) {
+                const container = $('#toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = msg;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    if (toast.parentNode) toast.remove();
+                }, duration + 300);
+            }
+
+            function randomInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function pickWeighted(items) {
+                const totalWeight = items.reduce((sum, item) => {
+                    const levelInfo = LEVELS[item.level];
+                    return sum + (levelInfo ? levelInfo.weight : 15);
+                }, 0);
+                let random = Math.random() * totalWeight;
+                for (const item of items) {
+                    const levelInfo = LEVELS[item.level];
+                    const w = levelInfo ? levelInfo.weight : 15;
+                    random -= w;
+                    if (random <= 0) return item;
+                }
+                return items[items.length - 1];
+            }
+
+            function getLevelEmoji(level) {
+                return LEVELS[level] ? LEVELS[level].emoji : '🔸';
+            }
+
+            function getLevelClass(level) {
+                return LEVELS[level] ? LEVELS[level].cls : 'level-mid';
+            }
+
+            // ==================== 粒子背景 ====================
+            function createParticles() {
+                const container = $('#particles');
+                container.innerHTML = '';
+                for (let i = 0; i < 30; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    const size = Math.random() * 4 + 1.5;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDuration = Math.random() * 8 + 6 + 's';
+                    particle.style.animationDelay = Math.random() * 10 + 's';
+                    container.appendChild(particle);
+                }
+            }
+
+            // ==================== 视图渲染 ====================
+            function renderView() {
+                const main = $('#mainContent');
+                switch (state.currentView) {
+                    case 'home':
+                        renderHome(main);
+                        break;
+                    case 'fortune':
+                        renderFortune(main);
+                        break;
+                    case 'decision':
+                        renderDecision(main);
+                        break;
+                    case 'divination':
+                        renderDivination(main);
+                        break;
+                    case 'history':
+                        renderHistory(main);
+                        break;
+                    default:
+                        renderHome(main);
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function renderHome(main) {
+                main.innerHTML = `
+                <div class="card" style="text-align:center;">
+                    <p style="letter-spacing:2px;color:var(--gold);font-size:0.9rem;">✨ 请选择您需要的服务 ✨</p>
+                </div>
+                <div class="feature-grid">
+                    <button class="feature-btn" onclick="app.navigate('divination')">
+                        <span class="icon">🏮</span>
+                        <span class="label">测吉凶</span>
+                        <span class="desc">摇签问卜·解读运势</span>
+                    </button>
+                    <button class="feature-btn" onclick="app.navigate('fortune')">
+                        <span class="icon">🔮</span>
+                        <span class="label">求运势</span>
+                        <span class="desc">每日运势·全方位解析</span>
+                    </button>
+                    <button class="feature-btn accent" onclick="app.navigate('decision')">
+                        <span class="icon">🎯</span>
+                        <span class="label">做决定</span>
+                        <span class="desc">抛硬币·随机选择·骰子</span>
+                    </button>
+                    <button class="feature-btn" onclick="app.navigate('history')">
+                        <span class="icon">📜</span>
+                        <span class="label">历史记录</span>
+                        <span class="desc">查看过往签文</span>
+                    </button>
+                </div>
+                <div class="card" style="text-align:center;padding:14px;">
+                    <p style="font-size:0.75rem;color:var(--text-light);letter-spacing:1px;">
+                        🕯️ 心诚则灵 · 仅供参考 · 积极生活 🕯️
+                    </p>
+                </div>
+            `;
+            }
+
+            function renderDivination(main) {
+                const libKeys = Object.keys(allQianLibraries);
+                const activeLib = allQianLibraries[state.activeLibrary];
+                const showResult = state.lastResult && state.lastResult.type === 'divination';
+
+                let tubesHTML = libKeys.map(key => {
+                    const lib = allQianLibraries[key];
+                    const active = key === state.activeLibrary ? ' active' : '';
+                    return `<button class="tube-chip${active}" onclick="app.selectLibrary('${key}')">${lib.icon} ${lib.name}</button>`;
+                }).join('');
+
+                let resultHTML = '';
+                if (showResult && state.lastResult) {
+                    const r = state.lastResult;
+                    resultHTML = `
+                    <div class="result-card" style="margin-top:16px;">
+                        <span class="result-level ${getLevelClass(r.level)}">${getLevelEmoji(r.level)} ${r.level}</span>
+                        <div class="result-number">第 ${r.qianId} 签</div>
+                        <p style="color:var(--text-light);font-size:0.75rem;">${activeLib.name} · ${activeLib.icon}</p>
+                        <div class="result-poem">${r.poem.replace(/\n/g, '<br>')}</div>
+                        <div class="result-interpretation">
+                            <strong>📖 解签：</strong>${r.interpretation}<br><br>
+                            <strong>💡 建议：</strong>${r.advice}<br>
+                            <span style="font-size:0.7rem;color:var(--text-light);">🏷️ ${r.keywords || ''}</span>
+                        </div>
+                        <div class="btn-row">
+                            <button class="btn btn-gold btn-sm" onclick="app.shakeAgain()">🔄 再摇一次</button>
+                            <button class="btn btn-outline btn-sm" onclick="app.navigate('history')">📜 查看历史</button>
+                        </div>
+                    </div>`;
+                }
+
+                main.innerHTML = `
+                <div class="card">
+                    <p style="text-align:center;letter-spacing:2px;color:var(--gold);margin-bottom:12px;">
+                        ${activeLib.icon} ${activeLib.name}
+                    </p>
+                    <p style="text-align:center;font-size:0.75rem;color:var(--text-light);">${activeLib.desc}</p>
+                    <div class="tube-selector">${tubesHTML}</div>
+                </div>
+                <div class="card">
+                    <div class="shake-area">
+                        <div class="shake-tube ${state.isShaking ? 'shaking' : ''}" id="shakeTube" onclick="app.triggerShake()">
+                            🏮
+                        </div>
+                        <p class="shake-hint" id="shakeHint">👆 点击签筒摇签</p>
+                    </div>
+                    ${state.shakeCount > 0 && !showResult ? `<p style="text-align:center;font-size:0.8rem;color:var(--text-light);">已摇 ${state.shakeCount} 次，请继续...</p>` : ''}
+                </div>
+                ${resultHTML}
+                <button class="btn btn-outline btn-sm" style="display:block;margin:0 auto;" onclick="app.navigate('home')">← 返回首页</button>
+            `;
+            }
+
+            function renderFortune(main) {
+                let cardsHTML = fortuneTypes.map(ft => {
+                    const stars = randomInt(2, 5);
+                    const starStr = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
+                    const advices = {
+                        'overall': ['运势平稳，宜积极行动', '整体向好，把握机会', '平稳中蕴含转机', '保持乐观，好运自来'],
+                        'career': ['适合展现才华', '贵人在侧，多交流', '踏实工作有回报', '新机会即将出现'],
+                        'wealth': ['财运稳定增长', '宜做长远规划', '小有进账，知足常乐', '谨慎投资，见好就收'],
+                        'love': ['桃花近在咫尺', '多沟通增进感情', '真诚待人，缘分自至', '给彼此一些空间'],
+                        'health': ['精力充沛状态佳', '注意作息规律', '适当运动有益身心', '保持愉悦心情'],
+                    };
+                    const advice = advices[ft.key][randomInt(0, 3)];
+                    return `
+                    <div class="fortune-card" onclick="app.showFortuneDetail('${ft.key}', '${ft.name}', '${ft.icon}', ${stars})">
+                        <span class="f-icon">${ft.icon}</span>
+                        <div class="f-info">
+                            <div class="f-name">${ft.name}</div>
+                            <div class="f-stars">${starStr}</div>
+                            <div class="f-advice">${advice}</div>
+                        </div>
+                        <span style="color:var(--gold);">›</span>
+                    </div>`;
+                }).join('');
+
+                main.innerHTML = `
+                <div class="card">
+                    <p style="text-align:center;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">🔮 今日运势</p>
+                    <p style="text-align:center;font-size:0.7rem;color:var(--text-light);">
+                        📅 ${new Date().toLocaleDateString('zh-CN', {year:'numeric',month:'long',day:'numeric',weekday:'long'})}
+                    </p>
+                </div>
+                <div class="card">
+                    ${cardsHTML}
+                </div>
+                <p style="text-align:center;font-size:0.7rem;color:var(--text-light);">🕯️ 运势仅供参考，积极心态最重要</p>
+                <button class="btn btn-outline btn-sm" style="display:block;margin:0 auto;" onclick="app.navigate('home')">← 返回首页</button>
+            `;
+            }
+
+            function renderDecision(main) {
+                const options = state.decisionOptions;
+                const tagsHTML = options.length > 0 ?
+                    options.map((o, i) =>
+                        `<span class="option-tag">${o} <span class="remove-tag" onclick="app.removeOption(${i})">×</span></span>`
+                    ).join('') :
+                    '<span style="color:var(--text-light);font-size:0.75rem;">请添加选项...</span>';
+
+                let diceHTML = '';
+                if (state.diceResult !== null) {
+                    const diceFaces = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+                    diceHTML = `
+                    <div class="decision-result" style="margin-top:12px;">
+                        <span class="dice-rolling" style="font-size:4rem;display:inline-block;">${diceFaces[state.diceResult]}</span>
+                        <p style="font-size:1.5rem;font-weight:bold;color:var(--gold);">点数：${state.diceResult}</p>
+                    </div>`;
+                }
+
+                let coinHTML = '';
+                if (state.coinResult !== undefined) {
+                    const coinMap = { true: { emoji: '🪙', txt: '正面（是）', cls: 'level-best' }, false: { emoji: '🪙',
+                            txt: '反面（否）', cls: 'level-mid' } };
+                    const cr = coinMap[state.coinResult];
+                    coinHTML = `
+                    <div class="decision-result" style="margin-top:12px;">
+                        <span style="font-size:4rem;display:inline-block;">${cr.emoji}</span>
+                        <p style="font-size:1.5rem;font-weight:bold;"><span class="result-level ${cr.cls}">${cr.txt}</span></p>
+                    </div>`;
+                }
+
+                let choiceHTML = '';
+                if (state.choiceResult) {
+                    choiceHTML = `
+                    <div class="decision-result" style="margin-top:12px;">
+                        <span class="big-emoji">🎉</span>
+                        <p style="color:var(--text-light);">命运的选择是：</p>
+                        <p class="chosen">${state.choiceResult}</p>
+                    </div>`;
+                }
+
+                main.innerHTML = `
+                <div class="card">
+                    <p style="text-align:center;letter-spacing:2px;color:var(--gold);margin-bottom:12px;">🎯 做决定</p>
+                    <div class="decision-input-area">
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="optionInput" placeholder="输入选项，如：去旅行" onkeydown="if(event.key==='Enter')app.addOption()">
+                            <button class="btn btn-gold btn-sm" onclick="app.addOption()" style="flex-shrink:0;">添加</button>
+                        </div>
+                        <div class="option-tags-wrap" id="optionTags">${tagsHTML}</div>
+                        ${options.length >= 2 ? `
+                        <button class="btn btn-gold" onclick="app.randomChoice()" style="width:100%;margin-top:8px;">
+                            🎲 帮我选一个！
+                        </button>` : `
+                        <p style="font-size:0.7rem;color:var(--text-light);text-align:center;">至少添加2个选项</p>`}
+                        ${options.length >= 2 ? `
+                        <button class="btn btn-outline btn-sm" onclick="app.clearOptions()" style="width:100%;">清空选项</button>` : ''}
+                    </div>
+                    ${choiceHTML}
+                </div>
+                <div class="card">
+                    <p style="text-align:center;letter-spacing:2px;color:var(--gold);margin-bottom:10px;">🪙 抛硬币</p>
+                    <button class="btn btn-gold" onclick="app.flipCoin()" style="width:100%;">抛硬币（是/否）</button>
+                    ${coinHTML}
+                </div>
+                <div class="card">
+                    <p style="text-align:center;letter-spacing:2px;color:var(--gold);margin-bottom:10px;">🎲 掷骰子</p>
+                    <button class="btn btn-gold" onclick="app.rollDice()" style="width:100%;">掷骰子（1-6）</button>
+                    ${diceHTML}
+                </div>
+                <button class="btn btn-outline btn-sm" style="display:block;margin:0 auto;" onclick="app.navigate('home')">← 返回首页</button>
+            `;
+                // 重置coin和choice结果显示状态
+                if (!state._keepCoinResult) state.coinResult = undefined;
+                if (!state._keepChoiceResult) state.choiceResult = null;
+                state._keepCoinResult = false;
+                state._keepChoiceResult = false;
+            }
+
+            function renderHistory(main) {
+                if (state.history.length === 0) {
+                    main.innerHTML = `
+                    <div class="card" style="text-align:center;">
+                        <p style="letter-spacing:2px;color:var(--gold);">📜 历史记录</p>
+                        <p style="color:var(--text-light);margin-top:20px;font-size:0.9rem;">暂无记录</p>
+                        <p style="color:var(--text-light);font-size:0.7rem;">去摇一支签吧~</p>
+                        <button class="btn btn-gold btn-sm" style="margin-top:16px;" onclick="app.navigate('divination')">🏮 去摇签</button>
+                    </div>
+                    <button class="btn btn-outline btn-sm" style="display:block;margin:0 auto;" onclick="app.navigate('home')">← 返回首页</button>
+                `;
+                    return;
+                }
+                let itemsHTML = state.history.slice(0, 30).map((h, i) => {
+                    let icon = '🏮';
+                    let label = h.level || '';
+                    if (h.type === 'coin') { icon = '🪙';
+                        label = h.resultText; } else if (h.type === 'dice') { icon = '🎲';
+                        label = '点数' + h.resultText; } else if (h.type === 'choice') { icon = '🎯';
+                        label = '选择'; } else if (h.type === 'fortune') { icon = '🔮';
+                        label = '运势'; }
+                    return `
+                    <div class="history-item" onclick="app.viewHistoryDetail(${i})">
+                        <span style="font-size:1.5rem;">${icon}</span>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-weight:bold;font-size:0.8rem;">${label} · ${h.libraryName || h.fortuneType || ''}</div>
+                            <div style="font-size:0.65rem;color:var(--text-light);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${h.poem ? h.poem.replace(/\n/g,' ').slice(0,30)+'...' : (h.resultText||'')}</div>
+                        </div>
+                        <span style="font-size:0.65rem;color:var(--text-light);flex-shrink:0;">${h.dateStr}</span>
+                    </div>`;
+                }).join('');
+
+                main.innerHTML = `
+                <div class="card">
+                    <p style="text-align:center;letter-spacing:2px;color:var(--gold);margin-bottom:8px;">📜 历史记录</p>
+                    <p style="text-align:center;font-size:0.7rem;color:var(--text-light);">共 ${state.history.length} 条记录</p>
+                </div>
+                <div class="card" style="max-height:55vh;overflow-y:auto;">
+                    ${itemsHTML}
+                </div>
+                <button class="btn btn-outline btn-sm" style="display:block;margin:0 auto;" onclick="app.clearHistory()">🗑️ 清除记录</button>
+                <button class="btn btn-outline btn-sm" style="display:block;margin:0 auto;margin-top:8px;" onclick="app.navigate('home')">← 返回首页</button>
+            `;
+            }
+
+            // ==================== 应用逻辑 ====================
+            const app = {
+                navigate(view) {
+                    state.currentView = view;
+                    state.lastResult = null;
+                    state.diceResult = null;
+                    state.coinResult = undefined;
+                    state.choiceResult = null;
+                    state.shakeCount = 0;
+                    state.isShaking = false;
+                    state._keepCoinResult = false;
+                    state._keepChoiceResult = false;
+                    renderView();
+                },
+
+                selectLibrary(key) {
+                    state.activeLibrary = key;
+                    state.lastResult = null;
+                    state.shakeCount = 0;
+                    state.isShaking = false;
+                    renderView();
+                },
+
+                triggerShake() {
+                    if (state.isShaking) return;
+                    state.isShaking = true;
+                    state.shakeCount++;
+                    renderView();
+                    // 重新绑定事件
+                    const tube = $('#shakeTube');
+                    if (tube) {
+                        tube.classList.add('shaking');
+                    }
+                    const hint = $('#shakeHint');
+                    if (hint) hint.textContent = '🎋 正在摇签中...';
+
+                    setTimeout(() => {
+                        state.isShaking = false;
+                        // 抽取签文
+                        const lib = allQianLibraries[state.activeLibrary];
+                        const qian = pickWeighted(lib.data);
+                        state.lastResult = {
+                            type: 'divination',
+                            libraryKey: state.activeLibrary,
+                            libraryName: lib.name,
+                            libraryIcon: lib.icon,
+                            qianId: qian.id,
+                            level: qian.level,
+                            poem: qian.poem,
+                            interpretation: qian.interpretation,
+                            advice: qian.advice,
+                            keywords: qian.keywords || '',
+                        };
+                        // 加入历史
+                        addHistory({
+                            type: 'divination',
+                            libraryName: lib.name,
+                            level: qian.level,
+                            poem: qian.poem,
+                            resultText: qian.level + ' 第' + qian.id + '签',
+                            qianId: qian.id,
+                        });
+                        renderView();
+                        // 轻微震动反馈
+                        if (navigator.vibrate) navigator.vibrate([30, 50, 30, 50, 60]);
+                    }, 700);
+                },
+
+                shakeAgain() {
+                    state.lastResult = null;
+                    state.shakeCount = 0;
+                    state.isShaking = false;
+                    renderView();
+                },
+
+                showFortuneDetail(key, name, icon, stars) {
+                    const details = {
+                        'overall': {
+                            summary: '今日综合运势',
+                            detail: '整体来看，今日运势' + ['较低', '平稳', '向好', '不错', '极佳'][stars - 1] +
+                                '。建议保持积极心态，善用今日的优势能量。遇到小挫折不必气馁，好运正在积累中。',
+                            luckyColor: ['深蓝', '墨绿', '金色', '红色', '紫色'][stars - 1],
+                            luckyNum: randomInt(1, 99),
+                        },
+                        'career': {
+                            summary: '事业运势',
+                            detail: '事业方面' + ['宜稳守', '可小幅推进', '适合积极表现', '有不错的机会', '迎来重要突破'][
+                                stars - 1
+                            ] + '。与同事保持良好沟通，上级可能正在关注你的表现。适合整理手头工作，为下一步做准备。',
+                            luckyColor: ['灰色', '蓝色', '白色', '金色', '红色'][stars - 1],
+                            luckyNum: randomInt(1, 99),
+                        },
+                        'wealth': {
+                            summary: '财运运势',
+                            detail: '财运方面' + ['需谨慎理财', '宜保守', '稳定增长', '有小惊喜', '财运亨通'][stars - 1] +
+                                '。正财稳定，偏财需看时机。今日适合做财务规划，避免冲动消费。',
+                            luckyColor: ['棕色', '金色', '黄色', '橙色', '红色'][stars - 1],
+                            luckyNum: randomInt(1, 99),
+                        },
+                        'love': {
+                            summary: '感情运势',
+                            detail: '感情方面' + ['需耐心经营', '宜多沟通', '温暖融洽', '甜蜜升温', '桃花盛开'][stars - 1] +
+                                '。单身者适合扩大社交圈，已有伴侣者适合一起做些温馨的事情。真诚是最好的吸引力。',
+                            luckyColor: ['粉色', '白色', '红色', '玫瑰色', '桃红色'][stars - 1],
+                            luckyNum: randomInt(1, 99),
+                        },
+                        'health': {
+                            summary: '健康运势',
+                            detail: '健康方面' + ['需注意休息', '保持规律作息', '状态良好', '精力充沛', '身心俱佳'][stars -
+                                1] + '。适合进行适度运动，注意饮食均衡。保持愉悦心情是最好的养生之道。',
+                            luckyColor: ['绿色', '青色', '蓝色', '白色', '金色'][stars - 1],
+                            luckyNum: randomInt(1, 99),
+                        },
+                    };
+                    const d = details[key];
+                    const starStr = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
+
+                    // 加入历史
+                    addHistory({
+                        type: 'fortune',
+                        fortuneType: name,
+                        level: stars >= 4 ? '好运' : stars >= 3 ? '平稳' : '需注意',
+                        resultText: starStr + ' ' + d.summary,
+                    });
+
+                    // 弹窗展示
+                    const overlay = document.createElement('div');
+                    overlay.className = 'modal-overlay';
+                    overlay.innerHTML = `
+                    <div class="modal">
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+                        <p style="text-align:center;font-size:1.5rem;">${icon}</p>
+                        <p style="text-align:center;font-weight:bold;letter-spacing:2px;color:var(--gold);font-size:1.1rem;">${name} · ${d.summary}</p>
+                        <p style="text-align:center;font-size:1.5rem;">${starStr}</p>
+                        <p style="line-height:1.8;color:var(--text);margin:12px 0;">${d.detail}</p>
+                        <p style="color:var(--gold);font-size:0.85rem;">🍀 幸运色：${d.luckyColor}</p>
+                        <p style="color:var(--gold);font-size:0.85rem;">🔢 幸运数字：${d.luckyNum}</p>
+                        <p style="text-align:center;font-size:0.7rem;color:var(--text-light);margin-top:10px;">🕯️ 心诚则灵，积极生活</p>
+                    </div>`;
+                    overlay.addEventListener('click', function(e) {
+                        if (e.target === overlay) overlay.remove();
+                    });
+                    document.body.appendChild(overlay);
+                },
+
+                addOption() {
+                    const input = $('#optionInput');
+                    if (!input) return;
+                    const val = input.value.trim();
+                    if (!val) return showToast('请输入选项内容');
+                    if (state.decisionOptions.length >= 20) return showToast('最多添加20个选项');
+                    if (state.decisionOptions.includes(val)) return showToast('选项已存在');
+                    state.decisionOptions.push(val);
+                    input.value = '';
+                    state.choiceResult = null;
+                    state._keepChoiceResult = false;
+                    renderView();
+                    // 重新聚焦
+                    setTimeout(() => {
+                        const newInput = $('#optionInput');
+                        if (newInput) newInput.focus();
+                    }, 100);
+                },
+
+                removeOption(index) {
+                    state.decisionOptions.splice(index, 1);
+                    state.choiceResult = null;
+                    state._keepChoiceResult = false;
+                    renderView();
+                },
+
+                clearOptions() {
+                    state.decisionOptions = [];
+                    state.choiceResult = null;
+                    state._keepChoiceResult = false;
+                    renderView();
+                },
+
+                randomChoice() {
+                    if (state.decisionOptions.length < 2) return showToast('至少需要2个选项');
+                    // 动画效果：快速轮换
+                    let count = 0;
+                    const totalFlashes = 12;
+                    const flashInterval = 80;
+                    state._keepChoiceResult = true;
+
+                    function flash() {
+                        if (count < totalFlashes) {
+                            state.choiceResult = state.decisionOptions[randomInt(0, state.decisionOptions
+                                .length - 1)];
+                            renderView();
+                            count++;
+                            setTimeout(flash, flashInterval + count * 15);
+                        } else {
+                            // 最终结果
+                            state.choiceResult = state.decisionOptions[randomInt(0, state.decisionOptions.length -
+                                1)];
+                            renderView();
+                            addHistory({
+                                type: 'choice',
+                                resultText: state.choiceResult,
+                                level: '选择结果',
+                            });
+                            if (navigator.vibrate) navigator.vibrate([50, 30, 80]);
+                        }
+                    }
+                    flash();
+                },
+
+                flipCoin() {
+                    state._keepCoinResult = true;
+                    state.coinResult = undefined;
+                    renderView();
+                    // 动画延迟
+                    setTimeout(() => {
+                        state.coinResult = Math.random() > 0.5;
+                        renderView();
+                        addHistory({
+                            type: 'coin',
+                            resultText: state.coinResult ? '正面（是）' : '反面（否）',
+                            level: state.coinResult ? '上签' : '中签',
+                        });
+                    }, 600);
+                },
+
+                rollDice() {
+                    state.diceResult = null;
+                    renderView();
+                    setTimeout(() => {
+                        state.diceResult = randomInt(1, 6);
+                        renderView();
+                        addHistory({
+                            type: 'dice',
+                            resultText: String(state.diceResult),
+                            level: state.diceResult >= 4 ? '好运' : state.diceResult >= 3 ? '一般' : '不佳',
+                        });
+                        if (navigator.vibrate) navigator.vibrate(40);
+                    }, 700);
+                },
+
+                viewHistoryDetail(index) {
+                    const h = state.history[index];
+                    if (!h) return;
+                    if (h.type === 'divination') {
+                        state.activeLibrary = h.libraryKey || 'guanyin';
+                        state.lastResult = {
+                            type: 'divination',
+                            libraryKey: h.libraryKey || 'guanyin',
+                            libraryName: h.libraryName || '',
+                            libraryIcon: allQianLibraries[h.libraryKey]?.icon || '🏮',
+                            qianId: h.qianId,
+                            level: h.level,
+                            poem: h.poem || '',
+                            interpretation: h.interpretation || '（历史记录，详细解读请重新摇签）',
+                            advice: h.advice || '',
+                            keywords: h.keywords || '',
+                        };
+                        state.shakeCount = 1;
+                        state.currentView = 'divination';
+                        renderView();
+                    } else {
+                        showToast('点击查看：' + (h.resultText || h.fortuneType || '详情'));
+                    }
+                },
+
+                clearHistory() {
+                    if (confirm('确定清除所有历史记录吗？此操作不可撤销。')) {
+                        state.history = [];
+                        saveHistory();
+                        renderView();
+                        showToast('历史记录已清除');
+                    }
+                },
+            };
+
+            // ==================== 初始化 ====================
+            function init() {
+                createParticles();
+                loadHistory();
+                renderView();
+
+                // 点击模态框外部关闭
+                document.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('modal-overlay')) {
+                        e.target.remove();
+                    }
+                });
+
+                // 键盘快捷键
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        const overlay = document.querySelector('.modal-overlay');
+                        if (overlay) overlay.remove();
+                    }
+                });
+
+                console.log('🏮 灵签宝已就绪');
+                console.log('  求运势 · 做决定 · 测吉凶');
+                console.log('  心诚则灵，仅供参考，积极生活');
+            }
+
+            // 暴露到全局
+            window.app = app;
+            window.initApp = init;
+
+            // 启动
+            init();
+        })();
+    </script>
+</body>
+</html>
