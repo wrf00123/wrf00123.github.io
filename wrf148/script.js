@@ -1070,7 +1070,6 @@ const websiteData = [{
         { name: "世界经理人", url: "https://www.ceconline.com/", desc: "商业管理资讯/经理人社区/职业发展" },
         { name: "OBPM", url: "http://www.obpm.org/download.html#", desc: "流程管理开放平台" },
         { name: "PMI", url: "https://www.pmichina.org/", desc: "项目管理协会" },
-        { name: "终身教育平台", url: "https://le.ouchn.cn/home", desc: "学习" },
         { name: "数字素养网", url: "https://szsyw.cn/jiaoshi", desc: "学习" },
         { name: "国家中小学云课堂", url: "https://web-bd.ykt.eduyun.cn/", desc: "学习" },
         { name: "语文迷", url: "https://www.yuwenmi.com/?ref=https://szsyw.cn", desc: "学习" },
