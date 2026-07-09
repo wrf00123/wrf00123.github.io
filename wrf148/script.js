@@ -647,6 +647,7 @@ const websiteData = [{
         { name: "单位换算器", url: "https://wrf00123.github.io/tool14.html", desc: "单位换算器" },
         { name: "html导出", url: "https://wrf00123.github.io/tool5.html", desc: "html工具" },
         { name: "txt导出", url: "https://wrf00123.github.io/tool17.html", desc: "txt工具" },
+        { name: "随机数生成器", url: "https://wrf00123.github.io/tool43.html", desc: "txt工具" },     
         { name: "灵签宝", url: "https://wrf00123.github.io/tool35.html", desc: "占卜" },
         { name: "不良影响演示", url: "https://wrf00123.github.io/tool10.html", desc: "演示工具" },
         { name: "生日祝福", url: "https://wrf00123.github.io/tool18.html", desc: "演示工具" },
