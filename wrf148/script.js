@@ -664,6 +664,7 @@ const websiteData = [{
         { name: "部门编号查询", url: "https://wrf00123.github.io/tool7.html", desc: "查询程序" },
         { name: "Doodle Recorder", url: "https://wrf00123.github.io/tool52.html", desc: "涂鸦演示录制" }, 
         { name: "赛博朋克故障艺术生成器", url: "https://wrf00123.github.io/tool51.html", desc: "图片文字" }, 
+        { name: "效率工具箱", url: "https://wrf00123.github.io/tool60.html", desc: "工具" },     
         { name: "玄机阁", url: "https://wrf00123.github.io/tool35.html", desc: "占卜" },
         { name: "不良影响演示", url: "https://wrf00123.github.io/tool10.html", desc: "演示工具" },
         { name: "生日祝福", url: "https://wrf00123.github.io/tool18.html", desc: "演示工具" },
