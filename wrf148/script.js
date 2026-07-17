@@ -674,7 +674,10 @@ const websiteData = [{
         { name: "智能排班", url: "https://wrf00123.github.io/tool63.html", desc: "工具" },
         { name: "聚餐菜谱清单", url: "https://wrf00123.github.io/tool69.html", desc: "工具" },       
         { name: "工资条生成器", url: "https://wrf00123.github.io/tool62.html", desc: "工具" },
-        { name: "组织架构图生成器", url: "https://wrf00123.github.io/tool61.html", desc: "工具" },      
+        { name: "组织架构图生成器", url: "https://wrf00123.github.io/tool61.html", desc: "工具" }, 
+        { name: "全能视频播放器", url: "https://wrf00123.github.io/tool72.html", desc: "工具" },
+        { name: "QC七大工具", url: "https://wrf00123.github.io/tool70.html", desc: "工具" },
+        { name: "产品直通率模拟展示", url: "https://wrf00123.github.io/tool71.html", desc: "演示工具" },
         { name: "不良影响演示", url: "https://wrf00123.github.io/tool10.html", desc: "演示工具" },
         { name: "生日祝福", url: "https://wrf00123.github.io/tool18.html", desc: "演示工具" },
     ]
