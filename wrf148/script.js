@@ -630,6 +630,7 @@ const websiteData = [{
         { name: "安全检查整改", url: "https://wrf00123.github.io/tool64.html", desc: "工具" },      
         { name: "文本去重", url: "https://wrf00123.github.io/tool37.html", desc: "工具" },
         { name: "提词器Pro", url: "https://wrf00123.github.io/tool38.html", desc: "工具" },  
+        { name: "WordCloud Pro", url: "https://wrf00123.github.io/tool82.html", desc: "专业词云生成器" },
         { name: "单词卡片制作", url: "https://wrf00123.github.io/tool41.html", desc: "工具" }, 
         { name: "pdf转图片", url: "https://wrf00123.github.io/tool29.html", desc: "工具" },
         { name: "图片转pdf", url: "https://wrf00123.github.io/tool22.html", desc: "工具" },
