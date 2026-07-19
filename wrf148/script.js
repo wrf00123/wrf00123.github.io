@@ -687,6 +687,8 @@ const websiteData = [{
         { name: "员工技能矩阵图", url: "https://wrf00123.github.io/tool81.html", desc: "工具" },
         { name: "英语课文背诵工具", url: "https://wrf00123.github.io/tool74.html", desc: "工具" },
         { name: "背诵助手", url: "https://wrf00123.github.io/tool75.html", desc: "工具" },
+        { name: "电脑配置检测", url: "https://wrf00123.github.io/tool83.html", desc: "工具" },
+        { name: "幸运抽奖Pro", url: "https://wrf00123.github.io/tool84.html", desc: "工具" },
         { name: "产品直通率模拟展示", url: "https://wrf00123.github.io/tool71.html", desc: "演示工具" },
         { name: "不良影响演示", url: "https://wrf00123.github.io/tool10.html", desc: "演示工具" },
         { name: "生日祝福", url: "https://wrf00123.github.io/tool18.html", desc: "演示工具" },
