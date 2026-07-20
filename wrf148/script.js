@@ -340,7 +340,6 @@ const websiteData = [{
         { name: "医疗器械数据库", url: "https://www.fda.gov/medical-devices/device-advice-comprehensive-regulatory-assistance/medical-device-databases", desc: "美国FDA" },
         { name: "510(k) Premarket Notification", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfPMN/pmn.cfm", desc: "美国FDA" },
         { name: "产品分类数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfpcd/classification.cfm", desc: "美国FDA" },
-        { name: "CDRH", url: "https://www.fda.gov/about-fda/fda-organization/center-devices-and-radiological-health", desc: "器械与放射健康中心|美国FDA" },
         { name: "FDA认可标准数据库", url: "https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfStandards/search.cfm", desc: "美国FDA" },
         { name: "QMSR", url: "https://www.fda.gov/medical-devices/postmarket-requirements-devices/quality-management-system-regulation-qmsr", desc: "美国FDA|质量管理体系法规" },
         { name: "自由信息法案", url: "https://www.fda.gov/regulatory-information/freedom-information", desc: "美国FDA" },
