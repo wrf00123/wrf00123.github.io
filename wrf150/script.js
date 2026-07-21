@@ -622,6 +622,7 @@ const websiteData = [{
         { name: "国家标准状态查询", url: "https://wrf00123.github.io/wrf/tool15", desc: "查询程序" },
         { name: "文件批量重命名", url: "https://wrf00123.github.io/wrf/tool27", desc: "工具" },
         { name: "文件命名转清单", url: "https://wrf00123.github.io/wrf/tool48", desc: "转清单" },
+        { name: "Excel压缩", url: "https://wrf00123.github.io/wrf/tool93", desc: "工具" },      
         { name: "文件整理", url: "https://wrf00123.github.io/wrf/tool79", desc: "工具" },
         { name: "码上扫描", url: "https://wrf00123.github.io/wrf/tool33", desc: "扫码工具" },
         { name: "名片设计器", url: "https://wrf00123.github.io/wrf/tool34", desc: "工具" }, 
