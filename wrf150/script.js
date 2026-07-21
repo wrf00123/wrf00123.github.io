@@ -645,6 +645,7 @@ const websiteData = [{
         { name: "图片裁剪工具", url: "https://wrf00123.github.io/wrf/tool45", desc: "工具" },
         { name: "图片添加水印", url: "https://wrf00123.github.io/wrf/tool24", desc: "文字图片水印" },
         { name: "图片滤镜调节器", url: "https://wrf00123.github.io/wrf/tool36", desc: "工具" },
+        { name: "GIF动图制作器", url: "https://wrf00123.github.io/wrf/tool92", desc: "工具" },       
         { name: "Pixel Mask Pro", url: "https://wrf00123.github.io/wrf/tool68", desc: "图片马赛克" },       
         { name: "图片压缩", url: "https://wrf00123.github.io/wrf/tool23", desc: "转格式" },
         { name: "全局按键可视化", url: "https://wrf00123.github.io/wrf/tool50", desc: "演示" },
