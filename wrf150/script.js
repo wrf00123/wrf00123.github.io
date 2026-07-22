@@ -380,7 +380,7 @@ const websiteData = [{
         { name: "HIBCC", url: "https://www.hibcc.org/", desc: "健康行业商业传播委员会" },
         { name: "HIBCC", url: "https://iccbba.org/", desc: "国际血库自动化通用理事会" },
         { name: "EDQM", url: "https://www.edqm.eu/en/home", desc: "欧洲药品与医疗质量局" },        
-        { name: "NATIONAL ARCHIVES", url: "https://www.archives.gov/", desc: "国家档案馆|美国国家档案和记录管理局" },    
+        { name: "NARA", url: "https://www.archives.gov/", desc: "美国国家档案和记录管理局" },    
         { name: "GMP1001", url: "https://www.gmp1001.com/h-col-109.html", desc: "药品/医疗器械/化妆品GMP标准" },
         { name: "蒲公英", url: "https://www.ouryao.com/forum.php", desc: "医疗标准下载（论坛）" },
     ]
