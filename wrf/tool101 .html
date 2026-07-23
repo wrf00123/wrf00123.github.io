@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 网址桌面快捷方式生成器</title>
+    <style>
+        :root {
+            --bg: #f0f4f8;
+            --bg-card: #ffffff;
+            --bg-input: #f7f9fc;
+            --text: #1a202c;
+            --text-secondary: #5a6c7d;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-focus: #667eea;
+            --primary: #5b6af0;
+            --primary-hover: #4a56d4;
+            --primary-light: #eef0ff;
+            --accent: #f59e0b;
+            --accent-light: #fffbeb;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.08);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.15);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #263348;
+            --text: #e2e8f0;
+            --text-secondary: #b0bec5;
+            --text-muted: #64748b;
+            --border: #334155;
+            --border-focus: #818cf8;
+            --primary: #818cf8;
+            --primary-hover: #6d7af0;
+            --primary-light: #1e2640;
+            --accent: #fbbf24;
+            --accent-light: #2d2415;
+            --success: #34d399;
+            --success-light: #1a2e25;
+            --danger: #f87171;
+            --danger-light: #2d1f1f;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background var(--transition-slow), color var(--transition-slow);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 背景装饰 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -30%;
+            left: -20%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(ellipse at center, rgba(91, 106, 240, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity var(--transition-slow);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -25%;
+            right: -15%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity var(--transition-slow);
+        }
+        [data-theme="dark"] body::before {
+            opacity: 0.5;
+        }
+        [data-theme="dark"] body::after {
+            opacity: 0.4;
+        }
+
+        .app-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 24px 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            padding: 20px 0 30px;
+        }
+        .header .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #5b6af0, #8b5cf6, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header .subtitle {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        /* 主题切换 & 顶部操作栏 */
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 16px;
+            border-radius: 50px;
+            border: 1.5px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all var(--transition);
+            white-space: nowrap;
+            position: relative;
+        }
+        .btn-icon:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+        }
+        .btn-icon:active {
+            transform: scale(0.96);
+        }
+        .btn-icon .icon-svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .theme-toggle {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            border: 1.5px solid var(--border);
+            background: var(--bg-card);
+            transition: all var(--transition);
+        }
+        .theme-toggle:hover {
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+            transform: rotate(15deg);
+        }
+
+        /* 主布局 */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        @media (max-width: 800px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* 卡片 */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 28px 26px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: all var(--transition-slow);
+            position: relative;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        .card-header {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+            letter-spacing: -0.2px;
+        }
+        .card-header .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 50px;
+            background: var(--primary-light);
+            color: var(--primary);
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        /* 表单 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            letter-spacing: 0.2px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-wrapper input,
+        .input-wrapper textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--bg-input);
+            color: var(--text);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all var(--transition);
+            outline: none;
+            resize: vertical;
+        }
+        .input-wrapper input:focus,
+        .input-wrapper textarea:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px rgba(91, 106, 240, 0.08);
+            background: var(--bg-card);
+        }
+        .input-wrapper input::placeholder,
+        .input-wrapper textarea::placeholder {
+            color: var(--text-muted);
+        }
+        .input-wrapper .input-action-btn {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 7px 13px;
+            border-radius: 6px;
+            border: none;
+            background: var(--primary-light);
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all var(--transition);
+            white-space: nowrap;
+        }
+        .input-wrapper .input-action-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        .input-wrapper .input-clear-btn {
+            right: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            padding: 4px 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition);
+        }
+        .input-wrapper .input-clear-btn:hover {
+            color: var(--danger);
+            background: var(--danger-light);
+        }
+
+        /* 平台选择 */
+        .platform-selector {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .platform-chip {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            background: var(--bg-input);
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all var(--transition);
+            user-select: none;
+            color: var(--text-secondary);
+        }
+        .platform-chip:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        .platform-chip.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 106, 240, 0.1);
+        }
+        .platform-chip .chip-icon {
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 2px;
+        }
+        .platform-chip .chip-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* 按钮 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            transition: all var(--transition);
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #5b6af0, #7c3aed);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(91, 106, 240, 0.35);
+            font-size: 1rem;
+            padding: 14px 28px;
+            width: 100%;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(91, 106, 240, 0.45);
+            transform: translateY(-2px);
+        }
+        .btn-primary:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn-sm {
+            padding: 7px 14px;
+            font-size: 0.78rem;
+            border-radius: 8px;
+            letter-spacing: 0.2px;
+        }
+        .btn-xs {
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            border-radius: 6px;
+            letter-spacing: 0.1px;
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* 预览区 */
+        .preview-area {
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .desktop-simulation {
+            background: linear-gradient(180deg, #e8ecf1 0%, #dce2e8 100%);
+            border-radius: var(--radius-lg);
+            padding: 30px 20px 20px;
+            width: 100%;
+            position: relative;
+            border: 1px solid #cbd5e0;
+            min-height: 160px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-start;
+            justify-content: center;
+            transition: all var(--transition-slow);
+        }
+        [data-theme="dark"] .desktop-simulation {
+            background: linear-gradient(180deg, #1a2435 0%, #15202b 100%);
+            border-color: #2d3a4a;
+        }
+        .desktop-simulation .desktop-label {
+            position: absolute;
+            top: 8px;
+            left: 16px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #8899aa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .desktop-icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: default;
+            width: 80px;
+            padding: 8px 4px;
+            border-radius: 8px;
+            transition: all var(--transition);
+            position: relative;
+        }
+        .desktop-icon-item:hover {
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.4);
+        }
+        [data-theme="dark"] .desktop-icon-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.06);
+        }
+        .desktop-icon-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            object-fit: contain;
+            background: #fff;
+            padding: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition);
+        }
+        .desktop-icon-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-align: center;
+            word-break: break-word;
+            color: #2d3748;
+            line-height: 1.2;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        [data-theme="dark"] .desktop-icon-name {
+            color: #cbd5e0;
+        }
+        .desktop-icon-item .arrow-overlay {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 10px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 50%;
+            filter: blur(3px);
+            transition: all var(--transition);
+        }
+
+        /* 二维码 */
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+        }
+        .qr-container img {
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            background: #fff;
+            padding: 8px;
+            transition: all var(--transition);
+        }
+        .qr-container .qr-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* 下载按钮组 */
+        .download-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .download-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text);
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .download-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+        .download-btn .os-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .os-dot.win {
+            background: #00a4ef;
+        }
+        .os-dot.mac {
+            background: #555;
+        }
+        .os-dot.linux {
+            background: #f5a623;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            padding: 14px 20px;
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            color: var(--text);
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow-xl);
+            border-left: 4px solid var(--primary);
+            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.3s 2.5s forwards;
+            pointer-events: auto;
+            max-width: 380px;
+            line-height: 1.4;
+        }
+        .toast.success {
+            border-left-color: var(--success);
+        }
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+        .toast.warning {
+            border-left-color: var(--accent);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 历史记录 */
+        .history-list {
+            max-height: 320px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+        .history-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .history-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-input);
+            border: 1px solid transparent;
+            transition: all var(--transition);
+            cursor: pointer;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+        }
+        .history-item:hover {
+            border-color: var(--border);
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
+        }
+        .history-item .hist-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            object-fit: contain;
+            flex-shrink: 0;
+            background: #fff;
+            padding: 2px;
+        }
+        .history-item .hist-info {
+            flex: 1;
+            min-width: 120px;
+        }
+        .history-item .hist-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.85rem;
+            line-height: 1.2;
+        }
+        .history-item .hist-url {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 250px;
+        }
+        .history-item .hist-actions {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .history-empty {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* 批量模式 */
+        .batch-area {
+            display: none;
+            margin-top: 8px;
+        }
+        .batch-area.active {
+            display: block;
+            animation: fadeInDown 0.3s ease;
+        }
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .batch-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .batch-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            background: var(--bg-input);
+            font-size: 0.8rem;
+            justify-content: space-between;
+        }
+        .batch-item .batch-url {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+
+        /* 标签 */
+        .tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .tag.win {
+            background: #e3f2fd;
+            color: #0078d4;
+        }
+        .tag.mac {
+            background: #f5f5f5;
+            color: #444;
+        }
+        .tag.linux {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        [data-theme="dark"] .tag.win {
+            background: #1a3a5c;
+            color: #60a5fa;
+        }
+        [data-theme="dark"] .tag.mac {
+            background: #2d2d2d;
+            color: #bbb;
+        }
+        [data-theme="dark"] .tag.linux {
+            background: #3d2e1a;
+            color: #fbbf24;
+        }
+
+        /* 设置面板 */
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .settings-panel.active {
+            display: flex;
+        }
+        .settings-dialog {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border);
+        }
+        .settings-dialog h3 {
+            margin-bottom: 16px;
+            font-size: 1.2rem;
+        }
+        .overlay-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 999;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 600px) {
+            .header .logo {
+                font-size: 1.6rem;
+            }
+            .card {
+                padding: 18px 14px;
+            }
+            .platform-selector {
+                gap: 4px;
+            }
+            .platform-chip {
+                padding: 8px 10px;
+                font-size: 0.75rem;
+            }
+            .btn-primary {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            .desktop-simulation {
+                padding: 20px 10px 14px;
+                gap: 8px;
+            }
+            .desktop-icon-item {
+                width: 60px;
+                padding: 4px;
+            }
+            .desktop-icon-img {
+                width: 36px;
+                height: 36px;
+                border-radius: 7px;
+            }
+            .desktop-icon-name {
+                font-size: 0.6rem;
+                max-width: 60px;
+            }
+            .history-item .hist-url {
+                max-width: 140px;
+            }
+            .download-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- 头部 -->
+        <div class="header">
+            <div class="logo">🔗 桌面快捷方式生成器</div>
+            <p class="subtitle">输入网址，一键生成 Windows / macOS / Linux 桌面快捷方式文件</p>
+        </div>
+
+        <!-- 顶部操作栏 -->
+        <div class="top-bar">
+            <button class="btn-icon" onclick="pasteFromClipboard()" title="从剪贴板读取URL">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                粘贴URL
+            </button>
+            <button class="btn-icon" onclick="toggleBatchMode()" id="batchToggleBtn" title="批量生成模式">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                批量模式
+            </button>
+            <button class="btn-icon" onclick="openSettings()" title="设置">
+                <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                设置
+            </button>
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" title="切换暗黑模式">🌙</button>
+        </div>
+
+        <!-- 主布局 -->
+        <div class="main-grid">
+            <!-- 左侧：输入区 -->
+            <div class="card" id="inputCard">
+                <div class="card-header">
+                    📝 快捷方式信息
+                    <span class="badge">输入</span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">🌐 网址 URL *</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="urlInput" placeholder="https://www.example.com" autocomplete="url"
+                        autofocus>
+                        <button class="input-clear-btn" id="urlClearBtn" title="清空"
+                    onclick="clearUrl()">✕</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">📛 快捷方式名称</label>
+                <div class="input-wrapper">
+                    <input type="text" id="nameInput" placeholder="自动从网址提取，也可自定义">
+                    <button class="input-clear-btn" id="nameClearBtn" title="清空"
+                onclick="clearName()">✕</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">🖥️ 目标平台</label>
+            <div class="platform-selector" id="platformSelector">
+                <div class="platform-chip active" data-platform="auto" onclick="selectPlatform('auto', this)">
+                    <span class="chip-icon">🤖</span>
+                    <span class="chip-label">自动检测</span>
+                </div>
+                <div class="platform-chip" data-platform="windows" onclick="selectPlatform('windows', this)">
+                    <span class="chip-icon">🪟</span>
+                    <span class="chip-label">Windows</span>
+                </div>
+                <div class="platform-chip" data-platform="mac" onclick="selectPlatform('mac', this)">
+                    <span class="chip-icon">🍎</span>
+                    <span class="chip-label">macOS</span>
+                </div>
+                <div class="platform-chip" data-platform="linux" onclick="selectPlatform('linux', this)">
+                    <span class="chip-icon">🐧</span>
+                    <span class="chip-label">Linux</span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">🖼️ 自定义图标 URL（可选）</label>
+            <div class="input-wrapper">
+                <input type="text" id="iconUrlInput" placeholder="留空自动获取网站 Favicon">
+                <button class="input-action-btn" onclick="autoFetchFavicon()" title="自动获取图标">🔍 获取图标</button>
+            </div>
+        </div>
+        <!-- 批量模式区域 -->
+        <div class="batch-area" id="batchArea">
+            <div class="form-group">
+                <label class="form-label">📋 批量 URL 列表（每行一个，支持 名称|URL 格式）</label>
+                <div class="input-wrapper">
+                    <textarea id="batchUrlTextarea" rows="5" placeholder="https://example1.com
+        我的网站|https://example2.com
+        https://example3.com"></textarea>
+            </div>
+        </div>
+        <button class="btn btn-sm btn-secondary" onclick="parseBatchUrls()" style="margin-bottom:8px;">🔍 解析批量列表</button>
+        <div class="batch-list" id="batchPreviewList"></div>
+    </div>
+    <button class="btn btn-primary" id="generateBtn" onclick="generateShortcut()">
+        ⚡ 生成并下载快捷方式
+    </button>
+    <p style="text-align:center;margin-top:6px;font-size:0.7rem;color:var(--text-muted);">
+        提示：<kbd>Ctrl</kbd> + <kbd>Enter</kbd> 快速生成
+    </p>
+</div>
+
+<!-- 右侧：预览区 -->
+<div class="card" id="previewCard">
+    <div class="card-header">
+        👁️ 实时预览
+        <span class="badge">预览</span>
+    </div>
+    <div class="preview-area" id="previewArea">
+        <div class="desktop-simulation" id="desktopSim">
+            <span class="desktop-label">模拟桌面</span>
+            <div class="desktop-icon-item" id="desktopIconPreview">
+                <img class="desktop-icon-img" id="previewIconImg"
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect fill='%23e2e8f0' width='48' height='48' rx='10'/%3E%3Ctext x='24' y='30' text-anchor='middle' fill='%2394a3b8' font-size='20'%3E🔗%3C/text%3E%3C/svg%3E"
+                alt="图标预览">
+                <span class="desktop-icon-name" id="previewIconName">示例快捷方式</span>
+                <div class="arrow-overlay"></div>
+            </div>
+        </div>
+        <!-- 二维码 -->
+        <div class="qr-container" id="qrContainer">
+            <img id="qrImage"
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Crect fill='%23f7f9fc' width='160' height='160' rx='8'/%3E%3Ctext x='80' y='85' text-anchor='middle' fill='%23b0b8c4' font-size='13'%3E输入网址后%3C/text%3E%3Ctext x='80' y='105' text-anchor='middle' fill='%23b0b8c4' font-size='13'%3E生成二维码%3C/text%3E%3C/svg%3E"
+            alt="二维码" width="160" height="160">
+            <span class="qr-label">📱 扫描二维码在手机打开</span>
+        </div>
+        <!-- 下载按钮组 -->
+        <div class="download-buttons" id="downloadButtons">
+            <button class="download-btn" onclick="downloadFile('windows')" id="dlWin">
+                <span class="os-dot win"></span> .url (Win)
+            </button>
+            <button class="download-btn" onclick="downloadFile('mac')" id="dlMac">
+                <span class="os-dot mac"></span> .webloc (Mac)
+            </button>
+            <button class="download-btn" onclick="downloadFile('linux')" id="dlLinux">
+                <span class="os-dot linux"></span> .desktop (Linux)
+            </button>
+            <button class="download-btn" onclick="downloadAllFormats()" id="dlAll" title="下载全部三种格式">
+                📦 全部下载
+            </button>
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="copyFileContent()" style="margin-top:4px;">
+            📋 复制文件内容
+        </button>
+    </div>
+</div>
+</div>
+
+<!-- 底部：历史记录 -->
+<div class="card" style="margin-top:24px;">
+    <div class="card-header" style="justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <span>📜 历史记录 <span class="badge">最近</span></span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-xs btn-outline" onclick="exportHistory()">📤 导出</button>
+            <button class="btn btn-xs btn-outline" onclick="importHistoryPrompt()">📥 导入</button>
+            <button class="btn btn-xs btn-danger" onclick="clearHistory()">🗑️ 清空</button>
+        </div>
+    </div>
+    <div class="history-list" id="historyList">
+        <div class="history-empty">暂无历史记录，生成快捷方式后将自动保存到这里</div>
+    </div>
+</div>
+</div>
+
+<!-- 设置面板 -->
+<div class="settings-panel" id="settingsPanel">
+    <div class="overlay-backdrop" onclick="closeSettings()"></div>
+    <div class="settings-dialog">
+        <h3>⚙️ 设置</h3>
+        <div class="form-group">
+            <label class="form-label">默认平台</label>
+            <div class="platform-selector" id="settingsPlatformSelector">
+                <div class="platform-chip active" data-platform="auto" onclick="setDefaultPlatform('auto', this)">🤖 自动</div>
+                <div class="platform-chip" data-platform="windows" onclick="setDefaultPlatform('windows', this)">🪟 Win</div>
+                <div class="platform-chip" data-platform="mac" onclick="setDefaultPlatform('mac', this)">🍎 Mac</div>
+                <div class="platform-chip" data-platform="linux" onclick="setDefaultPlatform('linux', this)">🐧 Linux</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">最大历史记录数量</label>
+            <input type="number" id="maxHistoryInput" value="50" min="5" max="200" style="width:100%;padding:10px;border-radius:8px;border:2px solid var(--border);background:var(--bg-input);color:var(--text);">
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;">
+            <button class="btn btn-sm btn-secondary" onclick="closeSettings()">取消</button>
+            <button class="btn btn-sm btn-primary" onclick="saveSettings()">保存设置</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast容器 -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+    (function() {
+        // ==================== 状态管理 ====================
+        const state = {
+            platform: 'auto', // auto | windows | mac | linux
+            isBatchMode: false,
+            batchItems: [],
+            currentGeneratedData: null, // 缓存当前生成的数据
+            settings: {
+                defaultPlatform: 'auto',
+                maxHistory: 50,
+            }
+        };
+
+        // ==================== DOM引用 ====================
+        const $urlInput = document.getElementById('urlInput');
+        const $nameInput = document.getElementById('nameInput');
+        const $iconUrlInput = document.getElementById('iconUrlInput');
+        const $generateBtn = document.getElementById('generateBtn');
+        const $batchArea = document.getElementById('batchArea');
+        const $batchUrlTextarea = document.getElementById('batchUrlTextarea');
+        const $batchPreviewList = document.getElementById('batchPreviewList');
+        const $historyList = document.getElementById('historyList');
+        const $previewIconImg = document.getElementById('previewIconImg');
+        const $previewIconName = document.getElementById('previewIconName');
+        const $qrImage = document.getElementById('qrImage');
+        const $toastContainer = document.getElementById('toastContainer');
+        const $settingsPanel = document.getElementById('settingsPanel');
+        const $maxHistoryInput = document.getElementById('maxHistoryInput');
+        const $themeToggleBtn = document.getElementById('themeToggleBtn');
+        const $desktopSim = document.getElementById('desktopSim');
+
+        // ==================== 初始化 ====================
+        function init() {
+            loadSettings();
+            loadTheme();
+            detectOS();
+            renderHistory();
+            setupEventListeners();
+            updatePreview();
+            // 尝试从剪贴板读取（需要用户交互触发，这里仅在focus时提示可用）
+            console.log('🔗 桌面快捷方式生成器已就绪');
+            console.log('  支持平台：Windows (.url) | macOS (.webloc) | Linux (.desktop)');
+            console.log('  快捷键：Ctrl+Enter 快速生成');
+        }
+
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('shortcut_gen_settings');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state.settings = { ...state.settings, ...parsed };
+                }
+            } catch (e) { /* ignore */ }
+            state.platform = state.settings.defaultPlatform || 'auto';
+            $maxHistoryInput.value = state.settings.maxHistory || 50;
+            // 更新平台选择器UI
+            updatePlatformUI();
+            updateSettingsPlatformUI();
+        }
+
+        function saveSettingsToStorage() {
+            try {
+                localStorage.setItem('shortcut_gen_settings', JSON.stringify(state.settings));
+            } catch (e) {
+                showToast('设置保存失败，存储空间不足', 'error');
+            }
+        }
+
+        function loadTheme() {
+            const saved = localStorage.getItem('shortcut_gen_theme');
+            if (saved === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                $themeToggleBtn.textContent = '☀️';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                $themeToggleBtn.textContent = '🌙';
+            }
+        }
+
+        function detectOS() {
+            const ua = navigator.userAgent || navigator.platform || '';
+            const platform = (navigator.platform || '').toLowerCase();
+            let detected = 'windows';
+            if (platform.includes('mac') || ua.includes('Mac OS')) {
+                detected = 'mac';
+            } else if (platform.includes('linux') || ua.includes('Linux')) {
+                detected = 'linux';
+            }
+            // 更新自动检测的显示
+            const autoChip = document.querySelector('.platform-chip[data-platform="auto"]');
+            if (autoChip) {
+                const osNames = { windows: '🪟 Windows', mac: '🍎 macOS', linux: '🐧 Linux' };
+                autoChip.querySelector('.chip-label').textContent =
+                    '自动检测 (' + osNames[detected] + ')';
+            }
+            // 存储检测结果
+            state.detectedOS = detected;
+        }
+
+        function setupEventListeners() {
+            // URL输入实时更新预览
+            $urlInput.addEventListener('input', debounce(updatePreview, 300));
+            $nameInput.addEventListener('input', debounce(updatePreview, 200));
+            $iconUrlInput.addEventListener('input', debounce(updatePreview, 400));
+
+            // 快捷键
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    generateShortcut();
+                }
+            });
+
+            // 拖放支持
+            $urlInput.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                $urlInput.style.borderColor = 'var(--border-focus)';
+                $urlInput.style.boxShadow = '0 0 0 4px rgba(91,106,240,0.12)';
+            });
+            $urlInput.addEventListener('dragleave', function() {
+                $urlInput.style.borderColor = '';
+                $urlInput.style.boxShadow = '';
+            });
+            $urlInput.addEventListener('drop', function(e) {
+                e.preventDefault();
+                $urlInput.style.borderColor = '';
+                $urlInput.style.boxShadow = '';
+                const data = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('text/uri-list') ||
+                    '';
+                if (data) {
+                    const urls = data.split('\n').filter(u => u.trim());
+                    if (urls.length > 0) {
+                        $urlInput.value = urls[0].trim();
+                        updatePreview();
+                        showToast('已从拖放中读取URL', 'success');
+                    }
+                }
+            });
+
+            // 粘贴事件 - 智能提取URL
+            $urlInput.addEventListener('paste', function(e) {
+                setTimeout(() => {
+                    const val = $urlInput.value.trim();
+                    // 尝试从粘贴的富文本中提取URL
+                    if (val && val.length > 200) {
+                        const extracted = extractURL(val);
+                        if (extracted && extracted !== val) {
+                            $urlInput.value = extracted;
+                            updatePreview();
+                        }
+                    }
+                }, 50);
+            });
+        }
+
+        function debounce(fn, delay) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
+        function extractURL(text) {
+            const urlRegex = /https?:\/\/[^\s<>"{}|\\^`\[\]]+/gi;
+            const matches = text.match(urlRegex);
+            return matches && matches.length > 0 ? matches[0] : text;
+        }
+
+        // ==================== 平台选择 ====================
+        function selectPlatform(platform, el) {
+            state.platform = platform;
+            updatePlatformUI();
+            updatePreview();
+            // 点击已选中的平台芯片时取消选中（回到auto）
+            if (el && el.classList.contains('active') && platform !== 'auto') {
+                // 不做取消，保持选中
+            }
+        }
+
+        function updatePlatformUI() {
+            const chips = document.querySelectorAll('#platformSelector .platform-chip');
+            chips.forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.platform === state.platform);
+            });
+        }
+
+        function getEffectivePlatform() {
+            if (state.platform === 'auto') {
+                return state.detectedOS || 'windows';
+            }
+            return state.platform;
+        }
+
+        // ==================== 预览更新 ====================
+        function updatePreview() {
+            const url = sanitizeURL($urlInput.value.trim());
+            const name = $nameInput.value.trim() || extractDomainName(url) || '示例快捷方式';
+            const iconUrl = $iconUrlInput.value.trim() || getFaviconURL(url);
+
+            // 更新桌面模拟图标
+            $previewIconName.textContent = name || '未命名快捷方式';
+            if (iconUrl) {
+                const img = new Image();
+                img.onload = function() {
+                    $previewIconImg.src = iconUrl;
+                };
+                img.onerror = function() {
+                    $previewIconImg.src = getDefaultIconSVG();
+                };
+                $previewIconImg.src = iconUrl;
+            } else {
+                $previewIconImg.src = getDefaultIconSVG();
+            }
+
+            // 更新二维码
+            if (url && isValidURL(url)) {
+                const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&margin=8`;
+                $qrImage.src = qrSrc;
+                $qrImage.alt = '二维码 - ' + url;
+            } else {
+                $qrImage.src =
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Crect fill='%23f7f9fc' width='160' height='160' rx='8'/%3E%3Ctext x='80' y='85' text-anchor='middle' fill='%23b0b8c4' font-size='13'%3E输入有效网址后%3C/text%3E%3Ctext x='80' y='105' text-anchor='middle' fill='%23b0b8c4' font-size='13'%3E生成二维码%3C/text%3E%3C/svg%3E";
+            }
+
+            // 更新下载按钮状态
+            const hasValidData = url && isValidURL(url);
+            document.getElementById('dlWin').style.opacity = hasValidData ? '1' : '0.5';
+            document.getElementById('dlMac').style.opacity = hasValidData ? '1' : '0.5';
+            document.getElementById('dlLinux').style.opacity = hasValidData ? '1' : '0.5';
+            document.getElementById('dlAll').style.opacity = hasValidData ? '1' : '0.5';
+        }
+
+        function getDefaultIconSVG() {
+            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect fill='%23e2e8f0' width='48' height='48' rx='10'/%3E%3Ctext x='24' y='30' text-anchor='middle' fill='%2394a3b8' font-size='20'%3E🔗%3C/text%3E%3C/svg%3E";
+        }
+
+        function getFaviconURL(url) {
+            if (!url || !isValidURL(url)) return '';
+            try {
+                const domain = new URL(url).hostname;
+                return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function autoFetchFavicon() {
+            const url = sanitizeURL($urlInput.value.trim());
+            if (url && isValidURL(url)) {
+                const faviconURL = getFaviconURL(url);
+                $iconUrlInput.value = faviconURL;
+                updatePreview();
+                showToast('已自动获取网站 Favicon 图标', 'success');
+            } else {
+                showToast('请先输入有效的网址', 'warning');
+            }
+        }
+
+        function sanitizeURL(url) {
+            if (!url) return '';
+            url = url.trim();
+            // 移除多余的前缀
+            if (url.startsWith('http://http://') || url.startsWith('https://https://')) {
+                url = url.replace(/^(https?:\/\/)+/, 'https://');
+            }
+            // 自动添加协议
+            if (!/^https?:\/\//i.test(url) && /^[\w-]+(\.[\w-]+)+/.test(url)) {
+                url = 'https://' + url;
+            }
+            return url;
+        }
+
+        function isValidURL(url) {
+            if (!url) return false;
+            try {
+                const u = new URL(url);
+                return u.protocol === 'http:' || u.protocol === 'https:';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function extractDomainName(url) {
+            if (!url) return '';
+            try {
+                const u = new URL(url);
+                let hostname = u.hostname.replace(/^www\./, '');
+                // 首字母大写
+                const parts = hostname.split('.');
+                if (parts.length > 0) {
+                    parts[0] = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+                }
+                return parts.join('.');
+            } catch (e) {
+                return url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0] || '';
+            }
+        }
+
+        // ==================== 生成快捷方式文件 ====================
+        function generateShortcut() {
+            const url = sanitizeURL($urlInput.value.trim());
+            if (!url || !isValidURL(url)) {
+                showToast('请输入有效的网址（以 http:// 或 https:// 开头）', 'error');
+                $urlInput.focus();
+                return;
+            }
+            const name = $nameInput.value.trim() || extractDomainName(url) || '快捷方式';
+            const iconUrl = $iconUrlInput.value.trim() || getFaviconURL(url);
+            const platform = getEffectivePlatform();
+
+            // 缓存生成数据
+            state.currentGeneratedData = { url, name, iconUrl, platform, timestamp: Date.now() };
+
+            // 自动下载对应平台的文件
+            downloadFile(platform);
+
+            // 添加到历史记录
+            addToHistory({ url, name, platform, iconUrl });
+
+            // 更新预览
+            updatePreview();
+
+            // 视觉反馈
+            $generateBtn.textContent = '✅ 已生成！';
+            $generateBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            setTimeout(() => {
+                $generateBtn.textContent = '⚡ 生成并下载快捷方式';
+                $generateBtn.style.background = '';
+            }, 1500);
+
+            showToast(`快捷方式"${name}"已生成并下载`, 'success');
+        }
+
+        function generateURLFileContent(url, name, iconUrl) {
+            let content = '[InternetShortcut]\r\n';
+            content += `URL=${url}\r\n`;
+            if (iconUrl) {
+                content += `IconFile=${iconUrl}\r\n`;
+                content += 'IconIndex=0\r\n';
+            }
+            content += `WorkingDirectory=\r\n`;
+            content += `ShowCommand=3\r\n`;
+            return content;
+        }
+
+        function generateWeblocFileContent(url, name) {
+            // macOS .webloc 文件 (XML plist 格式)
+            let content = '<?xml version="1.0" encoding="UTF-8"?>\n';
+            content += '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n';
+            content += '<plist version="1.0">\n';
+            content += '<dict>\n';
+            content += '\t<key>URL</key>\n';
+            content += '\t<string>' + escapeXML(url) + '</string>\n';
+            content += '</dict>\n';
+            content += '</plist>\n';
+            return content;
+        }
+
+        function generateDesktopFileContent(url, name, iconUrl) {
+            let content = '[Desktop Entry]\n';
+            content += 'Type=Link\n';
+            content += `Name=${name}\n`;
+            content += `URL=${url}\n`;
+            if (iconUrl) {
+                content += `Icon=${iconUrl}\n`;
+            } else {
+                content += 'Icon=web-browser\n';
+            }
+            content += 'Comment=Web Shortcut\n';
+            content += 'Categories=Network;\n';
+            content += 'StartupNotify=false\n';
+            content += 'Terminal=false\n';
+            return content;
+        }
+
+        function escapeXML(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(
+                /'/g, '&apos;');
+        }
+
+        function sanitizeFilename(name) {
+            // 移除或替换非法文件名字符
+            return name.replace(/[\\/:*?"<>|]/g, '_').replace(/[\r\n\t]/g, '').trim() || '快捷方式';
+        }
+
+        function downloadFile(platform) {
+            const data = state.currentGeneratedData;
+            if (!data) {
+                // 尝试从输入框获取
+                const url = sanitizeURL($urlInput.value.trim());
+                if (!url || !isValidURL(url)) {
+                    showToast('请先生成快捷方式', 'warning');
+                    return;
+                }
+                const name = $nameInput.value.trim() || extractDomainName(url) || '快捷方式';
+                const iconUrl = $iconUrlInput.value.trim() || getFaviconURL(url);
+                state.currentGeneratedData = { url, name, iconUrl, platform, timestamp: Date.now() };
+            }
+            const d = state.currentGeneratedData;
+            const safeName = sanitizeFilename(d.name);
+            let content, filename, mimeType;
+
+            switch (platform) {
+                case 'windows':
+                    content = generateURLFileContent(d.url, d.name, d.iconUrl);
+                    filename = safeName + '.url';
+                    mimeType = 'application/internet-shortcut';
+                    break;
+                case 'mac':
+                    content = generateWeblocFileContent(d.url, d.name);
+                    filename = safeName + '.webloc';
+                    mimeType = 'application/xml';
+                    break;
+                case 'linux':
+                    content = generateDesktopFileContent(d.url, d.name, d.iconUrl);
+                    filename = safeName + '.desktop';
+                    mimeType = 'application/x-desktop';
+                    break;
+                default:
+                    content = generateURLFileContent(d.url, d.name, d.iconUrl);
+                    filename = safeName + '.url';
+                    mimeType = 'application/internet-shortcut';
+            }
+
+            triggerBlobDownload(content, filename, mimeType);
+            addToHistory({ url: d.url, name: d.name, platform, iconUrl: d.iconUrl });
+            state.currentGeneratedData.platform = platform;
+        }
+
+        function downloadAllFormats() {
+            const data = state.currentGeneratedData;
+            if (!data) {
+                const url = sanitizeURL($urlInput.value.trim());
+                if (!url || !isValidURL(url)) {
+                    showToast('请先生成快捷方式', 'warning');
+                    return;
+                }
+                const name = $nameInput.value.trim() || extractDomainName(url) || '快捷方式';
+                const iconUrl = $iconUrlInput.value.trim() || getFaviconURL(url);
+                state.currentGeneratedData = { url, name, iconUrl, platform: 'all', timestamp: Date.now() };
+            }
+            const d = state.currentGeneratedData;
+            const safeName = sanitizeFilename(d.name);
+
+            // 依次下载三种格式（带延迟避免浏览器拦截）
+            const formats = [
+                { content: generateURLFileContent(d.url, d.name, d.iconUrl), filename: safeName + '.url',
+                    mimeType: 'application/internet-shortcut', label: 'Windows' },
+                { content: generateWeblocFileContent(d.url, d.name), filename: safeName + '.webloc',
+                    mimeType: 'application/xml', label: 'macOS' },
+                { content: generateDesktopFileContent(d.url, d.name, d.iconUrl), filename: safeName +
+                        '.desktop', mimeType: 'application/x-desktop', label: 'Linux' },
+            ];
+
+            formats.forEach((fmt, index) => {
+                setTimeout(() => {
+                    triggerBlobDownload(fmt.content, fmt.filename, fmt.mimeType);
+                }, index * 350);
+            });
+
+            showToast('正在依次下载三种格式的快捷方式...', 'success');
+            addToHistory({ url: d.url, name: d.name, platform: 'all', iconUrl: d.iconUrl });
+        }
+
+        function triggerBlobDownload(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType + ';charset=utf-8' });
+            const blobURL = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobURL;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            // 延迟释放
+            setTimeout(() => URL.revokeObjectURL(blobURL), 1000);
+        }
+
+        function copyFileContent() {
+            const data = state.currentGeneratedData;
+            if (!data) {
+                const url = sanitizeURL($urlInput.value.trim());
+                if (!url || !isValidURL(url)) {
+                    showToast('请先生成快捷方式', 'warning');
+                    return;
+                }
+                const name = $nameInput.value.trim() || extractDomainName(url) || '快捷方式';
+                const iconUrl = $iconUrlInput.value.trim() || getFaviconURL(url);
+                state.currentGeneratedData = { url, name, iconUrl, platform: getEffectivePlatform(),
+                    timestamp: Date.now() };
+            }
+            const d = state.currentGeneratedData;
+            const platform = d.platform === 'all' ? getEffectivePlatform() : d.platform;
+            let content;
+            switch (platform) {
+                case 'windows':
+                    content = generateURLFileContent(d.url, d.name, d.iconUrl);
+                    break;
+                case 'mac':
+                    content = generateWeblocFileContent(d.url, d.name);
+                    break;
+                case 'linux':
+                    content = generateDesktopFileContent(d.url, d.name, d.iconUrl);
+                    break;
+                default:
+                    content = generateURLFileContent(d.url, d.name, d.iconUrl);
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(content).then(() => {
+                    showToast('文件内容已复制到剪贴板', 'success');
+                }).catch(() => {
+                    fallbackCopy(content);
+                });
+            } else {
+                fallbackCopy(content);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('文件内容已复制到剪贴板', 'success');
+            } catch (e) {
+                showToast('复制失败，请手动选择文本复制', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // ==================== 批量模式 ====================
+        function toggleBatchMode() {
+            state.isBatchMode = !state.isBatchMode;
+            $batchArea.classList.toggle('active', state.isBatchMode);
+            const btn = document.getElementById('batchToggleBtn');
+            if (state.isBatchMode) {
+                btn.style.background = 'var(--primary-light)';
+                btn.style.borderColor = 'var(--primary)';
+                btn.style.color = 'var(--primary)';
+                showToast('批量模式已开启，输入多行URL每行一个', 'info');
+            } else {
+                btn.style.background = '';
+                btn.style.borderColor = '';
+                btn.style.color = '';
+                $batchPreviewList.innerHTML = '';
+                state.batchItems = [];
+            }
+        }
+
+        function parseBatchUrls() {
+            const raw = $batchUrlTextarea.value.trim();
+            if (!raw) {
+                $batchPreviewList.innerHTML = '<div class="history-empty">请输入URL列表</div>';
+                state.batchItems = [];
+                return;
+            }
+            const lines = raw.split('\n').filter(l => l.trim());
+            const items = [];
+            lines.forEach(line => {
+                line = line.trim();
+                let name = '';
+                let url = line;
+                // 支持 "名称|URL" 格式
+                if (line.includes('|') && !line.startsWith('http')) {
+                    const parts = line.split('|');
+                    if (parts.length >= 2) {
+                        name = parts[0].trim();
+                        url = parts.slice(1).join('|').trim();
+                    }
+                }
+                url = sanitizeURL(url);
+                if (url && isValidURL(url)) {
+                    if (!name) name = extractDomainName(url);
+                    items.push({ name, url, iconUrl: getFaviconURL(url) });
+                }
+            });
+            state.batchItems = items;
+            renderBatchPreview();
+            if (items.length > 0) {
+                showToast(`已解析 ${items.length} 个有效URL`, 'success');
+            } else {
+                showToast('未找到有效URL，请检查格式', 'warning');
+            }
+        }
+
+        function renderBatchPreview() {
+            if (state.batchItems.length === 0) {
+                $batchPreviewList.innerHTML = '<div class="history-empty">解析后此处显示URL列表</div>';
+                return;
+            }
+            $batchPreviewList.innerHTML = state.batchItems.map((item, i) => `
+            <div class="batch-item">
+              <span style="font-weight:600;flex-shrink:0;">#${i+1}</span>
+              <span class="batch-url">${escapeHTML(item.url)}</span>
+              <span style="font-size:0.7rem;color:var(--text-muted);flex-shrink:0;">→ ${escapeHTML(item.name)}</span>
+              <button class="btn btn-xs btn-success" onclick="downloadBatchItem(${i})">下载</button>
+            </div>
+          `).join('');
+        }
+
+        function downloadBatchItem(index) {
+            const item = state.batchItems[index];
+            if (!item) return;
+            const platform = getEffectivePlatform();
+            const safeName = sanitizeFilename(item.name);
+            let content, filename, mimeType;
+            switch (platform) {
+                case 'windows':
+                    content = generateURLFileContent(item.url, item.name, item.iconUrl);
+                    filename = safeName + '.url';
+                    mimeType = 'application/internet-shortcut';
+                    break;
+                case 'mac':
+                    content = generateWeblocFileContent(item.url, item.name);
+                    filename = safeName + '.webloc';
+                    mimeType = 'application/xml';
+                    break;
+                case 'linux':
+                    content = generateDesktopFileContent(item.url, item.name, item.iconUrl);
+                    filename = safeName + '.desktop';
+                    mimeType = 'application/x-desktop';
+                    break;
+                default:
+                    content = generateURLFileContent(item.url, item.name, item.iconUrl);
+                    filename = safeName + '.url';
+                    mimeType = 'application/internet-shortcut';
+            }
+            triggerBlobDownload(content, filename, mimeType);
+            addToHistory({ url: item.url, name: item.name, platform, iconUrl: item.iconUrl });
+            showToast(`已下载: ${item.name}`, 'success');
+        }
+
+        function downloadAllBatch() {
+            if (state.batchItems.length === 0) {
+                showToast('没有可下载的项目', 'warning');
+                return;
+            }
+            state.batchItems.forEach((item, i) => {
+                setTimeout(() => downloadBatchItem(i), i * 400);
+            });
+            showToast(`正在依次下载 ${state.batchItems.length} 个快捷方式...`, 'success');
+        }
+
+        // ==================== 历史记录 ====================
+        function getHistory() {
+            try {
+                const raw = localStorage.getItem('shortcut_gen_history');
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveHistory(history) {
+            const max = state.settings.maxHistory || 50;
+            const trimmed = history.slice(0, max);
+            try {
+                localStorage.setItem('shortcut_gen_history', JSON.stringify(trimmed));
+            } catch (e) {
+                // 存储空间不足，尝试删除旧记录
+                const half = trimmed.slice(0, Math.floor(max / 2));
+                localStorage.setItem('shortcut_gen_history', JSON.stringify(half));
+            }
+        }
+
+        function addToHistory(entry) {
+            const history = getHistory();
+            // 去重
+            const existsIndex = history.findIndex(h => h.url === entry.url && h.platform === entry.platform);
+            if (existsIndex >= 0) {
+                history.splice(existsIndex, 1);
+            }
+            history.unshift({
+                id: Date.now(),
+                url: entry.url,
+                name: entry.name,
+                platform: entry.platform,
+                iconUrl: entry.iconUrl || '',
+                createdAt: new Date().toISOString(),
+            });
+            saveHistory(history);
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const history = getHistory();
+            if (history.length === 0) {
+                $historyList.innerHTML = '<div class="history-empty">暂无历史记录，生成快捷方式后将自动保存到这里</div>';
+                return;
+            }
+            $historyList.innerHTML = history.map(h => {
+                const platformLabel = h.platform === 'all' ? '全部' :
+                    h.platform === 'windows' ? 'Win' :
+                    h.platform === 'mac' ? 'Mac' : 'Linux';
+                const platformTagClass = h.platform === 'all' ? 'win' : h.platform;
+                const iconSrc = h.iconUrl || getFaviconURL(h.url) || getDefaultIconSVG();
+                const timeStr = formatTimeAgo(h.createdAt);
+                return `
+              <div class="history-item" onclick="reuseHistory('${escapeAttr(h.url)}', '${escapeAttr(h.name)}', '${escapeAttr(h.iconUrl||'')}', '${escapeAttr(h.platform)}')">
+                <img class="hist-icon" src="${escapeAttr(iconSrc)}" alt="" onerror="this.src='${getDefaultIconSVG()}'" loading="lazy">
+                <div class="hist-info">
+                  <div class="hist-name">${escapeHTML(h.name)}</div>
+                  <div class="hist-url">${escapeHTML(h.url)}</div>
+                  <span style="font-size:0.65rem;color:var(--text-muted);">${timeStr}</span>
+                </div>
+                <span class="tag ${platformTagClass}">${platformLabel}</span>
+                <div class="hist-actions" onclick="event.stopPropagation();">
+                  <button class="btn btn-xs btn-outline" onclick="reuseHistory('${escapeAttr(h.url)}', '${escapeAttr(h.name)}', '${escapeAttr(h.iconUrl||'')}', '${escapeAttr(h.platform)}');downloadFile('${escapeAttr(h.platform==='all'?getEffectivePlatform():h.platform)}');">⬇️</button>
+                  <button class="btn btn-xs btn-danger" onclick="deleteHistoryItem(${h.id})">✕</button>
+                </div>
+              </div>
+            `;
+            }).join('');
+        }
+
+        function reuseHistory(url, name, iconUrl, platform) {
+            $urlInput.value = url;
+            $nameInput.value = name;
+            $iconUrlInput.value = iconUrl || '';
+            if (platform && platform !== 'all') {
+                state.platform = platform;
+                updatePlatformUI();
+            }
+            state.currentGeneratedData = {
+                url,
+                name,
+                iconUrl: iconUrl || getFaviconURL(url),
+                platform: platform === 'all' ? getEffectivePlatform() : platform,
+                timestamp: Date.now()
+            };
+            updatePreview();
+            showToast('已加载历史记录', 'info');
+            // 滚动到输入区
+            document.getElementById('inputCard').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function deleteHistoryItem(id) {
+            let history = getHistory();
+            history = history.filter(h => h.id !== id);
+            saveHistory(history);
+            renderHistory();
+            showToast('已删除该记录', 'info');
+        }
+
+        function clearHistory() {
+            if (confirm('确定要清空所有历史记录吗？此操作不可撤销。')) {
+                localStorage.removeItem('shortcut_gen_history');
+                renderHistory();
+                showToast('历史记录已清空', 'info');
+            }
+        }
+
+        function exportHistory() {
+            const history = getHistory();
+            if (history.length === 0) {
+                showToast('没有可导出的历史记录', 'warning');
+                return;
+            }
+            const json = JSON.stringify(history, null, 2);
+            triggerBlobDownload(json, 'shortcut-history-' + new Date().toISOString().slice(0, 10) + '.json',
+                'application/json');
+            showToast('历史记录已导出', 'success');
+        }
+
+        function importHistoryPrompt() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        const data = JSON.parse(ev.target.result);
+                        if (!Array.isArray(data)) throw new Error('格式错误');
+                        const existing = getHistory();
+                        const merged = [...data, ...existing];
+                        // 去重
+                        const seen = new Set();
+                        const unique = merged.filter(h => {
+                            const key = h.url + '|' + h.platform;
+                            if (seen.has(key)) return false;
+                            seen.add(key);
+                            return true;
+                        });
+                        saveHistory(unique);
+                        renderHistory();
+                        showToast(`成功导入，共 ${unique.length} 条记录`, 'success');
+                    } catch (err) {
+                        showToast('导入失败：文件格式不正确', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function formatTimeAgo(isoString) {
+            try {
+                const now = Date.now();
+                const then = new Date(isoString).getTime();
+                const diff = now - then;
+                if (diff < 60000) return '刚刚';
+                if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
+                if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
+                if (diff < 604800000) return Math.floor(diff / 86400000) + ' 天前';
+                return new Date(isoString).toLocaleDateString('zh-CN');
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function escapeAttr(str) {
+            return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(
+                />/g, '&gt;');
+        }
+
+        // ==================== 主题切换 ====================
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            if (current === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('shortcut_gen_theme', 'light');
+                $themeToggleBtn.textContent = '🌙';
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('shortcut_gen_theme', 'dark');
+                $themeToggleBtn.textContent = '☀️';
+            }
+        }
+
+        // ==================== 设置面板 ====================
+        function openSettings() {
+            $settingsPanel.classList.add('active');
+            $maxHistoryInput.value = state.settings.maxHistory || 50;
+            updateSettingsPlatformUI();
+        }
+
+        function closeSettings() {
+            $settingsPanel.classList.remove('active');
+        }
+
+        function updateSettingsPlatformUI() {
+            const chips = document.querySelectorAll('#settingsPlatformSelector .platform-chip');
+            chips.forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.platform === state.settings.defaultPlatform);
+            });
+        }
+
+        function setDefaultPlatform(platform, el) {
+            state.settings.defaultPlatform = platform;
+            updateSettingsPlatformUI();
+        }
+
+        function saveSettings() {
+            state.settings.defaultPlatform =
+                document.querySelector('#settingsPlatformSelector .platform-chip.active')?.dataset?.platform || 'auto';
+            state.settings.maxHistory = Math.max(5, Math.min(200, parseInt($maxHistoryInput.value) || 50));
+            state.platform = state.settings.defaultPlatform;
+            updatePlatformUI();
+            saveSettingsToStorage();
+            closeSettings();
+            showToast('设置已保存', 'success');
+        }
+
+        // ==================== 剪贴板 ====================
+        async function pasteFromClipboard() {
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        const url = extractURL(text);
+                        $urlInput.value = url || text;
+                        updatePreview();
+                        showToast('已从剪贴板读取' + (url ? 'URL' : '文本'), 'success');
+                    } else {
+                        showToast('剪贴板为空', 'warning');
+                    }
+                } else {
+                    showToast('当前浏览器不支持剪贴板读取，请手动粘贴', 'warning');
+                }
+            } catch (e) {
+                showToast('无法访问剪贴板，请检查浏览器权限设置', 'error');
+            }
+        }
+
+        function clearUrl() {
+            $urlInput.value = '';
+            $urlInput.focus();
+            updatePreview();
+        }
+
+        function clearName() {
+            $nameInput.value = '';
+            $nameInput.focus();
+            updatePreview();
+        }
+
+        // ==================== Toast ====================
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            $toastContainer.appendChild(toast);
+            // 自动移除
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 3000);
+            // 限制toast数量
+            const toasts = $toastContainer.querySelectorAll('.toast');
+            if (toasts.length > 5) {
+                toasts[0].remove();
+            }
+        }
+
+        // ==================== 初始化 ====================
+        init();
+
+        // 暴露全局函数
+        window.selectPlatform = selectPlatform;
+        window.toggleBatchMode = toggleBatchMode;
+        window.parseBatchUrls = parseBatchUrls;
+        window.downloadBatchItem = downloadBatchItem;
+        window.downloadAllBatch = downloadAllBatch;
+        window.generateShortcut = generateShortcut;
+        window.downloadFile = downloadFile;
+        window.downloadAllFormats = downloadAllFormats;
+        window.copyFileContent = copyFileContent;
+        window.pasteFromClipboard = pasteFromClipboard;
+        window.clearUrl = clearUrl;
+        window.clearName = clearName;
+        window.autoFetchFavicon = autoFetchFavicon;
+        window.toggleTheme = toggleTheme;
+        window.openSettings = openSettings;
+        window.closeSettings = closeSettings;
+        window.setDefaultPlatform = setDefaultPlatform;
+        window.saveSettings = saveSettings;
+        window.reuseHistory = reuseHistory;
+        window.deleteHistoryItem = deleteHistoryItem;
+        window.clearHistory = clearHistory;
+        window.exportHistory = exportHistory;
+        window.importHistoryPrompt = importHistoryPrompt;
+    })();
+</script>
+</body>
+</html>
