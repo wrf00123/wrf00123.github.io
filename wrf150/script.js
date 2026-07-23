@@ -724,6 +724,8 @@ const websiteData = [{
         { name: "英文音标输入器", url: "https://wrf00123.github.io/wrf/tool108", desc: "工具" }, 
         { name: "智能排座位系统", url: "https://wrf00123.github.io/wrf/tool109", desc: "工具" }, 
         { name: "喜事份子登记", url: "https://wrf00123.github.io/wrf/tool110", desc: "工具" },      
+        { name: "会议计时器", url: "https://wrf00123.github.io/wrf/tool111", desc: "工具" },
+        { name: "海报生成器", url: "https://wrf00123.github.io/wrf/tool112", desc: "工具" },
         { name: "产品直通率模拟展示", url: "https://wrf00123.github.io/wrf/tool71", desc: "演示工具" },
         { name: "不良影响演示", url: "https://wrf00123.github.io/wrf/tool10", desc: "演示工具" },
         { name: "全局按键可视化", url: "https://wrf00123.github.io/wrf/tool50", desc: "演示工具" },
