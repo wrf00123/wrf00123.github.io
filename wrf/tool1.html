@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文本对比工具 - Text Compare</title>
+<style>
+:root {
+  --bg: #f5f6fa;
+  --panel: #ffffff;
+  --border: #e0e3ec;
+  --text: #2c3e50;
+  --text-dim: #7f8c9b;
+  --accent: #3b82f6;
+  --accent-hover: #2f6fe0;
+  --add-bg: #e6f7e9;
+  --add-border: #4caf50;
+  --del-bg: #fdecea;
+  --del-border: #e74c3c;
+  --chg-bg: #fff8e1;
+  --chg-border: #f5a623;
+  --add-char: #a5f3b6;
+  --del-char: #f5b0ab;
+  --gutter: #f0f2f8;
+  --hover: #f0f4ff;
+  --scrollbar: #c9cfdd;
+  --btn: #f1f3f9;
+  --btn-hover: #e3e7f0;
+  --shadow: 0 2px 12px rgba(0,0,0,.06);
+  --toggle-on: #3b82f6;
+}
+[data-theme="dark"] {
+  --bg: #1a1c22;
+  --panel: #23262e;
+  --border: #343945;
+  --text: #dce0ea;
+  --text-dim: #8b91a0;
+  --accent: #60a5fa;
+  --accent-hover: #7db3fb;
+  --add-bg: #1c3a24;
+  --add-border: #3a8a4e;
+  --del-bg: #3d2325;
+  --del-border: #b5483d;
+  --chg-bg: #3d3322;
+  --chg-border: #c08a2c;
+  --add-char: #2f6b3f;
+  --del-char: #7c3530;
+  --gutter: #1e2129;
+  --hover: #2b3040;
+  --scrollbar: #3a4050;
+  --btn: #2c313d;
+  --btn-hover: #373d4c;
+  --shadow: 0 2px 12px rgba(0,0,0,.35);
+  --toggle-on: #60a5fa;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  transition: background .25s, color .25s;
+}
+header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  box-shadow: var(--shadow);
+  z-index: 5;
+}
+header h1 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-right: 6px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+header h1 .logo { font-size: 20px; }
+.spacer { flex: 1; }
+.btn {
+  border: 1px solid var(--border);
+  background: var(--btn);
+  color: var(--text);
+  padding: 7px 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background .15s, transform .05s;
+  white-space: nowrap;
+  user-select: none;
+}
+.btn:hover { background: var(--btn-hover); }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn.primary:hover { background: var(--accent-hover); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.icon-btn { padding: 7px 9px; }
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.toolbar .sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+label.set {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+.search-box { position: relative; display: flex; align-items: center; }
+.search-box input {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 7px 30px 7px 10px;
+  font-size: 13px;
+  width: 170px;
+  outline: none;
+  transition: border-color .15s;
+}
+.search-box input:focus { border-color: var(--accent); }
+.search-box .clear-x {
+  position: absolute; right: 6px; border: none; background: none;
+  color: var(--text-dim); cursor: pointer; font-size: 13px; padding: 2px;
+}
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+.stats {
+  display: flex;
+  gap: 10px;
+  padding: 8px 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 13px;
+  font-size: 12.5px;
+  box-shadow: var(--shadow);
+}
+.stat .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.dot.same { background: var(--text-dim); }
+.dot.add { background: var(--add-border); }
+.dot.del { background: var(--del-border); }
+.dot.chg { background: var(--chg-border); }
+.stat b { font-weight: 700; margin-left: 2px; }
+.stat .num { font-weight: 600; }
+.similarity-bar {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 20px; padding: 4px 13px; font-size: 12.5px;
+  box-shadow: var(--shadow);
+}
+.similarity-bar .track {
+  width: 90px; height: 7px; border-radius: 4px; background: var(--gutter);
+  overflow: hidden;
+}
+.similarity-bar .fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .3s; }
+.result-area {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 16px 20px;
+}
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  min-width: 600px;
+}
+.compare-col {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.col-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--gutter);
+  font-size: 12.5px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.col-head .badge { font-weight: 700; font-size: 13px; color: var(--text); }
+.col-head .count { margin-left: auto; }
+.line-num, .line-content {
+  font-family: Consolas, "Cascadia Code", "Courier New", monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  padding: 2px 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.diff-line {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  min-height: 24px;
+  position: relative;
+}
+.diff-line:hover { background: var(--hover); }
+.diff-line .line-num {
+  flex: 0 0 44px;
+  text-align: right;
+  padding: 2px 8px 2px 6px;
+  color: var(--text-dim);
+  background: var(--gutter);
+  border-right: 1px solid var(--border);
+  user-select: none;
+  font-size: 11.5px;
+}
+.diff-line .line-content { flex: 1; padding: 2px 10px; }
+.diff-line.add { background: var(--add-bg); }
+.diff-line.add .line-num { background: rgba(76,175,80,.18); color: #2e7d32; }
+.diff-line.del { background: var(--del-bg); }
+.diff-line.del .line-num { background: rgba(231,76,60,.15); color: #c0392b; }
+.diff-line.mod { background: var(--chg-bg); }
+.diff-line.mod .line-num { background: rgba(245,166,35,.18); color: #b07c12; }
+.diff-line.add .line-content { border-left: 3px solid var(--add-border); }
+.diff-line.del .line-content { border-left: 3px solid var(--del-border); }
+.diff-line.mod .line-content { border-left: 3px solid var(--chg-border); }
+.diff-line .mark {
+  flex: 0 0 22px;
+  text-align: center;
+  user-select: none;
+  font-size: 11px;
+  line-height: 24px;
+  color: var(--text-dim);
+}
+mark.char-add { background: var(--add-char); color: inherit; border-radius: 2px; padding: 0 1px; }
+mark.char-del { background: var(--del-char); color: inherit; border-radius: 2px; padding: 0 1px; }
+mark.search-hit { background: #ffe066; color: #5b4400; border-radius: 2px; }
+[data-theme="dark"] mark.search-hit { background: #8a6d1a; color: #fff; }
+.empty-msg {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; min-height: 260px; gap: 12px; color: var(--text-dim);
+}
+.empty-msg .big { font-size: 44px; opacity: .5; }
+.empty-msg .hint { font-size: 13px; max-width: 420px; text-align: center; line-height: 1.7; }
+.empty-msg code { background: var(--gutter); padding: 1px 6px; border-radius: 4px; }
+footer {
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+}
+.modal-mask {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  display: none; align-items: center; justify-content: center; z-index: 50;
+}
+.modal-mask.show { display: flex; }
+.modal {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 12px; padding: 22px 24px; width: min(480px, 92vw);
+  box-shadow: 0 12px 40px rgba(0,0,0,.25);
+  color: var(--text);
+}
+.modal h3 { font-size: 16px; margin-bottom: 12px; }
+.modal p { font-size: 13px; line-height: 1.7; margin-bottom: 12px; color: var(--text-dim); }
+.modal .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+.textarea-wrap { flex: 1; display: flex; min-height: 0; position: relative; }
+#leftInput, #rightInput {
+  flex: 1;
+  resize: none;
+  border: none;
+  outline: none;
+  padding: 10px 12px;
+  font-family: Consolas, "Cascadia Code", "Courier New", monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--panel);
+  min-height: 0;
+}
+.split-view { flex: 1; display: flex; min-height: 0; border-top: 1px solid var(--border); }
+.split-pane { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.split-pane + .split-pane { border-left: 1px solid var(--border); }
+.pane-title {
+  padding: 5px 10px; font-size: 12px; color: var(--text-dim);
+  background: var(--gutter); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.pane-title .lbl { font-weight: 700; color: var(--text); }
+.pane-title .meta { margin-left: auto; }
+.pane-title input[type="checkbox"] { accent-color: var(--accent); }
+.drop-over { outline: 3px dashed var(--accent); outline-offset: -3px; }
+.toast {
+  position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-80px);
+  background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 8px;
+  font-size: 13px; box-shadow: 0 6px 20px rgba(0,0,0,.25); opacity: 0;
+  transition: all .3s; z-index: 99; pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.hidden { display: none !important; }
+/* 滚动条 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+/* 响应式 */
+@media (max-width: 900px) {
+  .diff-grid { grid-template-columns: 1fr; }
+  .split-view { flex-direction: column; }
+  .split-pane + .split-pane { border-left: none; border-top: 1px solid var(--border); }
+}
+@media (max-width: 640px) {
+  .toolbar .responsive-hide { display: none; }
+  .search-box input { width: 120px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="logo">📑</span>文本对比工具</h1>
+  <span class="spacer"></span>
+  <button class="btn primary" id="btnCompare">🔄 开始对比</button>
+  <button class="btn" id="btnSwap" title="交换左右文本">⇄ 交换</button>
+  <button class="btn" id="btnClear" title="清空">🗑 清空</button>
+  <button class="btn" id="btnLoadL">📂 载入左文件</button>
+  <button class="btn" id="btnLoadR">📂 载入右文件</button>
+  <input type="file" id="fileL" accept=".txt,.log,.csv,.json,.xml,.html,.js,.py,.java,.cpp,.c,.ts,.md,.sql,text/*" class="hidden">
+  <input type="file" id="fileR" accept=".txt,.log,.csv,.json,.xml,.html,.js,.py,.java,.cpp,.c,.ts,.md,.sql,text/*" class="hidden">
+  <button class="btn icon-btn" id="btnTheme" title="切换主题">🌙</button>
+</header>
+
+<div class="toolbar">
+  <label class="set"><input type="checkbox" id="optIgnoreCase">忽略大小写</label>
+  <label class="set"><input type="checkbox" id="optIgnoreSpace">忽略空白差异</label>
+  <label class="set"><input type="checkbox" id="optTrimLine">忽略行首尾空白</label>
+  <label class="set"><input type="checkbox" id="optCharDiff" checked>字符级高亮</label>
+  <label class="set"><input type="checkbox" id="optOnlyChanged">仅显示差异行</label>
+  <span class="sep"></span>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="🔍 在结果中搜索…">
+    <button class="clear-x hidden" id="searchClear">✕</button>
+  </div>
+  <span class="sep"></span>
+  <button class="btn" id="btnCopyDiff">📋 复制差异报告</button>
+  <button class="btn" id="btnCopyResult">复制完整结果</button>
+  <button class="btn responsive-hide" id="btnExportHtml">⬇ 导出 HTML 报告</button>
+  <button class="btn responsive-hide" id="btnExportTxt">⬇ 导出 TXT 报告</button>
+  <button class="btn responsive-hide" id="btnPrint">🖨 打印</button>
+  <button class="btn icon-btn" id="btnHelp" title="帮助">❓</button>
+</div>
+
+<main>
+  <div class="split-view">
+    <div class="split-pane" id="dropL">
+      <div class="pane-title">
+        <span class="lbl">文本 A</span>
+        <span id="metaL" class="meta">0 行 · 0 字符</span>
+        <label class="set"><input type="checkbox" id="autoLoadL">自动对比</label>
+      </div>
+      <textarea id="leftInput" spellcheck="false" placeholder="在此粘贴文本 A，或将文件拖入此区域…"></textarea>
+    </div>
+    <div class="split-pane" id="dropR">
+      <div class="pane-title">
+        <span class="lbl">文本 B</span>
+        <span id="metaR" class="meta">0 行 · 0 字符</span>
+        <label class="set"><input type="checkbox" id="autoLoadR">自动对比</label>
+      </div>
+      <textarea id="rightInput" spellcheck="false" placeholder="在此粘贴文本 B，或将文件拖入此区域…"></textarea>
+    </div>
+  </div>
+
+  <div class="stats hidden" id="statsBar">
+    <div class="stat"><span class="dot same"></span>相同行 <b class="num" id="statSame">0</b></div>
+    <div class="stat"><span class="dot add"></span>新增行 <b class="num" id="statAdd">0</b></div>
+    <div class="stat"><span class="dot del"></span>删除行 <b class="num" id="statDel">0</b></div>
+    <div class="stat"><span class="dot chg"></span>修改行 <b class="num" id="statMod">0</b></div>
+    <div class="stat">新增 <b class="num" id="statAddChar">0</b> 字符 · 删除 <b class="num" id="statDelChar">0</b> 字符</div>
+    <div class="similarity-bar">
+      相似度
+      <span class="track"><span class="fill" id="simFill"></span></span>
+      <b id="simValue">100%</b>
+    </div>
+  </div>
+
+  <div class="result-area" id="resultArea">
+    <div class="empty-msg" id="emptyMsg">
+      <div class="big">🗒</div>
+      <div class="hint">
+        在上方输入 <b>文本 A</b> 和 <b>文本 B</b>，点击 <b>开始对比</b>。
+        <br>也支持 <code>拖拽文件</code> 或 <code>载入文件</code>，左侧文本默认自动对比。
+      </div>
+    </div>
+    <div class="diff-grid hidden" id="diffGrid"></div>
+  </div>
+</main>
+
+<footer>文本对比工具 · 基于最长公共子序列(LCS)算法 · 数据仅在本机处理，不会上传</footer>
+
+<div class="modal-mask" id="helpModal">
+  <div class="modal">
+    <h3>📖 使用帮助</h3>
+    <p><b>开始对比：</b> 点击工具栏「开始对比」，或在文本 A / B 面板勾选「自动对比」后随输入实时更新。</p>
+    <p><b>文件载入：</b> 点击「载入左文件 / 载入右文件」，或直接将文本文件拖入对应文本区域（支持 UTF-8 / GBK 自动识别）。</p>
+    <p><b>颜色含义：</b> <span style="color:var(--add-border)">绿色</span>=新增（仅右文件）、<span style="color:var(--del-border)">红色</span>=删除（仅左文件）、<span style="color:var(--chg-border)">橙色</span>=修改（对应行内容不同）。</p>
+    <p><b>字符级高亮：</b> 勾选后，修改行内部会以浅色标记出具体变化的字符，便于定位细微差异。</p>
+    <p><b>导出报告：</b> 「复制差异报告」仅包含有差异的行；「导出 HTML / TXT」生成完整对比报告并下载。</p>
+    <p><b>快捷键：</b> <code>Ctrl+Enter</code> 对比 · <code>Ctrl+1</code>/<code>Ctrl+2</code> 聚焦输入框 · <code>Ctrl+F</code> 在结果中搜索。</p>
+    <div class="actions">
+      <button class="btn primary" id="closeHelp">知道了</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+
+/* ================= 工具函数 ================= */
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function debounce(fn, ms = 400) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+/* ================= 文件读取（自动识别 UTF-8/GBK/UTF-16） ================= */
+async function readFileText(file) {
+  const buf = new Uint8Array(await file.arrayBuffer());
+  // UTF-8 BOM
+  if (buf[0] === 0xEF && buf[1] === 0xBB && buf[2] === 0xBF)
+    return new TextDecoder("utf-8").decode(buf.slice(3));
+  // UTF-16 LE BOM
+  if (buf[0] === 0xFF && buf[1] === 0xFE)
+    return new TextDecoder("utf-16le").decode(buf.slice(2));
+  // UTF-16 BE BOM
+  if (buf[0] === 0xFE && buf[1] === 0xFF)
+    return new TextDecoder("utf-16be").decode(buf.slice(2));
+  // 尝试 UTF-8
+  try {
+    const s = new TextDecoder("utf-8", { fatal: true }).decode(buf);
+    return s;
+  } catch (e) { /* 不是合法 UTF-8，尝试 GBK */ }
+  // 尝试 GBK
+  try {
+    const gbk = new TextDecoder("gbk", { fatal: true });
+    return gbk.decode(buf);
+  } catch (e) {
+    return new TextDecoder("utf-8").decode(buf);
+  }
+}
+
+/* ================= 字符级 Diff（用于修改行内部高亮） ================= */
+function charDiff(a, b) {
+  // 返回 { aMarks: 标记数组, bMarks: 标记数组 }，每个元素 {type:'same'|'del'|'add', ch}
+  const m = a.length, n = b.length;
+  const dp = new Uint16Array((m + 1) * (n + 1));
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 0; j--) {
+      const idx = i * (n + 1) + j;
+      if (a[i] === b[j]) dp[idx] = dp[(i + 1) * (n + 1) + j + 1] + 1;
+      else dp[idx] = Math.max(dp[(i + 1) * (n + 1) + j], dp[i * (n + 1) + j + 1]);
+    }
+  }
+  const aMarks = [], bMarks = [];
+  let i = 0, j = 0;
+  while (i < m && j < n) {
+    if (a[i] === b[j]) {
+      aMarks.push({ t: 0, ch: a[i] });
+      bMarks.push({ t: 0, ch: b[j] });
+      i++; j++;
+    } else if (dp[(i + 1) * (n + 1) + j] >= dp[i * (n + 1) + j + 1]) {
+      aMarks.push({ t: -1, ch: a[i] }); i++;
+    } else {
+      bMarks.push({ t: 1, ch: b[j] }); j++;
+    }
+  }
+  while (i < m) aMarks.push({ t: -1, ch: a[i++] });
+  while (j < n) bMarks.push({ t: 1, ch: b[j++] });
+  return { aMarks, bMarks };
+}
+
+/* ================= 行级 Diff（LCS） ================= */
+function lcsIndexes(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, () => new Uint32Array(n + 1));
+  for (let i = m - 1; i >= 0; i--) {
+    for (let j = n - 1; j >= 0; j--) {
+      dp[i][j] = (a[i] === b[j]) ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+  }
+  const common = [];
+  let i = 0, j = 0;
+  while (i < m && j < n) {
+    if (a[i] === b[j]) { common.push([i, j]); i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) i++;
+    else j++;
+  }
+  return common;
+}
+
+function computeDiff(a, b) {
+  const common = lcsIndexes(a, b);
+  const pairs = [];
+  let ai = 0, bi = 0;
+  for (const [ca, cb] of common) {
+    while (ai < ca) { pairs.push({ type: "del", ai: ai, bi: null, left: a[ai], right: null }); ai++; }
+    while (bi < cb) { pairs.push({ type: "add", ai: null, bi: bi, left: null, right: b[bi] }); bi++; }
+    // 找到相同行块，检查是否应标记为 mod（若首尾相同行相邻，它们就是 true same）
+    pairs.push({ type: "same", ai: ca, bi: cb, left: a[ca], right: b[cb] });
+    ai = ca + 1; bi = cb + 1;
+  }
+  while (ai < a.length) { pairs.push({ type: "del", ai: ai, bi: null, left: a[ai], right: null }); ai++; }
+  while (bi < b.length) { pairs.push({ type: "add", ai: null, bi: bi, left: null, right: b[bi] }); bi++; }
+
+  // 合并连续 del+add 为 mod：将 del 后的 add 块与 del 块配对为“修改”
+  const merged = [];
+  let i = 0;
+  while (i < pairs.length) {
+    const p = pairs[i];
+    if (p.type === "del") {
+      let j = i + 1;
+      while (j < pairs.length && pairs[j].type === "add") j++;
+      const dels = pairs.slice(i, i + (j - i === 0 ? 0 : 0)).filter(x => x.type === "del");
+      const adds = pairs.slice(i, j).filter(x => x.type === "add");
+      if (dels.length && adds.length) {
+        const n = Math.max(dels.length, adds.length);
+        for (let k = 0; k < n; k++) {
+          const d = dels[k], a2 = adds[k];
+          if (d && a2) {
+            merged.push({ type: "mod", ai: d.ai, bi: a2.bi, left: d.left, right: a2.right });
+          } else if (d) {
+            merged.push({ type: "del", ai: d.ai, bi: null, left: d.left, right: null });
+          } else {
+            merged.push({ type: "add", ai: null, bi: a2.bi, left: null, right: a2.right });
+          }
+        }
+      } else {
+        merged.push(p);
+      }
+      i = j;
+    } else {
+      merged.push(p);
+      i++;
+    }
+  }
+  return merged;
+}
+
+/* ================= 规范化（选项处理） ================= */
+let opts = {
+  ignoreCase: false,
+  ignoreSpace: false,
+  trimLine: false,
+  charDiff: true,
+  onlyChanged: false,
+};
+
+function normalizeLine(line) {
+  let s = line;
+  if (opts.trimLine) s = s.trim();
+  if (opts.ignoreSpace) s = s.replace(/\s+/g, "");
+  if (opts.ignoreCase) s = s.toLowerCase();
+  return s;
+}
+
+function loadOptions() {
+  opts.ignoreCase = $("optIgnoreCase").checked;
+  opts.ignoreSpace = $("optIgnoreSpace").checked;
+  opts.trimLine = $("optTrimLine").checked;
+  opts.charDiff = $("optCharDiff").checked;
+  opts.onlyChanged = $("optOnlyChanged").checked;
+}
+
+/* ================= 渲染 ================= */
+let currentResult = null;
+let searchTerm = "";
+let searchCount = 0;
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function escAttr(s) { return esc(s).replace(/"/g, "&quot;"); }
+
+function hl(text, marks) {
+  let html = "";
+  let runType = marks[0] ? marks[0].t : 0;
+  let run = "";
+  for (const mk of marks) {
+    if (mk.t !== runType) {
+      html += renderRun(runType, run);
+      runType = mk.t; run = "";
+    }
+    run += mk.ch;
+  }
+  html += renderRun(runType, run);
+  return html;
+}
+function renderRun(type, text) {
+  if (!text) return "";
+  if (type === 0) return esc(text);
+  const tag = type === 1 ? "mark class=\"char-add\"" : "mark class=\"char-del\"";
+  return "<" + tag + ">" + esc(text) + "</mark>";
+}
+
+function highlightSearch(html, raw) {
+  if (!searchTerm || !raw.includes(searchTerm)) return html;
+  const re = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+  const parts = raw.split(re);
+  let out = esc(parts[0]);
+  for (let i = 1; i < parts.length; i++) {
+    out += "<mark class=\"search-hit\">" + esc(searchTerm) + "</mark>" + esc(parts[i]);
+  }
+  // 若行内容被标记包裹，直接嵌入搜索高亮会破坏结构；此处简单处理：仅在没有 char-mark 时用。
+  return out;
+}
+
+function buildLineHtml(content, mode, rawForSearch) {
+  let html;
+  if (opts.charDiff && mode === "mod") {
+    // 重新做字符 diff（需要左右两侧原始文本）——放在 render 时处理
+    html = content;
+  } else {
+    html = esc(content == null ? "" : content);
+  }
+  if (searchTerm && rawForSearch) {
+    html = highlightSearchInLine(html, rawForSearch);
+  }
+  return html;
+}
+
+function highlightSearchInLine(html, raw) {
+  if (!raw || !raw.includes(searchTerm)) return html;
+  // 将 html 按 <mark...> 分隔，只在非 mark 片段里查找
+  const re = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+  let result = "";
+  let lastEnd = 0;
+  for (const match of raw.matchAll(re)) {
+    // 简单方式：不处理被 char-mark 覆盖的位置
+    result += esc(raw.slice(lastEnd, match.index));
+    result += "<mark class=\"search-hit\">" + esc(match[0]) + "</mark>";
+    lastEnd = match.index + match[0].length;
+  }
+  result += esc(raw.slice(lastEnd));
+  return result;
+}
+
+function renderResult() {
+  const diff = currentResult;
+  const area = $("resultArea");
+  const grid = $("diffGrid");
+  const empty = $("emptyMsg");
+  const statsBar = $("statsBar");
+
+  if (!diff) {
+    empty.classList.remove("hidden");
+    grid.classList.add("hidden");
+    grid.innerHTML = "";
+    statsBar.classList.add("hidden");
+    return;
+  }
+
+  empty.classList.add("hidden");
+  statsBar.classList.remove("hidden");
+
+  const isPair = diff.mode === "pair";
+  const rows = [];
+
+  for (const d of diff.items) {
+    if (opts.onlyChanged && d.type === "same") continue;
+    rows.push(d);
+  }
+
+  let html = "";
+  const leftIdx = [];
+  const rightIdx = [];
+  for (let k = 0; k < rows.length; k++) {
+    const d = rows[k];
+    const row = renderRow(d, isPair);
+    html += row.html;
+    if (row.leftLine != null) leftIdx.push(row.leftLine);
+    if (row.rightLine != null) rightIdx.push(row.rightLine);
+  }
+
+  // 统一格式：pair 模式左右各一列
+  if (isPair) {
+    // 生成左右两列
+    let lc = "", rc = "";
+    let li = 0, ri = 0;
+    for (let k = 0; k < rows.length; k++) {
+      const d = rows[k];
+      const l = renderCell(d, "left", li);
+      const r = renderCell(d, "right", ri);
+      lc += l;
+      rc += r;
+      if (l.added) li++;
+      if (r.added) ri++;
+    }
+    grid.innerHTML =
+      '<div class="compare-col"><div class="col-head"><span class="badge">文本 A</span>' +
+      '<span class="count" id="colCountL"></span></div>' + lc + "</div>" +
+      '<div class="compare-col"><div class="col-head"><span class="badge">文本 B</span>' +
+      '<span class="count" id="colCountR"></span></div>' + rc + "</div>";
+    $("colCountL").textContent = "共 " + diff.leftCount + " 行";
+    $("colCountR").textContent = "共 " + diff.rightCount + " 行";
+  } else {
+    grid.innerHTML = '<div class="compare-col" style="grid-column:1/-1">' +
+      '<div class="col-head"><span class="badge">对比结果</span><span class="count">' +
+      (opts.onlyChanged ? "仅差异行" : "全部行") + "</span></div>" +
+      html + "</div>";
+  }
+
+  grid.classList.remove("hidden");
+}
+
+function renderRow(d, isPair) {
+  // 单列模式：拼接两行
+  const left = d.left != null ? d.left : "";
+  const right = d.right != null ? d.right : "";
+  let lHtml, rHtml;
+  if (d.type === "mod" && opts.charDiff) {
+    const cd = charDiff(left, right);
+    lHtml = hl(left, cd.aMarks);
+    rHtml = hl(right, cd.bMarks);
+  } else {
+    lHtml = esc(left);
+    rHtml = esc(right);
+  }
+  lHtml = applySearch(lHtml, left);
+  rHtml = applySearch(rHtml, right);
+
+  const marker = { same: " ", add: "+", del: "-", mod: "±" }[d.type];
+  const rowHtml =
+    '<div class="diff-line ' + d.type + '">' +
+    '<span class="line-num">' + (d.ai != null ? d.ai + 1 : "·") + "</span>" +
+    '<span class="mark">' + marker + "</span>" +
+    '<span class="line-content">' + lHtml + "</span>" +
+    "</div>" +
+    '<div class="diff-line ' + d.type + '">' +
+    '<span class="line-num">' + (d.bi != null ? d.bi + 1 : "·") + "</span>" +
+    '<span class="mark">' + marker + "</span>" +
+    '<span class="line-content">' + rHtml + "</span>" +
+    "</div>";
+  return { html: rowHtml, leftLine: d.ai, rightLine: d.bi };
+}
+
+function renderCell(d, side, index) {
+  const isLeft = side === "left";
+  const val = isLeft ? (d.left != null ? d.left : "") : (d.right != null ? d.right : "");
+  const show = d.type === "same" || d.type === "mod" || (isLeft ? d.type === "del" : d.type === "add") || (d.type === "mod");
+  const cls = d.type;
+  let contentHtml;
+  if (d.type === "mod" && opts.charDiff) {
+    const cd = charDiff(d.left || "", d.right || "");
+    contentHtml = isLeft ? hl(d.left || "", cd.aMarks) : hl(d.right || "", cd.bMarks);
+  } else {
+    contentHtml = esc(val);
+  }
+  contentHtml = applySearch(contentHtml, val);
+  const lineNo = isLeft ? (d.ai != null ? d.ai + 1 : "") : (d.bi != null ? d.bi + 1 : "");
+  const marker = { same: " ", add: "+", del: "-", mod: "±" }[d.type];
+  return '<div class="diff-line ' + cls + '">' +
+    '<span class="line-num">' + lineNo + "</span>" +
+    '<span class="mark">' + marker + "</span>" +
+    '<span class="line-content">' + contentHtml + "</span>" +
+    "</div>";
+}
+
+function applySearch(html, raw) {
+  if (!searchTerm || raw == null || !raw.includes(searchTerm)) return html;
+  const re = new RegExp(searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g");
+  const parts = [];
+  let last = 0;
+  for (const m of raw.matchAll(re)) {
+    parts.push([raw.slice(last, m.index), true]);
+    parts.push([m[0], false]);
+    last = m.index + m[0].length;
+    searchCount++;
+  }
+  parts.push([raw.slice(last), true]);
+  let out = "";
+  for (const [txt, isPlain] of parts) {
+    if (!txt) continue;
+    if (isPlain) {
+      out += esc(txt);
+    } else {
+      out += "<mark class=\"search-hit\">" + esc(txt) + "</mark>";
+    }
+  }
+  return out;
+}
+
+/* ================= 对比主流程 ================= */
+function doCompare() {
+  loadOptions();
+  const left = $("leftInput").value.replace(/\r\n?/g, "\n");
+  const right = $("rightInput").value.replace(/\r\n?/g, "\n");
+  const aLines = left === "" ? [] : left.split("\n");
+  const bLines = right === "" ? [] : right.split("\n");
+
+  // 更新行数/字符统计
+  $("metaL").textContent = aLines.length + " 行 · " + left.length + " 字符";
+  $("metaR").textContent = bLines.length + " 行 · " + right.length + " 字符";
+
+  if (!aLines.length && !bLines.length) {
+    currentResult = null;
+    $("emptyMsg").innerHTML =
+      '<div class="big">🗒</div><div class="hint">输入文本后点击 <b>开始对比</b>。</div>';
+    renderResult();
+    return;
+  }
+
+  const aKey = aLines.map(normalizeLine);
+  const bKey = bLines.map(normalizeLine);
+
+  const t0 = performance.now();
+  const pairs = computeDiff(aKey, bKey);
+  // 映射回原始文本
+  const items = pairs.map(p => {
+    if (p.type === "same") return { type: "same", left: aLines[p.ai], right: bLines[p.bi], ai: p.ai, bi: p.bi };
+    if (p.type === "mod") return { type: "mod", left: aLines[p.ai], right: bLines[p.bi], ai: p.ai, bi: p.bi };
+    if (p.type === "del") return { type: "del", left: aLines[p.ai], ai: p.ai, bi: null };
+    return { type: "add", right: bLines[p.bi], ai: null, bi: p.bi };
+  });
+
+  // 统计
+  const stat = { same: 0, add: 0, del: 0, mod: 0, addChar: 0, delChar: 0 };
+  for (const it of items) {
+    if (it.type === "same") stat.same++;
+    else if (it.type === "add") { stat.add++; stat.addChar += it.right.length; }
+    else if (it.type === "del") { stat.del++; stat.delChar += it.left.length; }
+    else {
+      stat.mod++;
+      const cd = charDiff(it.left || "", it.right || "");
+      stat.addChar += cd.bMarks.filter(m => m.t === 1).length;
+      stat.delChar += cd.aMarks.filter(m => m.t === -1).length;
+    }
+  }
+  const total = stat.same + stat.add + stat.del + stat.mod;
+  const similarity = total === 0 ? 1 : (2 * stat.same) / (aLines.length + bLines.length);
+
+  $("statSame").textContent = stat.same;
+  $("statAdd").textContent = stat.add;
+  $("statDel").textContent = stat.del;
+  $("statMod").textContent = stat.mod;
+  $("statAddChar").textContent = stat.addChar;
+  $("statDelChar").textContent = stat.delChar;
+  $("simValue").textContent = Math.round(similarity * 100) + "%";
+  $("simFill").style.width = Math.round(similarity * 100) + "%";
+
+  currentResult = {
+    items, leftCount: aLines.length, rightCount: bLines.length,
+    mode: "pair", stat,
+    aLines, bLines,
+  };
+  renderResult();
+  const ms = performance.now() - t0;
+  if (ms > 300) toast("对比完成，耗时 " + ms.toFixed(0) + "ms");
+}
+
+/* ================= 报告导出 ================= */
+function buildReportText(onlyDiff) {
+  const diff = currentResult;
+  if (!diff) return "";
+  const L = [], R = [];
+  const lines = [];
+  for (const it of diff.items) {
+    if (onlyDiff && it.type === "same") continue;
+    const ln = it.ai != null ? String(it.ai + 1).padStart(4) : "    ";
+    const rn = it.bi != null ? String(it.bi + 1).padStart(4) : "    ";
+    const op = { same: "  ", add: "++", del: "--", mod: "± " }[it.type];
+    L.push(ln + " " + op + " " + (it.left != null ? it.left : ""));
+    R.push(rn + " " + op + " " + (it.right != null ? it.right : ""));
+  }
+  const head = "文本对比报告\n生成时间: " + new Date().toLocaleString() +
+    "\n相似度: " + $("simValue").textContent +
+    "\n相同: " + diff.stat.same + " | 新增: " + diff.stat.add + " | 删除: " + diff.stat.del + " | 修改: " + diff.stat.mod +
+    "\n新增字符: " + diff.stat.addChar + " | 删除字符: " + diff.stat.delChar + "\n" +
+    "-".repeat(60) + "\n";
+  if (onlyDiff) return head + L.join("\n") + "\n" + "-".repeat(60) + "\n" + R.join("\n") + "\n";
+  const w = Math.max(...diff.aLines.map(l => l.length), 0);
+  const block = [];
+  for (let i = 0; i < diff.aLines.length || i < diff.bLines.length; i++) {
+    block.push((i < diff.aLines.length ? diff.aLines[i] : "").padEnd(Math.min(w, 120)) + "  |  " + (i < diff.bLines.length ? diff.bLines[i] : ""));
+  }
+  return head + block.join("\n") + "\n";
+}
+
+function copyText(txt, okMsg) {
+  navigator.clipboard.writeText(txt).then(() => toast(okMsg)).catch(() => {
+    // 降级方案
+    const ta = document.createElement("textarea");
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); ta.remove();
+    toast(okMsg);
+  });
+}
+
+function download(name, content, mime) {
+  const blob = new Blob([content], { type: mime + ";charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* ================= 事件绑定 ================= */
+function bindEvents() {
+  $("btnCompare").addEventListener("click", doCompare);
+
+  $("btnSwap").addEventListener("click", () => {
+    const l = $("leftInput").value, r = $("rightInput").value;
+    $("leftInput").value = r; $("rightInput").value = l;
+    doCompare(); toast("已交换左右文本");
+  });
+
+  $("btnClear").addEventListener("click", () => {
+    $("leftInput").value = ""; $("rightInput").value = "";
+    currentResult = null;
+    $("diffGrid").classList.add("hidden");
+    $("statsBar").classList.add("hidden");
+    $("metaL").textContent = "0 行 · 0 字符";
+    $("metaR").textContent = "0 行 · 0 字符";
+    $("emptyMsg").classList.remove("hidden");
+    $("emptyMsg").innerHTML =
+      '<div class="big">🗒</div><div class="hint">输入文本后点击 <b>开始对比</b>。</div>';
+  });
+
+  $("btnLoadL").addEventListener("click", () => $("fileL").click());
+  $("btnLoadR").addEventListener("click", () => $("fileR").click());
+  $("fileL").addEventListener("change", async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $("leftInput").value = await readFileText(f);
+    if ($("autoLoadL").checked || $("autoLoadR").checked) doCompare();
+    else doCompare();
+    toast("已载入: " + f.name);
+    e.target.value = "";
+  });
+  $("fileR").addEventListener("change", async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $("rightInput").value = await readFileText(f);
+    doCompare();
+    toast("已载入: " + f.name);
+    e.target.value = "";
+  });
+
+  // 拖拽
+  for (const [dropId, inputId] of [["dropL", "leftInput"], ["dropR", "rightInput"]]) {
+    const drop = $(dropId), inp = $(inputId);
+    drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("drop-over"); });
+    drop.addEventListener("dragleave", () => drop.classList.remove("drop-over"));
+    drop.addEventListener("drop", async e => {
+      e.preventDefault();
+      drop.classList.remove("drop-over");
+      const f = e.dataTransfer.files[0];
+      if (f && (f.type.startsWith("text/") || f.name.match(/\.(txt|log|csv|json|xml|html|js|py|java|cpp|c|ts|md|sql|ini|cfg|yml|yaml)$/i))) {
+        inp.value = await readFileText(f);
+        doCompare();
+        toast("已载入: " + f.name);
+      } else {
+        toast("请拖入文本文件");
+      }
+    });
+  }
+
+  // 自动对比
+  const autoCompare = debounce(() => {
+    if ($("autoLoadL").checked || $("autoLoadR").checked) doCompare();
+  }, 500);
+  $("leftInput").addEventListener("input", autoCompare);
+  $("rightInput").addEventListener("input", autoCompare);
+  $("autoLoadL").addEventListener("change", () => { if ($("autoLoadL").checked) doCompare(); });
+  $("autoLoadR").addEventListener("change", () => { if ($("autoLoadR").checked) doCompare(); });
+
+  // 选项变化
+  for (const id of ["optIgnoreCase", "optIgnoreSpace", "optTrimLine", "optCharDiff", "optOnlyChanged"]) {
+    $(id).addEventListener("change", () => {
+      if (currentResult) doCompare();
+    });
+  }
+
+  // 搜索
+  const doSearch = debounce(() => {
+    searchTerm = $("searchInput").value.trim();
+    $("searchClear").classList.toggle("hidden", !searchTerm);
+    if (currentResult) renderResult();
+  }, 200);
+  $("searchInput").addEventListener("input", doSearch);
+  $("searchClear").addEventListener("click", () => {
+    $("searchInput").value = ""; searchTerm = "";
+    $("searchClear").classList.add("hidden");
+    if (currentResult) renderResult();
+  });
+
+  // 复制/导出/打印
+  $("btnCopyDiff").addEventListener("click", () => {
+    const t = buildReportText(true);
+    if (!t) return toast("请先进行对比");
+    copyText(t, "已复制差异报告");
+  });
+  $("btnCopyResult").addEventListener("click", () => {
+    const t = buildReportText(false);
+    if (!t) return toast("请先进行对比");
+    copyText(t, "已复制完整结果");
+  });
+  $("btnExportHtml").addEventListener("click", () => {
+    if (!currentResult) return toast("请先进行对比");
+    const t = buildReportText(true).split("\n").map(esc).join("<br>");
+    const html = "<!DOCTYPE html><html lang=\"zh-CN\"><head><meta charset=\"UTF-8\"><title>文本对比报告</title>" +
+      "<style>body{font-family:Consolas,monospace;font-size:13px;margin:24px;line-height:1.6;}" +
+      "h1{font-size:18px}</style></head><body><h1>文本对比报告</h1><pre>" + t + "</pre></body></html>";
+    download("文本对比报告_" + Date.now() + ".html", html, "text/html");
+    toast("已导出 HTML 报告");
+  });
+  $("btnExportTxt").addEventListener("click", () => {
+    if (!currentResult) return toast("请先进行对比");
+    download("文本对比报告_" + Date.now() + ".txt", buildReportText(true), "text/plain");
+    toast("已导出 TXT 报告");
+  });
+  $("btnPrint").addEventListener("click", () => {
+    if (!currentResult) return toast("请先进行对比");
+    const t = buildReportText(true);
+    const w = window.open("", "_blank", "width=800,height=600");
+    w.document.write("<pre>" + esc(t) + "</pre>");
+    w.document.close();
+    w.focus();
+    w.print();
+  });
+
+  // 主题
+  $("btnTheme").addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = cur === "dark" ? "" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    $("btnTheme").textContent = next === "dark" ? "☀️" : "🌙";
+    localStorage.setItem("tc-theme", next);
+  });
+
+  // 帮助
+  $("btnHelp").addEventListener("click", () => $("helpModal").classList.add("show"));
+  $("closeHelp").addEventListener("click", () => $("helpModal").classList.remove("show"));
+  $("helpModal").addEventListener("click", e => {
+    if (e.target === $("helpModal")) $("helpModal").classList.remove("show");
+  });
+
+  // 快捷键
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); doCompare(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === "1") { e.preventDefault(); $("leftInput").focus(); }
+    if ((e.ctrlKey || e.metaKey) && e.key === "2") { e.preventDefault(); $("rightInput").focus(); }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f") {
+      if (currentResult) { e.preventDefault(); $("searchInput").focus(); }
+    }
+  });
+}
+
+/* ================= 初始化 ================= */
+function init() {
+  const saved = localStorage.getItem("tc-theme");
+  if (saved) {
+    document.documentElement.setAttribute("data-theme", saved);
+    $("btnTheme").textContent = saved === "dark" ? "☀️" : "🌙";
+  }
+  bindEvents();
+  // 预置示例数据
+  $("leftInput").value =
+"版本 1.0.0\n- 新增用户登录功能\n- 修复了崩溃问题\n- 优化了页面加载速度\n- 添加了导出报表\n- 界面全面改版\n- 数据库升级到 MySQL 8\n- 支持多语言";
+  $("rightInput").value =
+"版本 1.1.0\n- 新增用户登录功能\n- 修复了崩溃问题\n- 优化了页面加载速度\n- 添加了导出报表功能\n- 增加夜间模式\n- 数据库升级到 MySQL 8.0.30\n- 支持多语言\n- 修复若干小 Bug";
+  doCompare();
+}
+
+init();
+</script>
+</body>
+</html>
