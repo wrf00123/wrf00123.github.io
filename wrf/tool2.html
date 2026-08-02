@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF水印移除工具 - 专业版</title>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js">
+    </script>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --panel-bg: #ffffff;
+            --primary: #4f6ef7;
+            --primary-hover: #3b54e0;
+            --danger: #e74c3c;
+            --danger-hover: #c0392b;
+            --success: #27ae60;
+            --success-hover: #219a52;
+            --warning: #f39c12;
+            --text: #2c3e50;
+            --text-light: #636e72;
+            --border: #e0e4e8;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --transition: 0.2s ease;
+            --font: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* ========== 顶部导航栏 ========== */
+        .header {
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .header .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .header .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+        .header .badge {
+            font-size: 0.7em;
+            background: #eef2ff;
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* ========== 按钮样式 ========== */
+        .btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            font-family: var(--font);
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 14px rgba(79, 110, 247, 0.35);
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: var(--success-hover);
+            box-shadow: 0 4px 14px rgba(39, 174, 96, 0.35);
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: var(--danger-hover);
+            box-shadow: 0 4px 14px rgba(231, 76, 60, 0.35);
+        }
+        .btn-outline {
+            background: #fff;
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #f8faff;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.8em;
+            border-radius: 4px;
+        }
+        .btn-xs {
+            padding: 3px 8px;
+            font-size: 0.7em;
+            border-radius: 3px;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+        }
+
+        /* ========== 主布局 ========== */
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 130px);
+            gap: 0;
+            position: relative;
+        }
+
+        /* ========== 左侧面板 ========== */
+        .sidebar {
+            width: 380px;
+            min-width: 380px;
+            background: var(--panel-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px;
+            gap: 14px;
+            z-index: 50;
+            box-shadow: var(--shadow);
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #d0d5dd;
+            border-radius: 10px;
+        }
+
+        .panel-section {
+            background: #fafbfc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+        }
+        .panel-section h3 {
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 700;
+        }
+        .panel-section h3 .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: inline-block;
+        }
+
+        /* 上传区域 */
+        .upload-zone {
+            border: 2px dashed #d0d7e2;
+            border-radius: var(--radius);
+            padding: 28px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            background: #fdfdfe;
+            position: relative;
+        }
+        .upload-zone:hover,
+        .upload-zone.drag-over {
+            border-color: var(--primary);
+            background: #f5f7ff;
+            box-shadow: inset 0 0 0 4px rgba(79, 110, 247, 0.04);
+        }
+        .upload-zone .icon-upload {
+            font-size: 2.8em;
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.7;
+        }
+        .upload-zone p {
+            font-size: 0.9em;
+            color: var(--text-light);
+            margin: 4px 0;
+        }
+        .upload-zone .file-name {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 0.85em;
+            margin-top: 6px;
+            word-break: break-all;
+        }
+        .upload-zone input[type="file"] {
+            display: none;
+        }
+
+        /* 页面导航 */
+        .page-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .page-nav .page-info {
+            font-weight: 600;
+            font-size: 0.9em;
+            min-width: 80px;
+            text-align: center;
+        }
+        .page-nav input {
+            width: 50px;
+            text-align: center;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 6px;
+            font-size: 0.9em;
+            font-family: var(--font);
+        }
+        .page-nav input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.1);
+        }
+
+        /* 工具模式切换 */
+        .tool-tabs {
+            display: flex;
+            gap: 4px;
+            background: #eef1f5;
+            border-radius: var(--radius-sm);
+            padding: 3px;
+        }
+        .tool-tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: 600;
+            transition: all var(--transition);
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-family: var(--font);
+        }
+        .tool-tab.active {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+        .tool-tab:hover:not(.active) {
+            color: var(--text);
+        }
+
+        /* 颜色选择器行 */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .color-row label {
+            font-size: 0.85em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .color-row input[type="color"] {
+            width: 40px;
+            height: 32px;
+            border: 1.5px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 2px;
+        }
+        .color-row input[type="range"] {
+            flex: 1;
+            min-width: 60px;
+            accent-color: var(--primary);
+        }
+        .color-presets {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .color-preset {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all var(--transition);
+        }
+        .color-preset:hover {
+            border-color: var(--primary);
+            transform: scale(1.15);
+        }
+        .color-preset.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.2);
+        }
+
+        /* 标记列表 */
+        .markers-list {
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .markers-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .markers-list::-webkit-scrollbar-thumb {
+            background: #d0d5dd;
+            border-radius: 10px;
+        }
+        .marker-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 10px;
+            font-size: 0.8em;
+            gap: 8px;
+            transition: all var(--transition);
+        }
+        .marker-item:hover {
+            border-color: #b0b8c4;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+        }
+        .marker-item .marker-color-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+        }
+        .marker-item .marker-info {
+            flex: 1;
+            min-width: 0;
+            font-size: 0.78em;
+            color: var(--text-light);
+            line-height: 1.3;
+        }
+        .marker-item .marker-actions {
+            display: flex;
+            gap: 3px;
+        }
+        .no-markers {
+            text-align: center;
+            color: #b0b8c4;
+            font-size: 0.85em;
+            padding: 16px;
+            font-style: italic;
+        }
+
+        /* 范围选择 */
+        .range-options {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .range-options label {
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            transition: all var(--transition);
+            background: #fff;
+        }
+        .range-options label:hover {
+            border-color: var(--primary);
+        }
+        .range-options input[type="radio"] {
+            accent-color: var(--primary);
+        }
+        .range-options input[type="radio"]:checked+span {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .range-input {
+            width: 90px;
+            padding: 6px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.85em;
+            text-align: center;
+            font-family: var(--font);
+        }
+        .range-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* ========== 右侧预览区 ========== */
+        .preview-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #e8ecf1;
+            position: relative;
+            overflow: hidden;
+        }
+        .preview-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            z-index: 10;
+        }
+        .preview-toolbar .zoom-slider {
+            width: 100px;
+            accent-color: var(--primary);
+        }
+        .preview-toolbar .zoom-label {
+            font-weight: 600;
+            font-size: 0.85em;
+            min-width: 45px;
+            text-align: center;
+        }
+        .preview-canvas-wrapper {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            cursor: crosshair;
+        }
+        .preview-canvas-wrapper.eyedropper-mode {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='9' cy='9' r='6' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cline x1='13' y1='13' x2='18' y2='18' stroke='%23000' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E") 2 18, crosshair;
+        }
+        .preview-canvas-wrapper.panning-mode {
+            cursor: grab;
+        }
+        .preview-canvas-wrapper.panning-mode:active {
+            cursor: grabbing;
+        }
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+            box-shadow: var(--shadow-lg);
+            border-radius: 4px;
+            background: #fff;
+        }
+        .canvas-container canvas {
+            display: block;
+            border-radius: 4px;
+        }
+        .overlay-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            border-radius: 4px;
+            z-index: 5;
+        }
+        .canvas-container.selection-active .overlay-canvas {
+            pointer-events: auto;
+        }
+        .preview-placeholder {
+            text-align: center;
+            color: #b0b8c4;
+        }
+        .preview-placeholder .big-icon {
+            font-size: 5em;
+            display: block;
+            opacity: 0.4;
+            margin-bottom: 10px;
+        }
+        .preview-placeholder p {
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        /* ========== 底部状态栏 ========== */
+        .status-bar {
+            background: #fff;
+            border-top: 1px solid var(--border);
+            padding: 8px 20px;
+            font-size: 0.8em;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            z-index: 100;
+        }
+        .status-bar .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #b0b8c4;
+            display: inline-block;
+        }
+        .status-bar .status-dot.ready {
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+        .status-bar .status-dot.processing {
+            background: var(--warning);
+            animation: pulse 0.6s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ========== Toast提示 ========== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9em;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.5s forwards;
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
+            word-break: break-word;
+        }
+        .toast.success {
+            background: var(--success);
+        }
+        .toast.error {
+            background: var(--danger);
+        }
+        .toast.info {
+            background: var(--primary);
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 900px) {
+            .main-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .sidebar {
+                width: 100%;
+                min-width: 100%;
+                max-height: 45vh;
+                flex-shrink: 0;
+            }
+            .preview-area {
+                min-height: 400px;
+            }
+            .header {
+                padding: 8px 12px;
+            }
+            .header .logo {
+                font-size: 1.1em;
+            }
+        }
+        @media (max-width: 500px) {
+            .sidebar {
+                padding: 8px;
+                gap: 8px;
+            }
+            .panel-section {
+                padding: 10px;
+            }
+            .btn {
+                padding: 7px 12px;
+                font-size: 0.8em;
+            }
+            .tool-tab {
+                padding: 6px 8px;
+                font-size: 0.7em;
+            }
+        }
+
+        /* 进度条 */
+        .progress-bar-wrap {
+            width: 100%;
+            height: 6px;
+            background: #eef1f5;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="logo">
+            <svg viewBox="0 0 32 32" fill="none"><rect x="4" y="2" width="24" height="28" rx="3" stroke="currentColor" stroke-width="2.5" fill="none"/><line x1="10" y1="8" x2="22" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="13" x2="22" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="18" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="22" cy="22" r="4" fill="#4f6ef7" stroke="none"/><line x1="20.5" y1="22" x2="23.5" y2="22" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+            PDF水印移除工具
+        </div>
+        <span class="badge">专业版</span>
+        <div class="header-actions">
+            <button class="btn btn-outline btn-sm" onclick="resetAll()" title="清除所有标记和文件">🔄 重置</button>
+            <button class="btn btn-outline btn-sm" id="btnAutoDetect" disabled onclick="autoDetectWatermarks()" title="自动检测当前页面的潜在水印">🔍 自动检测</button>
+            <button class="btn btn-primary btn-sm" id="btnProcess" disabled onclick="processPDF()">⚡ 移除水印并下载</button>
+        </div>
+    </div>
+
+    <!-- 主布局 -->
+    <div class="main-container">
+        <!-- 左侧面板 -->
+        <div class="sidebar" id="sidebar">
+            <!-- 上传 -->
+            <div class="panel-section">
+                <h3><span class="dot"></span>📂 上传PDF文件</h3>
+                <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+                    <span class="icon-upload">📄</span>
+                    <p><strong>拖拽PDF文件到此处</strong></p>
+                    <p>或点击选择文件</p>
+                    <p style="font-size:0.75em;color:#a0a8b4;">支持最大 100MB 的PDF文件</p>
+                    <div class="file-name" id="fileNameDisplay"></div>
+                </div>
+                <input type="file" id="fileInput" accept=".pdf" onchange="handleFileSelect(this.files)">
+            </div>
+
+            <!-- 工具模式 -->
+            <div class="panel-section">
+                <h3><span class="dot"></span>🛠️ 工具模式</h3>
+                <div class="tool-tabs">
+                    <button class="tool-tab active" data-tool="mark" onclick="setTool('mark')">✏️ 标记水印</button>
+                    <button class="tool-tab" data-tool="eyedropper" onclick="setTool('eyedropper')">💉 取色器</button>
+                    <button class="tool-tab" data-tool="pan" onclick="setTool('pan')">✋ 拖拽画布</button>
+                </div>
+                <p style="font-size:0.7em;color:var(--text-light);margin-top:6px;" id="toolHint">在预览区拖拽鼠标标记水印区域</p>
+            </div>
+
+            <!-- 覆盖设置 -->
+            <div class="panel-section">
+                <h3><span class="dot"></span>🎨 覆盖颜色设置</h3>
+                <div class="color-row">
+                    <label>颜色:</label>
+                    <input type="color" id="coverColor" value="#ffffff" onchange="updateCoverColor()">
+                    <span style="font-size:0.8em;" id="colorHexLabel">#FFFFFF</span>
+                </div>
+                <div class="color-presets" id="colorPresets">
+                    <span class="color-preset active" style="background:#ffffff;" data-color="#ffffff" title="纯白"></span>
+                    <span class="color-preset" style="background:#f5f5f0;" data-color="#f5f5f0" title="暖白"></span>
+                    <span class="color-preset" style="background:#fafaf5;" data-color="#fafaf5" title="米白"></span>
+                    <span class="color-preset" style="background:#f0f0f0;" data-color="#f0f0f0" title="浅灰"></span>
+                    <span class="color-preset" style="background:#e8e8e0;" data-color="#e8e8e0" title="暖灰"></span>
+                    <span class="color-preset" style="background:#fffef5;" data-color="#fffef5" title="奶油"></span>
+                </div>
+                <div class="color-row" style="margin-top:8px;">
+                    <label>不透明度:</label>
+                    <input type="range" id="coverOpacity" min="50" max="100" value="100" oninput="updateOpacityLabel()">
+                    <span style="font-size:0.8em;min-width:32px;" id="opacityLabel">100%</span>
+                </div>
+            </div>
+
+            <!-- 标记列表 -->
+            <div class="panel-section">
+                <h3><span class="dot"></span>📋 水印标记列表 <span style="font-weight:400;font-size:0.8em;" id="markerCount">(0个)</span></h3>
+                <div class="markers-list" id="markersList">
+                    <div class="no-markers">暂无标记，请在预览区拖拽添加</div>
+                </div>
+                <button class="btn btn-outline btn-sm" style="width:100%;margin-top:8px;" id="btnClearMarkers" disabled onclick="clearAllMarkers()">🗑️ 清除全部标记</button>
+                <button class="btn btn-outline btn-sm" style="width:100%;margin-top:4px;" id="btnCopyToAll" disabled onclick="copyMarkersToAllPages()">📋 复制标记到所有页面</button>
+            </div>
+
+            <!-- 处理范围 -->
+            <div class="panel-section">
+                <h3><span class="dot"></span>📄 处理页面范围</h3>
+                <div class="range-options">
+                    <label><input type="radio" name="pageRange" value="all" checked onchange="updatePageRange()"><span>全部页面</span></label>
+                    <label><input type="radio" name="pageRange" value="current" onchange="updatePageRange()"><span>仅当前页</span></label>
+                    <label><input type="radio" name="pageRange" value="custom" onchange="updatePageRange()"><span>自定义</span></label>
+                </div>
+                <div style="margin-top:6px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;" id="customRangeWrap" hidden>
+                    <span style="font-size:0.8em;">从</span>
+                    <input type="number" class="range-input" id="rangeStart" min="1" value="1" placeholder="起始页">
+                    <span style="font-size:0.8em;">到</span>
+                    <input type="number" class="range-input" id="rangeEnd" min="1" value="1" placeholder="结束页">
+                </div>
+            </div>
+
+            <!-- 进度 -->
+            <div class="panel-section" id="progressSection" hidden>
+                <h3><span class="dot"></span>⏳ 处理进度</h3>
+                <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressFill"></div></div>
+                <p style="font-size:0.8em;text-align:center;margin-top:4px;" id="progressText">准备中...</p>
+            </div>
+        </div>
+
+        <!-- 右侧预览区 -->
+        <div class="preview-area">
+            <div class="preview-toolbar">
+                <button class="btn btn-outline btn-sm" id="btnPrevPage" disabled onclick="goToPage(-1)">◀ 上一页</button>
+                <span class="page-info" id="pageInfo">- / -</span>
+                <button class="btn btn-outline btn-sm" id="btnNextPage" disabled onclick="goToPage(1)">下一页 ▶</button>
+                <input type="number" id="pageJumpInput" style="width:50px;padding:6px;text-align:center;border:1.5px solid var(--border);border-radius:4px;font-family:var(--font);" min="1" placeholder="页" onkeydown="if(event.key==='Enter')jumpToPage()">
+                <button class="btn btn-outline btn-xs" onclick="jumpToPage()">跳转</button>
+                <span style="color:var(--border);margin:0 4px;">|</span>
+                <button class="btn btn-outline btn-xs" onclick="zoomOut()">🔍−</button>
+                <input type="range" class="zoom-slider" id="zoomSlider" min="30" max="300" value="100" oninput="updateZoom()">
+                <span class="zoom-label" id="zoomLabel">100%</span>
+                <button class="btn btn-outline btn-xs" onclick="zoomIn()">🔍+</button>
+                <button class="btn btn-outline btn-xs" onclick="fitToScreen()" title="适应屏幕">📐</button>
+                <span style="color:var(--border);margin:0 4px;">|</span>
+                <span style="font-size:0.75em;color:var(--text-light);" id="coordDisplay">坐标: - , -</span>
+            </div>
+            <div class="preview-canvas-wrapper" id="previewWrapper">
+                <div class="preview-placeholder" id="placeholder">
+                    <span class="big-icon">📄</span>
+                    <p>上传PDF文件后<br>在此处预览并标记水印</p>
+                    <p style="font-size:0.8em;color:#c0c8d4;">拖拽鼠标标记水印区域</p>
+                </div>
+                <div class="canvas-container" id="canvasContainer" hidden>
+                    <canvas id="pdfCanvas"></canvas>
+                    <canvas class="overlay-canvas" id="overlayCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部状态栏 -->
+    <div class="status-bar">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">就绪 - 请上传PDF文件</span>
+        <span style="margin-left:auto;font-size:0.75em;">快捷键: <kbd>M</kbd>标记 <kbd>E</kbd>取色 <kbd>P</kbd>拖拽 <kbd>Del</kbd>删除标记 <kbd>Ctrl+Z</kbd>撤销</span>
+    </div>
+
+    <!-- Toast容器 -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ==================== 全局状态 ====================
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+
+        const state = {
+            pdfDoc: null, // PDF.js文档对象
+            pdfBytes: null, // 原始PDF字节（用于pdf-lib处理）
+            totalPages: 0,
+            currentPage: 1,
+            renderScale: 1.5, // 渲染缩放（用于清晰度）
+            displayScale: 1.0, // 显示缩放
+            baseRenderScale: 1.5, // 基础渲染缩放
+            currentTool: 'mark', // 'mark' | 'eyedropper' | 'pan'
+            markers: [], // {page, x, y, w, h, color, opacity} (canvas坐标，相对于1.5倍渲染)
+            markerIdCounter: 0,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0,
+            selectionRect: null, // 当前拖拽中的矩形
+            coverColor: '#ffffff',
+            coverOpacity: 100,
+            pageRange: 'all',
+            rangeStart: 1,
+            rangeEnd: 1,
+            panStartX: 0,
+            panStartY: 0,
+            panScrollLeft: 0,
+            panScrollTop: 0,
+            isPanning: false,
+            undoStack: [], // 用于撤销
+        };
+
+        // ==================== DOM引用 ====================
+        const $ = (sel) => document.querySelector(sel);
+        const $$ = (sel) => document.querySelectorAll(sel);
+
+        const dom = {
+            uploadZone: $('#uploadZone'),
+            fileInput: $('#fileInput'),
+            fileNameDisplay: $('#fileNameDisplay'),
+            pdfCanvas: $('#pdfCanvas'),
+            overlayCanvas: $('#overlayCanvas'),
+            canvasContainer: $('#canvasContainer'),
+            placeholder: $('#placeholder'),
+            previewWrapper: $('#previewWrapper'),
+            pageInfo: $('#pageInfo'),
+            pageJumpInput: $('#pageJumpInput'),
+            zoomSlider: $('#zoomSlider'),
+            zoomLabel: $('#zoomLabel'),
+            coordDisplay: $('#coordDisplay'),
+            markersList: $('#markersList'),
+            markerCount: $('#markerCount'),
+            btnClearMarkers: $('#btnClearMarkers'),
+            btnCopyToAll: $('#btnCopyToAll'),
+            btnProcess: $('#btnProcess'),
+            btnAutoDetect: $('#btnAutoDetect'),
+            btnPrevPage: $('#btnPrevPage'),
+            btnNextPage: $('#btnNextPage'),
+            coverColor: $('#coverColor'),
+            coverOpacity: $('#coverOpacity'),
+            colorHexLabel: $('#colorHexLabel'),
+            opacityLabel: $('#opacityLabel'),
+            colorPresets: $('#colorPresets'),
+            customRangeWrap: $('#customRangeWrap'),
+            rangeStart: $('#rangeStart'),
+            rangeEnd: $('#rangeEnd'),
+            progressSection: $('#progressSection'),
+            progressFill: $('#progressFill'),
+            progressText: $('#progressText'),
+            statusDot: $('#statusDot'),
+            statusText: $('#statusText'),
+            toolHint: $('#toolHint'),
+            toastContainer: $('#toastContainer'),
+        };
+
+        // ==================== Toast ====================
+        function showToast(msg, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = msg;
+            dom.toastContainer.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ==================== 状态更新 ====================
+        function setStatus(text, state_type) {
+            dom.statusText.textContent = text;
+            dom.statusDot.className = 'status-dot';
+            if (state_type === 'ready') dom.statusDot.classList.add('ready');
+            if (state_type === 'processing') dom.statusDot.classList.add('processing');
+        }
+
+        // ==================== 文件处理 ====================
+        function handleFileSelect(files) {
+            if (!files || files.length === 0) return;
+            const file = files[0];
+            if (file.type !== 'application/pdf') {
+                showToast('请选择PDF文件', 'error');
+                return;
+            }
+            if (file.size > 100 * 1024 * 1024) {
+                showToast('文件大小超过100MB限制', 'error');
+                return;
+            }
+            dom.fileNameDisplay.textContent = `📎 ${file.name} (${formatSize(file.size)})`;
+            setStatus('正在加载PDF...', 'processing');
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                state.pdfBytes = new Uint8Array(e.target.result);
+                try {
+                    state.pdfDoc = await pdfjsLib.getDocument({ data: state.pdfBytes.slice(0) }).promise;
+                    state.totalPages = state.pdfDoc.numPages;
+                    state.currentPage = 1;
+                    state.markers = [];
+                    state.markerIdCounter = 0;
+                    state.undoStack = [];
+                    state.pageRange = 'all';
+                    state.rangeStart = 1;
+                    state.rangeEnd = state.totalPages;
+                    dom.rangeStart.value = 1;
+                    dom.rangeEnd.value = state.totalPages;
+                    dom.rangeStart.max = state.totalPages;
+                    dom.rangeEnd.max = state.totalPages;
+                    document.querySelector('input[name="pageRange"][value="all"]').checked = true;
+                    dom.customRangeWrap.hidden = true;
+                    updateUIForPDF();
+                    await renderCurrentPage();
+                    setStatus(`已加载: ${file.name} (${state.totalPages}页)`, 'ready');
+                    showToast(`PDF加载成功！共 ${state.totalPages} 页`, 'success');
+                } catch (err) {
+                    console.error(err);
+                    showToast('PDF解析失败: ' + err.message, 'error');
+                    setStatus('加载失败', '');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + 'B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + 'KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
+        }
+
+        function updateUIForPDF() {
+            dom.canvasContainer.hidden = false;
+            dom.placeholder.hidden = true;
+            dom.btnProcess.disabled = false;
+            dom.btnAutoDetect.disabled = false;
+            dom.btnPrevPage.disabled = false;
+            dom.btnNextPage.disabled = false;
+            dom.pageJumpInput.max = state.totalPages;
+            dom.pageJumpInput.value = state.currentPage;
+            updatePageInfo();
+            updateMarkersList();
+            updateClearMarkersBtn();
+            updateCopyAllBtn();
+        }
+
+        function updatePageInfo() {
+            dom.pageInfo.textContent = `${state.currentPage} / ${state.totalPages}`;
+            dom.pageJumpInput.value = state.currentPage;
+            dom.rangeEnd.max = state.totalPages;
+            dom.rangeStart.max = state.totalPages;
+        }
+
+        // ==================== 页面渲染 ====================
+        async function renderCurrentPage() {
+            if (!state.pdfDoc) return;
+            const page = await state.pdfDoc.getPage(state.currentPage);
+            const viewport = page.getViewport({ scale: state.baseRenderScale * state.displayScale });
+            const canvas = dom.pdfCanvas;
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            canvas.style.width = viewport.width + 'px';
+            canvas.style.height = viewport.height + 'px';
+            const ctx = canvas.getContext('2d');
+            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+            state.renderScale = state.baseRenderScale * state.displayScale;
+            // 更新覆盖画布
+            dom.overlayCanvas.width = viewport.width;
+            dom.overlayCanvas.height = viewport.height;
+            dom.overlayCanvas.style.width = viewport.width + 'px';
+            dom.overlayCanvas.style.height = viewport.height + 'px';
+            drawAllMarkersOnOverlay();
+            updatePageInfo();
+            updateMarkersList();
+            updateClearMarkersBtn();
+            updateCopyAllBtn();
+            updateZoomUI();
+        }
+
+        function drawAllMarkersOnOverlay() {
+            const canvas = dom.overlayCanvas;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const pageMarkers = state.markers.filter(m => m.page === state.currentPage);
+            for (const marker of pageMarkers) {
+                drawMarkerRect(ctx, marker);
+            }
+            // 绘制当前拖拽中的矩形
+            if (state.selectionRect && state.selectionRect.page === state.currentPage) {
+                drawMarkerRect(ctx, state.selectionRect, true);
+            }
+        }
+
+        function drawMarkerRect(ctx, marker, isTemp = false) {
+            ctx.save();
+            if (isTemp) {
+                ctx.strokeStyle = '#4f6ef7';
+                ctx.lineWidth = 2.5;
+                ctx.setLineDash([6, 3]);
+                ctx.fillStyle = 'rgba(79,110,247,0.15)';
+            } else {
+                ctx.strokeStyle = '#e74c3c';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([]);
+                ctx.fillStyle = 'rgba(231,76,60,0.1)';
+            }
+            ctx.fillRect(marker.x, marker.y, marker.w, marker.h);
+            ctx.strokeRect(marker.x, marker.y, marker.w, marker.h);
+
+            // 绘制控制点
+            if (!isTemp) {
+                const cx = marker.x + marker.w / 2;
+                const cy = marker.y + marker.h / 2;
+                ctx.fillStyle = '#e74c3c';
+                [
+                    [marker.x, marker.y],
+                    [marker.x + marker.w, marker.y],
+                    [marker.x, marker.y + marker.h],
+                    [marker.x + marker.w, marker.y + marker.h]
+                ].forEach(([px, py]) => {
+                    ctx.beginPath();
+                    ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                // 中心标签
+                ctx.fillStyle = 'rgba(231,76,60,0.85)';
+                ctx.font = 'bold 10px "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`#${marker.id}`, cx, cy - 2);
+            }
+            ctx.restore();
+        }
+
+        // ==================== 坐标转换 ====================
+        // Canvas坐标 -> PDF坐标（用于pdf-lib）
+        function canvasCoordsToPDF(marker) {
+            if (!state.pdfDoc) return null;
+            // PDF页面使用points（1/72英寸），需要获取页面实际尺寸
+            // renderScale是当前渲染使用的总缩放比例
+            const scale = state.renderScale;
+            // 需要获取PDF页面的实际尺寸
+            // 在渲染时，viewport.width = pageWidth * scale, viewport.height = pageHeight * scale
+            // 所以 pdfX = canvasX / scale, pdfY = pageHeight - (canvasY + canvasH) / scale
+            // pageHeight需要从PDF文档获取
+            return {
+                pdfX: marker.x / scale,
+                pdfY: null, // 需要在处理时动态计算
+                pdfW: marker.w / scale,
+                pdfH: marker.h / scale,
+                canvasX: marker.x,
+                canvasY: marker.y,
+                canvasW: marker.w,
+                canvasH: marker.h,
+                scale: scale,
+            };
+        }
+
+        // ==================== 标记管理 ====================
+        function addMarker(x, y, w, h) {
+            if (w < 5 || h < 5) return; // 太小忽略
+            const marker = {
+                id: ++state.markerIdCounter,
+                page: state.currentPage,
+                x: Math.round(x),
+                y: Math.round(y),
+                w: Math.round(w),
+                h: Math.round(h),
+                color: state.coverColor,
+                opacity: state.coverOpacity / 100,
+            };
+            // 保存到撤销栈
+            state.undoStack.push({ action: 'add', marker: { ...marker } });
+            if (state.undoStack.length > 100) state.undoStack.shift();
+            state.markers.push(marker);
+            drawAllMarkersOnOverlay();
+            updateMarkersList();
+            updateClearMarkersBtn();
+            updateCopyAllBtn();
+            showToast(`标记 #${marker.id} 已添加 (页面${state.currentPage})`, 'info');
+        }
+
+        function removeMarkerById(id) {
+            const idx = state.markers.findIndex(m => m.id === id);
+            if (idx >= 0) {
+                const removed = state.markers[idx];
+                state.undoStack.push({ action: 'remove', marker: { ...removed }, index: idx });
+                if (state.undoStack.length > 100) state.undoStack.shift();
+                state.markers.splice(idx, 1);
+                drawAllMarkersOnOverlay();
+                updateMarkersList();
+                updateClearMarkersBtn();
+                updateCopyAllBtn();
+                showToast(`标记 #${id} 已删除`, 'info');
+            }
+        }
+
+        function clearAllMarkers() {
+            if (state.markers.length === 0) return;
+            if (!confirm(`确定要清除全部 ${state.markers.length} 个标记吗？此操作可撤销。`)) return;
+            state.undoStack.push({ action: 'clearAll', markers: state.markers.map(m => ({ ...m })) });
+            if (state.undoStack.length > 100) state.undoStack.shift();
+            state.markers = [];
+            drawAllMarkersOnOverlay();
+            updateMarkersList();
+            updateClearMarkersBtn();
+            updateCopyAllBtn();
+            showToast('全部标记已清除', 'info');
+        }
+
+        function copyMarkersToAllPages() {
+            const currentPageMarkers = state.markers.filter(m => m.page === state.currentPage);
+            if (currentPageMarkers.length === 0) {
+                showToast('当前页面没有标记可复制', 'error');
+                return;
+            }
+            if (!confirm(`将当前页面的 ${currentPageMarkers.length} 个标记复制到所有 ${state.totalPages} 页？`)) return;
+            state.undoStack.push({ action: 'copyAll', addedMarkerIds: [] });
+            const newIds = [];
+            for (let p = 1; p <= state.totalPages; p++) {
+                if (p === state.currentPage) continue;
+                for (const marker of currentPageMarkers) {
+                    const newMarker = {
+                        ...marker,
+                        id: ++state.markerIdCounter,
+                        page: p,
+                    };
+                    state.markers.push(newMarker);
+                    newIds.push(newMarker.id);
+                }
+            }
+            if (state.undoStack.length > 100) state.undoStack.shift();
+            state.undoStack[state.undoStack.length - 1].addedMarkerIds = newIds;
+            drawAllMarkersOnOverlay();
+            updateMarkersList();
+            updateClearMarkersBtn();
+            updateCopyAllBtn();
+            showToast(`已复制标记到所有页面 (新增${newIds.length}个标记)`, 'success');
+        }
+
+        function undo() {
+            if (state.undoStack.length === 0) {
+                showToast('没有可撤销的操作', 'info');
+                return;
+            }
+            const lastAction = state.undoStack.pop();
+            if (lastAction.action === 'add') {
+                const idx = state.markers.findIndex(m => m.id === lastAction.marker.id);
+                if (idx >= 0) state.markers.splice(idx, 1);
+                showToast('已撤销添加标记', 'info');
+            } else if (lastAction.action === 'remove') {
+                state.markers.splice(lastAction.index, 0, lastAction.marker);
+                showToast('已撤销删除标记', 'info');
+            } else if (lastAction.action === 'clearAll') {
+                state.markers = lastAction.markers;
+                showToast('已撤销清除全部标记', 'info');
+            } else if (lastAction.action === 'copyAll') {
+                for (const id of (lastAction.addedMarkerIds || [])) {
+                    const idx = state.markers.findIndex(m => m.id === id);
+                    if (idx >= 0) state.markers.splice(idx, 1);
+                }
+                showToast('已撤销复制标记', 'info');
+            }
+            drawAllMarkersOnOverlay();
+            updateMarkersList();
+            updateClearMarkersBtn();
+            updateCopyAllBtn();
+        }
+
+        function updateMarkersList() {
+            const allMarkers = state.markers;
+            const pageMarkers = allMarkers.filter(m => m.page === state.currentPage);
+            dom.markerCount.textContent = `(${allMarkers.length}个总计, 本页${pageMarkers.length}个)`;
+            if (pageMarkers.length === 0) {
+                dom.markersList.innerHTML = '<div class="no-markers">当前页暂无标记</div>';
+            } else {
+                dom.markersList.innerHTML = pageMarkers.map(m => `
+                    <div class="marker-item">
+                        <span class="marker-color-dot" style="background:${m.color};"></span>
+                        <span class="marker-info">#${m.id} @(${m.x},${m.y}) ${m.w}×${m.h}px 透明度${Math.round(m.opacity*100)}%</span>
+                        <span class="marker-actions">
+                            <button class="btn btn-outline btn-xs" onclick="highlightMarker(${m.id})" title="定位">📍</button>
+                            <button class="btn btn-danger btn-xs" onclick="removeMarkerById(${m.id})" title="删除">✕</button>
+                        </span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function highlightMarker(id) {
+            const marker = state.markers.find(m => m.id === id);
+            if (!marker) return;
+            if (marker.page !== state.currentPage) {
+                state.currentPage = marker.page;
+                renderCurrentPage().then(() => {
+                    flashMarkerOnCanvas(marker);
+                });
+            } else {
+                flashMarkerOnCanvas(marker);
+            }
+        }
+
+        function flashMarkerOnCanvas(marker) {
+            const overlayCtx = dom.overlayCanvas.getContext('2d');
+            let flashes = 0;
+            const maxFlashes = 6;
+            const interval = setInterval(() => {
+                drawAllMarkersOnOverlay();
+                if (flashes % 2 === 0) {
+                    overlayCtx.save();
+                    overlayCtx.strokeStyle = '#ff6b00';
+                    overlayCtx.lineWidth = 4;
+                    overlayCtx.setLineDash([]);
+                    overlayCtx.shadowColor = 'rgba(255,107,0,0.7)';
+                    overlayCtx.shadowBlur = 12;
+                    overlayCtx.strokeRect(marker.x, marker.y, marker.w, marker.h);
+                    overlayCtx.restore();
+                }
+                flashes++;
+                if (flashes >= maxFlashes) {
+                    clearInterval(interval);
+                    drawAllMarkersOnOverlay();
+                }
+            }, 200);
+        }
+
+        function updateClearMarkersBtn() {
+            dom.btnClearMarkers.disabled = state.markers.length === 0;
+        }
+
+        function updateCopyAllBtn() {
+            const hasCurrentPageMarkers = state.markers.some(m => m.page === state.currentPage);
+            dom.btnCopyToAll.disabled = !hasCurrentPageMarkers || state.totalPages <= 1;
+        }
+
+        // ==================== 预览区交互 ====================
+        function getCanvasCoords(e) {
+            const rect = dom.pdfCanvas.getBoundingClientRect();
+            const scaleX = dom.pdfCanvas.width / rect.width;
+            const scaleY = dom.pdfCanvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY,
+            };
+        }
+
+        dom.overlayCanvas.addEventListener('mousedown', (e) => {
+            if (state.currentTool === 'pan') {
+                state.isPanning = true;
+                state.panStartX = e.clientX;
+                state.panStartY = e.clientY;
+                state.panScrollLeft = dom.previewWrapper.scrollLeft;
+                state.panScrollTop = dom.previewWrapper.scrollTop;
+                dom.previewWrapper.classList.add('panning-mode');
+                e.preventDefault();
+                return;
+            }
+            if (state.currentTool === 'eyedropper') {
+                const coords = getCanvasCoords(e);
+                pickColorFromCanvas(coords.x, coords.y);
+                return;
+            }
+            if (state.currentTool === 'mark') {
+                const coords = getCanvasCoords(e);
+                state.isDragging = true;
+                state.dragStartX = coords.x;
+                state.dragStartY = coords.y;
+                state.selectionRect = {
+                    id: -1,
+                    page: state.currentPage,
+                    x: coords.x,
+                    y: coords.y,
+                    w: 0,
+                    h: 0,
+                    color: state.coverColor,
+                    opacity: state.coverOpacity / 100,
+                };
+                e.preventDefault();
+            }
+        });
+
+        dom.overlayCanvas.addEventListener('mousemove', (e) => {
+            const coords = getCanvasCoords(e);
+            dom.coordDisplay.textContent =
+                `坐标: ${Math.round(coords.x)}, ${Math.round(coords.y)} | 页面: ${state.currentPage}`;
+
+            if (state.isPanning) {
+                const dx = e.clientX - state.panStartX;
+                const dy = e.clientY - state.panStartY;
+                dom.previewWrapper.scrollLeft = state.panScrollLeft - dx;
+                dom.previewWrapper.scrollTop = state.panScrollTop - dy;
+                return;
+            }
+            if (state.isDragging && state.selectionRect) {
+                const x = Math.min(state.dragStartX, coords.x);
+                const y = Math.min(state.dragStartY, coords.y);
+                const w = Math.abs(coords.x - state.dragStartX);
+                const h = Math.abs(coords.y - state.dragStartY);
+                state.selectionRect.x = x;
+                state.selectionRect.y = y;
+                state.selectionRect.w = w;
+                state.selectionRect.h = h;
+                drawAllMarkersOnOverlay();
+            }
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (state.isPanning) {
+                state.isPanning = false;
+                dom.previewWrapper.classList.remove('panning-mode');
+                return;
+            }
+            if (state.isDragging && state.selectionRect) {
+                const rect = state.selectionRect;
+                if (rect.w >= 8 && rect.h >= 8) {
+                    addMarker(rect.x, rect.y, rect.w, rect.h);
+                }
+                state.isDragging = false;
+                state.selectionRect = null;
+                drawAllMarkersOnOverlay();
+            }
+        });
+
+        // 取色器
+        function pickColorFromCanvas(cx, cy) {
+            const canvas = dom.pdfCanvas;
+            const ctx = canvas.getContext('2d');
+            const pixel = ctx.getImageData(Math.round(cx), Math.round(cy), 1, 1).data;
+            const hex = '#' + [pixel[0], pixel[1], pixel[2]].map(v => v.toString(16).padStart(2, '0')).join('');
+            state.coverColor = hex;
+            dom.coverColor.value = hex;
+            dom.colorHexLabel.textContent = hex.toUpperCase();
+            updateColorPresetActive();
+            showToast(`已取色: ${hex.toUpperCase()}`, 'info');
+            // 自动切换回标记模式
+            setTool('mark');
+        }
+
+        // ==================== 工具切换 ====================
+        function setTool(tool) {
+            state.currentTool = tool;
+            state.isDragging = false;
+            state.selectionRect = null;
+            state.isPanning = false;
+            dom.previewWrapper.classList.remove('panning-mode', 'eyedropper-mode');
+            if (tool === 'eyedropper') {
+                dom.previewWrapper.classList.add('eyedropper-mode');
+            }
+            if (tool === 'pan') {
+                dom.previewWrapper.classList.add('panning-mode');
+            }
+            // 更新tab样式
+            $$('.tool-tab').forEach(t => t.classList.remove('active'));
+            const activeTab = document.querySelector(`.tool-tab[data-tool="${tool}"]`);
+            if (activeTab) activeTab.classList.add('active');
+            // 更新提示
+            const hints = {
+                mark: '在预览区拖拽鼠标标记水印区域',
+                eyedropper: '点击预览区中的颜色来取样（用于覆盖颜色）',
+                pan: '拖拽鼠标移动画布视图',
+            };
+            dom.toolHint.textContent = hints[tool] || '';
+            drawAllMarkersOnOverlay();
+        }
+
+        // ==================== 颜色设置 ====================
+        function updateCoverColor() {
+            state.coverColor = dom.coverColor.value;
+            dom.colorHexLabel.textContent = state.coverColor.toUpperCase();
+            updateColorPresetActive();
+            // 更新所有现有标记的颜色
+            for (const marker of state.markers) {
+                if (marker.page === state.currentPage || true) {
+                    // 不自动更新已有标记颜色，保持用户意图
+                }
+            }
+            drawAllMarkersOnOverlay();
+        }
+
+        function updateOpacityLabel() {
+            state.coverOpacity = parseInt(dom.coverOpacity.value);
+            dom.opacityLabel.textContent = state.coverOpacity + '%';
+        }
+
+        function updateColorPresetActive() {
+            $$('.color-preset').forEach(p => {
+                p.classList.toggle('active', p.dataset.color.toLowerCase() === state.coverColor.toLowerCase());
+            });
+        }
+
+        // 颜色预设点击
+        dom.colorPresets.addEventListener('click', (e) => {
+            const preset = e.target.closest('.color-preset');
+            if (!preset) return;
+            const color = preset.dataset.color;
+            state.coverColor = color;
+            dom.coverColor.value = color;
+            dom.colorHexLabel.textContent = color.toUpperCase();
+            updateColorPresetActive();
+            drawAllMarkersOnOverlay();
+        });
+
+        // ==================== 缩放 ====================
+        function updateZoom() {
+            state.displayScale = parseInt(dom.zoomSlider.value) / 100;
+            state.baseRenderScale = 1.5;
+            renderCurrentPage();
+        }
+
+        function updateZoomUI() {
+            const pct = Math.round(state.displayScale * 100);
+            dom.zoomSlider.value = pct;
+            dom.zoomLabel.textContent = pct + '%';
+        }
+
+        function zoomIn() {
+            state.displayScale = Math.min(3.0, state.displayScale + 0.15);
+            state.baseRenderScale = 1.5;
+            renderCurrentPage();
+        }
+
+        function zoomOut() {
+            state.displayScale = Math.max(0.3, state.displayScale - 0.15);
+            state.baseRenderScale = 1.5;
+            renderCurrentPage();
+        }
+
+        function fitToScreen() {
+            const wrapper = dom.previewWrapper;
+            const maxW = wrapper.clientWidth - 40;
+            const maxH = wrapper.clientHeight - 40;
+            const canvas = dom.pdfCanvas;
+            if (canvas.width === 0 || canvas.height === 0) return;
+            const scaleW = maxW / (canvas.width / state.displayScale);
+            const scaleH = maxH / (canvas.height / state.displayScale);
+            state.displayScale = Math.min(scaleW, scaleH) * state.displayScale;
+            state.displayScale = Math.max(0.3, Math.min(3.0, state.displayScale));
+            state.baseRenderScale = 1.5;
+            renderCurrentPage();
+        }
+
+        // ==================== 页面导航 ====================
+        function goToPage(delta) {
+            const newPage = state.currentPage + delta;
+            if (newPage < 1 || newPage > state.totalPages) return;
+            state.currentPage = newPage;
+            renderCurrentPage();
+        }
+
+        function jumpToPage() {
+            const page = parseInt(dom.pageJumpInput.value);
+            if (isNaN(page) || page < 1 || page > state.totalPages) {
+                showToast(`请输入1-${state.totalPages}之间的页码`, 'error');
+                return;
+            }
+            state.currentPage = page;
+            renderCurrentPage();
+        }
+
+        function updatePageRange() {
+            const selected = document.querySelector('input[name="pageRange"]:checked');
+            if (selected) {
+                state.pageRange = selected.value;
+                dom.customRangeWrap.hidden = state.pageRange !== 'custom';
+            }
+        }
+
+        // ==================== 自动检测水印 ====================
+        async function autoDetectWatermarks() {
+            if (!state.pdfDoc) return;
+            setStatus('正在自动检测水印...', 'processing');
+            showToast('正在分析当前页面，检测潜在水印...', 'info');
+            const canvas = dom.pdfCanvas;
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            const width = canvas.width;
+            const height = canvas.height;
+            // 检测低对比度、接近白色的区域（水印常见特征）
+            const detectedRegions = [];
+            const visited = new Set();
+            const step = 4; // 采样步长
+            for (let y = 0; y < height; y += step * 4) {
+                for (let x = 0; x < width; x += step * 4) {
+                    const idx = (y * width + x) * 4;
+                    const r = data[idx];
+                    const g = data[idx + 1];
+                    const b = data[idx + 2];
+                    const brightness = (r + g + b) / 3;
+                    // 检测浅色但非纯白的像素（可能是水印）
+                    if (brightness > 140 && brightness < 248 && Math.max(r, g, b) - Math.min(r, g, b) < 40) {
+                        const key = `${Math.floor(x/step)},${Math.floor(y/step)}`;
+                        if (!visited.has(key)) {
+                            visited.add(key);
+                            detectedRegions.push({ x, y });
+                        }
+                    }
+                }
+            }
+            if (detectedRegions.length > 15) {
+                // 聚类分析，找到水印区域
+                const clusters = simpleCluster(detectedRegions, 80);
+                let addedCount = 0;
+                for (const cluster of clusters) {
+                    if (cluster.count >= 8) {
+                        const padding = 10;
+                        const mx = Math.max(0, cluster.minX - padding);
+                        const my = Math.max(0, cluster.minY - padding);
+                        const mw = Math.min(width - mx, cluster.maxX - cluster.minX + padding * 2);
+                        const mh = Math.min(height - my, cluster.maxY - cluster.minY + padding * 2);
+                        if (mw > 20 && mh > 10 && mw < width * 0.9 && mh < height * 0.5) {
+                            addMarker(mx, my, mw, mh);
+                            addedCount++;
+                        }
+                    }
+                }
+                if (addedCount > 0) {
+                    showToast(`自动检测完成，已添加 ${addedCount} 个标记`, 'success');
+                } else {
+                    showToast('未检测到明显水印区域，请手动标记', 'info');
+                }
+            } else {
+                showToast('未检测到明显水印特征，请使用手动标记', 'info');
+            }
+            setStatus('自动检测完成', 'ready');
+        }
+
+        function simpleCluster(points, radius) {
+            const clusters = [];
+            const assigned = new Set();
+            for (const p of points) {
+                if (assigned.has(p)) continue;
+                const cluster = { points: [p], minX: p.x, minY: p.y, maxX: p.x, maxY: p.y, count: 1 };
+                assigned.add(p);
+                let expanded = true;
+                while (expanded) {
+                    expanded = false;
+                    for (const q of points) {
+                        if (assigned.has(q)) continue;
+                        const cx = (cluster.minX + cluster.maxX) / 2;
+                        const cy = (cluster.minY + cluster.maxY) / 2;
+                        const dist = Math.hypot(q.x - cx, q.y - cy);
+                        if (dist < radius) {
+                            cluster.points.push(q);
+                            cluster.minX = Math.min(cluster.minX, q.x);
+                            cluster.minY = Math.min(cluster.minY, q.y);
+                            cluster.maxX = Math.max(cluster.maxX, q.x);
+                            cluster.maxY = Math.max(cluster.maxY, q.y);
+                            cluster.count++;
+                            assigned.add(q);
+                            expanded = true;
+                        }
+                    }
+                }
+                clusters.push(cluster);
+            }
+            return clusters;
+        }
+
+        // ==================== PDF处理 ====================
+        async function processPDF() {
+            if (!state.pdfBytes || state.markers.length === 0) {
+                showToast('请先上传PDF并标记水印区域', 'error');
+                return;
+            }
+            // 确定要处理的页面
+            let pagesToProcess = [];
+            if (state.pageRange === 'all') {
+                for (let i = 1; i <= state.totalPages; i++) pagesToProcess.push(i);
+            } else if (state.pageRange === 'current') {
+                pagesToProcess = [state.currentPage];
+            } else {
+                const start = parseInt(dom.rangeStart.value) || 1;
+                const end = parseInt(dom.rangeEnd.value) || state.totalPages;
+                for (let i = Math.max(1, start); i <= Math.min(state.totalPages, end); i++) {
+                    pagesToProcess.push(i);
+                }
+            }
+            if (pagesToProcess.length === 0) {
+                showToast('没有需要处理的页面', 'error');
+                return;
+            }
+            const relevantMarkers = state.markers.filter(m => pagesToProcess.includes(m.page));
+            if (relevantMarkers.length === 0) {
+                showToast('选定页面范围内没有水印标记', 'error');
+                return;
+            }
+            setStatus('正在处理PDF...', 'processing');
+            dom.progressSection.hidden = false;
+            dom.progressFill.style.width = '0%';
+            dom.progressText.textContent = '准备处理...';
+            dom.btnProcess.disabled = true;
+            try {
+                const { PDFDocument, rgb } = PDFLib;
+                const pdfDoc = await PDFDocument.load(state.pdfBytes, { ignoreEncryption: true });
+                const pages = pdfDoc.getPages();
+                const totalSteps = pagesToProcess.length;
+                let completedSteps = 0;
+                for (const pageNum of pagesToProcess) {
+                    if (pageNum < 1 || pageNum > pages.length) continue;
+                    const page = pages[pageNum - 1];
+                    const { width: pageWidth, height: pageHeight } = page.getSize();
+                    const pageMarkers = state.markers.filter(m => m.page === pageNum);
+                    for (const marker of pageMarkers) {
+                        // 转换坐标：canvas坐标 -> PDF坐标
+                        const scale = state.renderScale;
+                        const pdfX = marker.x / scale;
+                        const pdfY = pageHeight - (marker.y + marker.h) / scale;
+                        const pdfW = marker.w / scale;
+                        const pdfH = marker.h / scale;
+                        const colorHex = marker.color || state.coverColor;
+                        const opacity = marker.opacity !== undefined ? marker.opacity : state
+                            .coverOpacity / 100;
+                        const r = parseInt(colorHex.slice(1, 3), 16) / 255;
+                        const g = parseInt(colorHex.slice(3, 5), 16) / 255;
+                        const b = parseInt(colorHex.slice(5, 7), 16) / 255;
+                        // 绘制覆盖矩形
+                        page.drawRectangle({
+                            x: pdfX,
+                            y: pdfY,
+                            width: pdfW,
+                            height: pdfH,
+                            color: rgb(r, g, b),
+                            opacity: opacity,
+                        });
+                    }
+                    completedSteps++;
+                    const pct = Math.round((completedSteps / totalSteps) * 100);
+                    dom.progressFill.style.width = pct + '%';
+                    dom.progressText.textContent = `处理页面 ${completedSteps}/${totalSteps} (${pct}%)`;
+                    // 让UI更新
+                    await new Promise(r => setTimeout(r, 10));
+                }
+                const processedBytes = await pdfDoc.save();
+                dom.progressFill.style.width = '100%';
+                dom.progressText.textContent = '处理完成！正在准备下载...';
+                // 触发下载
+                const blob = new Blob([processedBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = '水印已移除_' + new Date().toISOString().slice(0, 10) + '.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                setStatus('PDF处理完成，已开始下载', 'ready');
+                showToast(`✅ 处理完成！已处理 ${totalSteps} 页，共移除 ${relevantMarkers.length} 处水印`, 'success');
+            } catch (err) {
+                console.error(err);
+                showToast('处理失败: ' + err.message, 'error');
+                setStatus('处理失败', '');
+            } finally {
+                dom.progressSection.hidden = true;
+                dom.progressFill.style.width = '0%';
+                dom.btnProcess.disabled = false;
+            }
+        }
+
+        // ==================== 重置 ====================
+        function resetAll() {
+            if (state.markers.length > 0 && !confirm('确定要重置所有内容吗？所有标记将丢失。')) return;
+            state.pdfDoc = null;
+            state.pdfBytes = null;
+            state.totalPages = 0;
+            state.currentPage = 1;
+            state.markers = [];
+            state.markerIdCounter = 0;
+            state.undoStack = [];
+            state.displayScale = 1.0;
+            state.baseRenderScale = 1.5;
+            state.coverColor = '#ffffff';
+            state.coverOpacity = 100;
+            state.pageRange = 'all';
+            state.selectionRect = null;
+            state.isDragging = false;
+            state.isPanning = false;
+            dom.canvasContainer.hidden = true;
+            dom.placeholder.hidden = false;
+            dom.fileNameDisplay.textContent = '';
+            dom.pdfCanvas.width = 0;
+            dom.pdfCanvas.height = 0;
+            dom.overlayCanvas.width = 0;
+            dom.overlayCanvas.height = 0;
+            dom.btnProcess.disabled = true;
+            dom.btnAutoDetect.disabled = true;
+            dom.btnPrevPage.disabled = true;
+            dom.btnNextPage.disabled = true;
+            dom.btnClearMarkers.disabled = true;
+            dom.btnCopyToAll.disabled = true;
+            dom.markersList.innerHTML = '<div class="no-markers">暂无标记</div>';
+            dom.markerCount.textContent = '(0个)';
+            dom.coverColor.value = '#ffffff';
+            dom.coverOpacity.value = 100;
+            dom.colorHexLabel.textContent = '#FFFFFF';
+            dom.opacityLabel.textContent = '100%';
+            dom.zoomSlider.value = 100;
+            dom.zoomLabel.textContent = '100%';
+            dom.pageInfo.textContent = '- / -';
+            dom.pageJumpInput.value = '';
+            dom.progressSection.hidden = true;
+            dom.progressFill.style.width = '0%';
+            dom.customRangeWrap.hidden = true;
+            document.querySelector('input[name="pageRange"][value="all"]').checked = true;
+            updateColorPresetActive();
+            setStatus('就绪 - 请上传PDF文件', '');
+            dom.fileInput.value = '';
+            showToast('已重置所有内容', 'info');
+        }
+
+        // ==================== 拖拽上传 ====================
+        dom.uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dom.uploadZone.classList.add('drag-over');
+        });
+        dom.uploadZone.addEventListener('dragleave', () => {
+            dom.uploadZone.classList.remove('drag-over');
+        });
+        dom.uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dom.uploadZone.classList.remove('drag-over');
+            handleFileSelect(e.dataTransfer.files);
+        });
+
+        // ==================== 键盘快捷键 ====================
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' && e.target.type !== 'range') return;
+            const key = e.key.toLowerCase();
+            if (key === 'm' && !e.ctrlKey && !e.metaKey) {
+                setTool('mark');
+            } else if (key === 'e' && !e.ctrlKey && !e.metaKey) {
+                setTool('eyedropper');
+            } else if (key === 'p' && !e.ctrlKey && !e.metaKey) {
+                setTool('pan');
+            } else if (key === 'delete' || key === 'backspace') {
+                const pageMarkers = state.markers.filter(m => m.page === state.currentPage);
+                if (pageMarkers.length > 0 && state.currentTool === 'mark') {
+                    removeMarkerById(pageMarkers[pageMarkers.length - 1].id);
+                }
+            } else if (key === 'z' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                undo();
+            } else if (key === 'arrowleft' && e.ctrlKey) {
+                e.preventDefault();
+                goToPage(-1);
+            } else if (key === 'arrowright' && e.ctrlKey) {
+                e.preventDefault();
+                goToPage(1);
+            }
+        });
+
+        // ==================== 窗口大小调整 ====================
+        let resizeDebounce = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeDebounce);
+            resizeDebounce = setTimeout(() => {
+                if (state.pdfDoc) renderCurrentPage();
+            }, 300);
+        });
+
+        // ==================== 初始化 ====================
+        function init() {
+            updateColorPresetActive();
+            updateOpacityLabel();
+            updateClearMarkersBtn();
+            updateCopyAllBtn();
+            setStatus('就绪 - 请上传PDF文件', '');
+            dom.progressSection.hidden = true;
+            dom.customRangeWrap.hidden = true;
+            setTool('mark');
+            console.log('✅ PDF水印移除工具 - 专业版 已就绪');
+            console.log('📋 功能：手动标记 | 取色器 | 自动检测 | 多页处理 | 颜色预设 | 撤销');
+            console.log('⌨️ 快捷键：M=标记 E=取色 P=拖拽 Del=删除标记 Ctrl+Z=撤销');
+        }
+
+        init();
+    </script>
+</body>
+</html>
