@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF 全能预览器</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>">
+<style>
+:root{
+  --bg:#eef0f4; --panel:#ffffff; --panel2:#f6f7f9; --toolbar:#f8f9fb;
+  --border:#d8dbe2; --border2:#e6e8ee;
+  --text:#1f2430; --muted:#6b7280; --accent:#2563eb; --accent-hover:#1d4ed8;
+  --accent-soft:rgba(37,99,235,.12); --danger:#dc2626;
+  --shadow:0 1px 3px rgba(0,0,0,.12); --shadow-lg:0 10px 30px rgba(0,0,0,.18);
+  --scroll-thumb:#c3c9d4;
+}
+body.dark{
+  --bg:#17191e; --panel:#22252c; --panel2:#2a2e37; --toolbar:#1d2027;
+  --border:#343945; --border2:#2c313b;
+  --text:#e6e8ee; --muted:#9aa1ae; --accent:#3b82f6; --accent-hover:#60a5fa;
+  --accent-soft:rgba(59,130,246,.16); --danger:#ef4444;
+  --shadow:0 1px 3px rgba(0,0,0,.4); --shadow-lg:0 12px 34px rgba(0,0,0,.55);
+  --scroll-thumb:#4a505c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:"Segoe UI",system-ui,-apple-system,"Microsoft YaHei",sans-serif;
+  background:var(--bg); color:var(--text); overflow:hidden; font-size:14px;
+  transition:background .2s,color .2s;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:transparent;color:var(--text)}
+button:disabled{opacity:.4;cursor:not-allowed}
+input,select{font-family:inherit;color:var(--text)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--scroll-thumb);border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}
+
+#app{display:flex;flex-direction:column;height:100%}
+
+/* ---------- Toolbar ---------- */
+#toolbar{
+  display:flex;align-items:center;gap:4px;flex-wrap:wrap;
+  padding:6px 10px;background:var(--toolbar);border-bottom:1px solid var(--border);
+  user-select:none;z-index:20;flex:0 0 auto;
+}
+.tb-group{display:flex;align-items:center;gap:2px;padding:0 6px;border-right:1px solid var(--border)}
+.tb-group:last-child{border-right:none}
+.tbtn{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  min-width:32px;height:30px;padding:0 8px;border-radius:6px;font-size:14px;
+  color:var(--text);transition:background .12s,color .12s;white-space:nowrap;
+}
+.tbtn:hover{background:var(--accent-soft);color:var(--accent)}
+.tbtn.on{background:var(--accent);color:#fff}
+.tbtn.primary{background:var(--accent);color:#fff}
+.tbtn.primary:hover{background:var(--accent-hover)}
+.tbtn .ico{font-size:15px;line-height:1}
+.tbtn.small{min-width:26px;padding:0 5px}
+#pageInput{
+  width:52px;height:28px;text-align:center;border:1px solid var(--border);
+  border-radius:6px;background:var(--panel);font-size:13px;outline:none;
+}
+#pageInput:focus{border-color:var(--accent)}
+#pageTotal{color:var(--muted);font-size:13px;margin:0 4px}
+#zoomLabel{
+  min-width:52px;text-align:center;font-size:12.5px;color:var(--muted);
+  cursor:pointer;border-radius:6px;padding:0 4px;height:28px;line-height:28px;
+}
+#zoomLabel:hover{background:var(--accent-soft);color:var(--accent)}
+#fileName{max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12.5px;color:var(--muted)}
+
+/* ---------- Search bar ---------- */
+#searchbar{
+  display:none;align-items:center;gap:6px;padding:6px 10px;
+  background:var(--panel);border-bottom:1px solid var(--border);z-index:19;
+}
+#searchbar.show{display:flex}
+#searchInput{
+  flex:0 1 360px;height:30px;padding:0 10px;border:1px solid var(--border);
+  border-radius:6px;background:var(--panel2);font-size:13px;outline:none;
+}
+#searchInput:focus{border-color:var(--accent)}
+#searchCount{font-size:12.5px;color:var(--muted);min-width:70px}
+.search-case{font-size:11px;color:var(--muted)}
+#caseSens{cursor:pointer;user-select:none}
+
+/* ---------- Content row ---------- */
+#content{display:flex;flex:1 1 auto;min-height:0}
+#sidebar{
+  width:200px;flex:0 0 auto;background:var(--panel);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;min-height:0;transition:margin-left .18s ease;
+}
+#sidebar.collapsed{margin-left:-200px}
+#sideTabs{display:flex;border-bottom:1px solid var(--border);flex:0 0 auto}
+.side-tab{
+  flex:1;height:34px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;
+}
+.side-tab.on{color:var(--accent);border-bottom-color:var(--accent);background:var(--accent-soft)}
+#thumbView,#outlineView{flex:1 1 auto;overflow:auto;padding:8px;min-height:0}
+#outlineView{display:none;padding:4px}
+.thumb-item{position:relative;margin-bottom:10px;cursor:pointer;text-align:center;border-radius:4px;padding:4px}
+.thumb-item .thumb-page-num{position:absolute;top:2px;right:6px;font-size:11px;color:var(--muted);background:var(--panel);padding:0 4px;border-radius:4px;border:1px solid var(--border)}
+.thumb-item .thumb-canvas{border:1px solid var(--border);background:#fff;border-radius:3px;box-shadow:var(--shadow)}
+.thumb-item.active{background:var(--accent-soft);outline:2px solid var(--accent);border-radius:6px}
+.thumb-item.active .thumb-canvas{border-color:var(--accent)}
+#resizer{width:5px;cursor:col-resize;flex:0 0 auto;background:transparent;transition:background .15s}
+#resizer:hover,#resizer.dragging{background:var(--accent)}
+#viewerWrap{flex:1 1 auto;min-width:0;position:relative;display:flex;flex-direction:column;background:var(--bg)}
+#viewer{flex:1 1 auto;overflow:auto;padding:16px;position:relative}
+#viewer.single{overflow:hidden;display:flex;align-items:center;justify-content:center}
+#viewer.single .page-frame{display:none}
+#viewer.single .page-frame.active{display:block}
+.page-frame{
+  position:relative;margin:0 auto 14px;box-shadow:var(--shadow-lg);
+  background:#fff;border-radius:2px;overflow:hidden;
+}
+.page-wrap{position:relative;width:100%;height:100%}
+.canvasWrapper{position:relative}
+canvas{display:block}
+.textLayer{
+  position:absolute;inset:0;overflow:hidden;opacity:1;line-height:1;
+  text-size-adjust:none;forced-color-adjust:none;transform-origin:0 0;z-index:2;
+  caret-color:transparent;text-align:initial;
+}
+.textLayer :is(span,br){color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0% 0%}
+.textLayer span.markedContent{top:0;height:0}
+.textLayer .highlight{margin:-1px;padding:1px;background:#b6d2ff;border-radius:4px}
+.textLayer .highlight.selected{background:rgba(0,100,0,.2)}
+.textLayer .search-hl{background:#ffd54f;color:transparent;border-radius:2px;box-shadow:0 0 0 1px #ffb300}
+.textLayer .search-hl.current{background:#ff8a3d;box-shadow:0 0 0 1px #e65100}
+.textLayer ::selection{background:rgba(0,0,255,.25)}
+#emptyOverlay{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:13px;pointer-events:none;z-index:1;
+}
+
+/* ---------- Outline ---------- */
+.outline-item{font-size:13px;padding:5px 8px;border-radius:5px;cursor:pointer;color:var(--text)}
+.outline-item:hover{background:var(--accent-soft);color:var(--accent)}
+.outline-children{padding-left:16px}
+
+/* ---------- Status bar ---------- */
+#statusbar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:4px 12px;background:var(--toolbar);border-top:1px solid var(--border);
+  font-size:12px;color:var(--muted);user-select:none;z-index:20;flex:0 0 auto;
+}
+#statusbar .right{display:flex;gap:14px;align-items:center}
+
+/* ---------- Overlays ---------- */
+#welcome{
+  position:fixed;inset:0;z-index:100;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+}
+#welcome.hide{display:none}
+.welcome-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:16px;
+  box-shadow:var(--shadow-lg);padding:40px 36px;max-width:560px;width:100%;text-align:center;
+}
+.welcome-icon{font-size:56px;margin-bottom:12px}
+.welcome-card h1{font-size:22px;margin-bottom:6px}
+.welcome-card p{color:var(--muted);margin-bottom:22px;line-height:1.7}
+.dropzone{
+  border:2px dashed var(--border);border-radius:12px;padding:34px 20px;color:var(--muted);
+  transition:all .15s;cursor:pointer;background:var(--panel2);
+}
+.dropzone:hover,.dropzone.over{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.dropzone .dz-main{font-size:15px;margin-bottom:6px}
+.dropzone .dz-sub{font-size:12.5px}
+.welcome-row{display:flex;gap:10px;margin-top:16px}
+.welcome-row button{
+  flex:1;height:40px;border-radius:8px;border:1px solid var(--border);background:var(--panel);
+  font-size:13.5px;color:var(--text);
+}
+.welcome-row button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.welcome-row button.primary:hover{background:var(--accent-hover)}
+.welcome-row button:hover{background:var(--accent-soft)}
+.url-input{
+  flex:1;height:38px;padding:0 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--panel);outline:none;font-size:13px;min-width:0;
+}
+.url-input:focus{border-color:var(--accent)}
+#loading{
+  position:fixed;inset:0;z-index:110;background:rgba(0,0,0,.35);
+  display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;
+  color:#fff;font-size:14px;backdrop-filter:blur(2px);
+}
+#loading.show{display:flex}
+.spinner{width:42px;height:42px;border:4px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- Help modal ---------- */
+#help{
+  position:fixed;inset:0;z-index:120;background:rgba(0,0,0,.45);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+#help.show{display:flex}
+.help-card{
+  background:var(--panel);border:1px solid var(--border);border-radius:14px;
+  box-shadow:var(--shadow-lg);max-width:560px;width:100%;max-height:82vh;overflow:auto;padding:22px 26px;
+}
+.help-card h2{font-size:17px;margin-bottom:12px}
+.kbd-table{width:100%;border-collapse:collapse;font-size:13px}
+.kbd-table td{padding:6px 4px;border-bottom:1px solid var(--border2)}
+.kbd-table tr:last-child td{border-bottom:none}
+.kbd-table td:first-child{color:var(--muted);width:44%}
+kbd{
+  background:var(--panel2);border:1px solid var(--border);border-bottom-width:2px;
+  border-radius:5px;padding:1px 7px;font-size:12px;font-family:inherit;
+}
+.help-close{margin-top:16px;width:100%;height:38px;border-radius:8px;background:var(--accent);color:#fff}
+
+/* ---------- Toast ---------- */
+#toast{
+  position:fixed;left:50%;bottom:46px;transform:translateX(-50%) translateY(20px);
+  background:var(--panel);color:var(--text);border:1px solid var(--border);
+  border-radius:8px;box-shadow:var(--shadow-lg);padding:10px 18px;font-size:13px;
+  opacity:0;pointer-events:none;transition:all .25s;z-index:130;max-width:80vw;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.error{border-color:var(--danger);color:var(--danger)}
+
+@media (max-width:900px){
+  #toolbar{gap:2px;padding:5px 6px}
+  #fileName{max-width:100px}
+  .hide-sm{display:none!important}
+  #searchInput{flex:1}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="toolbar">
+    <span id="fileName" title="当前文件"></span>
+    <div class="tb-group">
+      <button class="tbtn primary" id="btnOpen" title="打开 PDF 文件"><span class="ico">📂</span><span class="hide-sm">打开</span></button>
+      <button class="tbtn" id="btnOpenUrl" title="从网址打开"><span class="ico">🔗</span></button>
+      <button class="tbtn" id="btnDownload" title="下载当前文件 (Ctrl+S)"><span class="ico">⬇️</span></button>
+      <button class="tbtn" id="btnPrint" title="打印 / 导出为 PDF (Ctrl+P)"><span class="ico">🖨️</span></button>
+    </div>
+    <div class="tb-group">
+      <button class="tbtn" id="btnPrev" title="上一页 (←)"><span class="ico">◀</span></button>
+      <input id="pageInput" type="number" min="1" value="1" title="跳转到页面 (回车)">
+      <span id="pageTotal">/ 0</span>
+      <button class="tbtn" id="btnNext" title="下一页 (→)"><span class="ico">▶</span></button>
+    </div>
+    <div class="tb-group">
+      <button class="tbtn" id="btnZoomOut" title="缩小 (-)"><span class="ico">🔍➖</span></button>
+      <span id="zoomLabel" title="点击恢复适应宽度">100%</span>
+      <button class="tbtn" id="btnZoomIn" title="放大 (+)"><span class="ico">🔍➕</span></button>
+      <button class="tbtn" id="btnFitWidth" title="适合宽度 (0)"><span class="ico">⇔</span></button>
+      <button class="tbtn" id="btnFitPage" title="适合页面 (1)"><span class="ico">⤢</span></button>
+    </div>
+    <div class="tb-group">
+      <button class="tbtn" id="btnRotateCw" title="顺时针旋转 (R)"><span class="ico">↻</span></button>
+      <button class="tbtn" id="btnRotateCcw" title="逆时针旋转 (Shift+R)"><span class="ico">↺</span></button>
+    </div>
+    <div class="tb-group">
+      <button class="tbtn" id="btnThumbs" title="缩略图 (T)"><span class="ico">🖼️</span></button>
+      <button class="tbtn" id="btnOutline" title="书签 / 目录 (O)"><span class="ico">📑</span></button>
+      <button class="tbtn" id="btnScrollMode" title="滚动模式：连续 / 单页 (M)"><span class="ico">▤</span></button>
+    </div>
+    <div class="tb-group">
+      <button class="tbtn" id="btnSearch" title="搜索 (Ctrl+F / S)"><span class="ico">🔎</span></button>
+      <button class="tbtn" id="btnFullscreen" title="全屏 (F)"><span class="ico">⛶</span></button>
+      <button class="tbtn" id="btnDark" title="深色模式"><span class="ico">🌙</span></button>
+      <button class="tbtn" id="btnHelp" title="快捷键帮助 (?)"><span class="ico">❓</span></button>
+    </div>
+  </header>
+
+  <div id="searchbar">
+    <input id="searchInput" type="text" placeholder="输入要查找的文本，回车查找">
+    <button class="tbtn small" id="btnSearchPrev" title="上一个 (Shift+Enter)">▲</button>
+    <button class="tbtn small" id="btnSearchNext" title="下一个 (Enter)">▼</button>
+    <span id="searchCount">0 / 0</span>
+    <label class="search-case" title="区分大小写"><input type="checkbox" id="caseSens"> 大小写</label>
+    <button class="tbtn small" id="btnSearchClose" title="关闭 (Esc)">✕</button>
+  </div>
+
+  <div id="content">
+    <aside id="sidebar" class="collapsed">
+      <div id="sideTabs">
+        <button class="side-tab on" data-tab="thumb">缩略图</button>
+        <button class="side-tab" data-tab="outline">书签</button>
+      </div>
+      <div id="thumbView"></div>
+      <div id="outlineView"></div>
+    </aside>
+    <div id="resizer"></div>
+    <div id="viewerWrap">
+      <div id="viewer"></div>
+      <div id="emptyOverlay">打开一个 PDF 文件开始预览</div>
+    </div>
+  </div>
+
+  <footer id="statusbar">
+    <span id="statusLeft">就绪</span>
+    <span class="right">
+      <span id="statusZoom"></span>
+      <span id="statusMode"></span>
+      <span id="statusHint">快捷键 ? 查看帮助</span>
+    </span>
+  </footer>
+</div>
+
+<div id="welcome">
+  <div class="welcome-card">
+    <div class="welcome-icon">📄</div>
+    <h1>PDF 全能预览器</h1>
+    <p>支持本地打开、网址加载、缩放旋转、缩略图、书签目录、文本搜索、打印导出等完整功能</p>
+    <div class="dropzone" id="dropzone">
+      <div class="dz-main">将 PDF 文件拖放到此处</div>
+      <div class="dz-sub">或点击选择文件</div>
+    </div>
+    <div class="welcome-row">
+      <button class="primary" id="btnWelcomeOpen">📂 选择文件</button>
+      <button id="btnWelcomeUrl">🔗 打开网址</button>
+    </div>
+  </div>
+</div>
+
+<div id="loading"><div class="spinner"></div><div id="loadingText">正在加载…</div></div>
+
+<div id="help">
+  <div class="help-card">
+    <h2>⌨️ 快捷键</h2>
+    <table class="kbd-table">
+      <tr><td><kbd>←</kbd> / <kbd>→</kbd> / <kbd>PageUp</kbd> / <kbd>PageDown</kbd> / <kbd>空格</kbd></td><td>上一页 / 下一页</td></tr>
+      <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>第一页 / 最后一页</td></tr>
+      <tr><td><kbd>+</kbd> / <kbd>−</kbd></td><td>放大 / 缩小</td></tr>
+      <tr><td><kbd>0</kbd></td><td>适合宽度</td></tr>
+      <tr><td><kbd>1</kbd></td><td>适合页面</td></tr>
+      <tr><td><kbd>R</kbd> / <kbd>Shift</kbd>+<kbd>R</kbd></td><td>顺时针 / 逆时针旋转</td></tr>
+      <tr><td><kbd>M</kbd></td><td>连续滚动 / 单页切换</td></tr>
+      <tr><td><kbd>T</kbd></td><td>缩略图侧栏</td></tr>
+      <tr><td><kbd>O</kbd></td><td>书签目录侧栏</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd> 或 <kbd>S</kbd></td><td>搜索文本</td></tr>
+      <tr><td><kbd>F</kbd></td><td>全屏</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>P</kbd></td><td>打印 / 导出 PDF</td></tr>
+      <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>下载文件</td></tr>
+      <tr><td><kbd>G</kbd></td><td>跳转到指定页</td></tr>
+      <tr><td><kbd>?</kbd></td><td>此帮助</td></tr>
+      <tr><td><kbd>Esc</kbd></td><td>关闭搜索 / 全屏 / 帮助</td></tr>
+    </table>
+    <button class="help-close" id="btnHelpClose">知道了</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<input type="file" id="fileInput" accept="application/pdf" hidden>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+(function(){
+'use strict';
+
+if (!window.pdfjsLib) {
+  document.getElementById('welcome').querySelector('p').textContent =
+    '无法加载 PDF.js 库，请检查网络连接后刷新页面。';
+  return;
+}
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+/* ---------------- State ---------------- */
+const state = {
+  pdf: null,
+  data: null,
+  filename: '',
+  numPages: 0,
+  rotation: 0,
+  pageNum: 1,
+  fitMode: 'width',
+  zoomFactor: 1,
+  scrollMode: 'continuous',
+  pages: [],
+  offsets: [],
+  rendering: new Set(),
+  pageTexts: [],
+  search: { q: '', matches: [], idx: -1 },
+  dark: localStorage.getItem('pdfview.dark') === '1',
+  currentMatchPromise: null,
+};
+
+/* ---------------- DOM refs ---------------- */
+const $ = id => document.getElementById(id);
+const viewer = $('viewer');
+const pageInput = $('pageInput');
+const pageTotal = $('pageTotal');
+const zoomLabel = $('zoomLabel');
+const fileNameEl = $('fileName');
+const sidebar = $('sidebar');
+const thumbView = $('thumbView');
+const outlineView = $('outlineView');
+const searchbar = $('searchbar');
+const searchInput = $('searchInput');
+const searchCount = $('searchCount');
+const caseSens = $('caseSens');
+const loading = $('loading');
+const loadingText = $('loadingText');
+const toast = $('toast');
+const statusLeft = $('statusLeft');
+const statusZoom = $('statusZoom');
+const statusMode = $('statusMode');
+
+if (state.dark) document.body.classList.add('dark');
+$('btnDark').textContent = state.dark ? '☀️' : '🌙';
+
+/* ---------------- Toast ---------------- */
+let toastTimer = null;
+function showToast(msg, isError) {
+  toast.textContent = msg;
+  toast.className = 'show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toast.className = ''; }, 2600);
+}
+
+/* ---------------- Loading ---------------- */
+function setLoading(on, text) {
+  loading.classList.toggle('show', on);
+  if (text) loadingText.textContent = text;
+}
+
+/* ---------------- File loading ---------------- */
+function openFile(file) {
+  if (!file || !/\.pdf$/i.test(file.name)) {
+    showToast('请选择 PDF 文件', true);
+    return;
+  }
+  setLoading(true, '正在读取 ' + file.name + ' …');
+  file.arrayBuffer().then(buf => initPdf(buf, file.name))
+    .catch(e => { setLoading(false); showToast('读取文件失败：' + e.message, true); });
+}
+
+async function openUrl(url) {
+  url = (url || '').trim();
+  if (!url) return;
+  setLoading(true, '正在从网址下载…');
+  try {
+    const resp = await fetch(url, { credentials: 'omit' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const buf = await resp.arrayBuffer();
+    const name = decodeURIComponent(url.split('/').pop().split('?')[0] || 'document.pdf');
+    await initPdf(buf, name);
+  } catch (e) {
+    setLoading(false);
+    showToast('打开网址失败（可能存在跨域限制）：' + e.message, true);
+  }
+}
+
+/* ---------------- Core init ---------------- */
+async function initPdf(data, name) {
+  state.data = data;
+  state.filename = name || 'document.pdf';
+  const task = pdfjsLib.getDocument({ data });
+  state.pdf = await task.promise;
+  state.numPages = state.pdf.numPages;
+  state.rotation = 0;
+  state.pageNum = 1;
+  state.pageTexts = [];
+  state.search = { q: '', matches: [], idx: -1 };
+  clearSearchUI();
+
+  fileNameEl.textContent = state.filename + '（' + state.numPages + ' 页）';
+  $('welcome').classList.add('hide');
+  $('emptyOverlay').style.display = 'none';
+
+  buildPageFrames();
+  buildThumbs();
+  buildOutline();
+  await recomputeViewports();
+  indexTextsBackground();
+  updatePageUI();
+  updateZoomUI();
+  updateStatusBar();
+  setLoading(false);
+  statusLeft.textContent = state.filename + '  共 ' + state.numPages + ' 页';
+  showToast('已加载：' + state.filename);
+}
+
+/* ---------------- Page frames ---------------- */
+function buildPageFrames() {
+  viewer.innerHTML = '';
+  viewer.classList.remove('single');
+  state.pages = [];
+  state.rendering.clear();
+  for (let i = 0; i < state.numPages; i++) {
+    const frame = document.createElement('div');
+    frame.className = 'page-frame';
+    const wrap = document.createElement('div');
+    wrap.className = 'page-wrap';
+    const cw = document.createElement('div');
+    cw.className = 'canvasWrapper';
+    const canvas = document.createElement('canvas');
+    const textLayer = document.createElement('div');
+    textLayer.className = 'textLayer';
+    cw.appendChild(canvas);
+    wrap.appendChild(cw);
+    wrap.appendChild(textLayer);
+    frame.appendChild(wrap);
+    viewer.appendChild(frame);
+    state.pages.push({
+      api: state.pdf.getPage(i + 1),
+      frame, canvas, textLayer,
+      scale: 1, w: 0, h: 0,
+      baseViewport: null,
+      renderedScale: -1, renderedRot: -1,
+      tlScale: -1, tlRot: -1, tlBuilt: false,
+      spans: [], hits: [], thumbDone: false,
+    });
+  }
+}
+
+/* ---------------- Layout ---------------- */
+let viewportGen = 0;
+async function recomputeViewports() {
+  const gen = ++viewportGen;
+  const rot = state.rotation;
+  await Promise.all(state.pages.map(async p => {
+    try {
+      const page = await p.api;
+      if (gen !== viewportGen) return;
+      p.baseViewport = page.getViewport({ scale: 1, rotation: rot });
+    } catch (e) { /* ignore */ }
+  }));
+  if (gen === viewportGen) relayout();
+}
+function layout() {
+  if (!state.pdf) return;
+  const availW = viewer.clientWidth;
+  const availH = viewer.clientHeight;
+  const isSingle = state.scrollMode === 'single';
+  const pad = isSingle ? 0 : 16;
+  const widthTarget = Math.max(50, availW - pad * 2);
+  const heightTarget = Math.max(50, availH - pad * 2);
+
+  for (let i = 0; i < state.numPages; i++) {
+    const p = state.pages[i];
+    if (!p.baseViewport) continue;
+    const vw = p.baseViewport.width, vh = p.baseViewport.height;
+    let scale;
+    if (state.fitMode === 'width') {
+      scale = widthTarget / vw;
+    } else if (state.fitMode === 'page') {
+      scale = Math.min(widthTarget / vw, heightTarget / vh);
+    } else {
+      scale = (widthTarget / vw) * state.zoomFactor;
+    }
+    p.scale = scale;
+    p.w = vw * scale;
+    p.h = vh * scale;
+  }
+  applyLayout();
+}
+function applyLayout() {
+  if (!state.pdf) return;
+  state.offsets = [];
+  const isSingle = state.scrollMode === 'single';
+  viewer.classList.toggle('single', isSingle);
+  let top = 0;
+  for (let i = 0; i < state.numPages; i++) {
+    const p = state.pages[i];
+    p.frame.style.width = p.w + 'px';
+    p.frame.style.height = p.h + 'px';
+    if (isSingle) p.frame.classList.toggle('active', i === state.pageNum - 1);
+    state.offsets.push(top);
+    top += p.h + (isSingle ? 0 : 14);
+  }
+  if (isSingle) { viewer.scrollTop = 0; viewer.scrollLeft = 0; }
+}
+
+/* ---------------- Rendering ---------------- */
+function visibleRange() {
+  const top = viewer.scrollTop, bot = top + viewer.clientHeight;
+  let s = -1, e = -1;
+  for (let i = 0; i < state.numPages; i++) {
+    const t = state.offsets[i], b = t + state.pages[i].h;
+    if (b >= top && t <= bot) { if (s === -1) s = i; e = i; }
+  }
+  if (s === -1) { s = 0; e = 0; }
+  s = Math.max(0, s - 2);
+  e = Math.min(state.numPages - 1, e + 2);
+  return [s, e];
+}
+function renderNear() {
+  if (!state.pdf) return;
+  if (state.scrollMode === 'single') {
+    renderPage(state.pageNum - 1);
+    return;
+  }
+  const [s, e] = visibleRange();
+  for (let i = s; i <= e; i++) renderPage(i);
+  for (let i = 0; i < state.numPages; i++) {
+    if (i < s - 8 || i > e + 8) clearPage(i);
+  }
+}
+function clearPage(i) {
+  const p = state.pages[i];
+  p.canvas.width = 1; p.canvas.height = 1;
+  p.renderedScale = -1; p.renderedRot = -1;
+  p.tlBuilt = false; p.spans = []; p.hits = [];
+  p.textLayer.innerHTML = '';
+}
+async function renderPage(i) {
+  if (i < 0 || i >= state.numPages) return;
+  if (state.rendering.has(i)) return;
+  state.rendering.add(i);
+  const p = state.pages[i];
+  try {
+    const page = await p.api;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    if (p.scale !== p.renderedScale || state.rotation !== p.renderedRot) {
+      const viewport = page.getViewport({ scale: p.scale, rotation: state.rotation });
+      const canvas = p.canvas;
+      canvas.width = Math.floor(viewport.width * dpr);
+      canvas.height = Math.floor(viewport.height * dpr);
+      canvas.style.width = p.w + 'px';
+      canvas.style.height = p.h + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      await page.render({
+        canvasContext: ctx,
+        viewport,
+        transform: dpr === 1 ? null : [dpr, 0, 0, dpr, 0, 0],
+      }).promise;
+      p.renderedScale = p.scale;
+      p.renderedRot = state.rotation;
+    }
+    await buildTextLayer(i, page);
+    applySearchHighlight(i);
+  } catch (e) {
+    if (e && e.name !== 'RenderingCancelledException') {
+      console.error('render page', i + 1, e);
+    }
+  } finally {
+    state.rendering.delete(i);
+  }
+}
+async function buildTextLayer(i, page) {
+  const p = state.pages[i];
+  if (p.tlBuilt && p.tlScale === p.scale && p.tlRot === state.rotation) return;
+  const tl = p.textLayer;
+  tl.innerHTML = '';
+  tl.style.width = p.w + 'px';
+  tl.style.height = p.h + 'px';
+  try {
+    const textContent = await page.getTextContent();
+    const vp = page.getViewport({ scale: p.scale, rotation: state.rotation });
+    const r = pdfjsLib.renderTextLayer({
+      textContentSource: textContent,
+      container: tl,
+      viewport: vp,
+      textDivs: [],
+    });
+    if (r && r.promise) await r.promise;
+  } catch (e) {
+    console.warn('text layer', i + 1, e);
+  }
+  p.spans = Array.from(tl.querySelectorAll('span'));
+  p.tlBuilt = true;
+  p.tlScale = p.scale;
+  p.tlRot = state.rotation;
+}
+function applySearchHighlight(i) {
+  const p = state.pages[i];
+  p.hits = [];
+  p.spans.forEach(sp => sp.classList.remove('search-hl', 'current'));
+  if (!state.search.q) return;
+  p.spans.forEach(sp => {
+    if (sp.textContent.toLowerCase().includes(state.search.q.toLowerCase())) {
+      sp.classList.add('search-hl');
+      p.hits.push(sp);
+    }
+  });
+  const m = state.search.matches[state.search.idx];
+  if (m && m.page === i && p.hits.length) {
+    const cur = p.hits[Math.min(m.local, p.hits.length - 1)];
+    cur.classList.add('current');
+    cur.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+}
+
+/* ---------------- Navigation ---------------- */
+function goToPage(n) {
+  if (!state.pdf) return;
+  n = Math.max(1, Math.min(state.numPages, n));
+  state.pageNum = n;
+  updatePageUI();
+  if (state.scrollMode === 'single') {
+    applyLayout();
+    renderNear();
+  } else {
+    const off = state.offsets[n - 1];
+    if (off != null) viewer.scrollTo({ top: off, behavior: 'smooth' });
+    renderNear();
+  }
+  highlightThumb(n);
+}
+function currentPageFromScroll() {
+  if (state.scrollMode === 'single') return;
+  const top = viewer.scrollTop;
+  let n = 1;
+  for (let i = 0; i < state.numPages; i++) {
+    if (top >= state.offsets[i] - 4) n = i + 1;
+  }
+  if (n !== state.pageNum) {
+    state.pageNum = n;
+    updatePageUI();
+    highlightThumb(n);
+  }
+}
+function updatePageUI() {
+  pageInput.value = state.pageNum;
+  pageTotal.textContent = '/ ' + state.numPages;
+}
+
+/* ---------------- Zoom ---------------- */
+function zoomIn() {
+  state.fitMode = 'custom';
+  state.zoomFactor *= 1.2;
+  relayout();
+}
+function zoomOut() {
+  state.fitMode = 'custom';
+  state.zoomFactor /= 1.2;
+  relayout();
+}
+function fitWidth() { state.fitMode = 'width'; state.zoomFactor = 1; relayout(); }
+function fitPage() { state.fitMode = 'page'; state.zoomFactor = 1; relayout(); }
+function relayout() {
+  layout();
+  renderNear();
+  updateZoomUI();
+  updateStatusBar();
+}
+function updateZoomUI() {
+  if (!state.pdf || !state.pages.length) return;
+  zoomLabel.textContent = Math.round(state.pages[state.pageNum - 1].scale * 100) + '%';
+  statusZoom.textContent = '缩放 ' + Math.round(state.pages[state.pageNum - 1].scale * 100) + '%';
+}
+
+/* ---------------- Rotation ---------------- */
+function rotate(deg) {
+  state.rotation = (state.rotation + deg + 360) % 360;
+  for (let i = 0; i < state.numPages; i++) {
+    const p = state.pages[i];
+    p.renderedScale = -1; p.renderedRot = -1;
+    p.tlBuilt = false; p.spans = []; p.hits = [];
+    p.thumbDone = false;
+  }
+  recomputeViewports().then(() => { ensureThumbs(); });
+}
+function rotateCw() { rotate(90); }
+function rotateCcw() { rotate(-90); }
+
+/* ---------------- Thumbnails ---------------- */
+function buildThumbs() {
+  thumbView.innerHTML = '';
+  for (let i = 0; i < state.numPages; i++) {
+    const item = document.createElement('div');
+    item.className = 'thumb-item';
+    item.dataset.page = i + 1;
+    const canvas = document.createElement('canvas');
+    canvas.className = 'thumb-canvas';
+    const num = document.createElement('div');
+    num.className = 'thumb-page-num';
+    num.textContent = i + 1;
+    item.appendChild(canvas);
+    item.appendChild(num);
+    thumbView.appendChild(item);
+    state.pages[i].thumbEl = item;
+    state.pages[i].thumbCanvas = canvas;
+  }
+}
+function ensureThumbs() {
+  const rect = thumbView.getBoundingClientRect();
+  const top = rect.top, bot = rect.bottom;
+  const items = thumbView.children;
+  for (let i = 0; i < items.length; i++) {
+    const r = items[i].getBoundingClientRect();
+    if (r.bottom >= top && r.top <= bot) renderThumb(i);
+  }
+}
+async function renderThumb(i) {
+  const p = state.pages[i];
+  if (p.thumbDone) return;
+  p.thumbDone = true;
+  try {
+    const page = await p.api;
+    const vp1 = page.getViewport({ scale: 1, rotation: state.rotation });
+    const tw = 132;
+    const scale = tw / vp1.width;
+    const vp = page.getViewport({ scale, rotation: state.rotation });
+    const canvas = p.thumbCanvas;
+    canvas.width = vp.width;
+    canvas.height = vp.height;
+    canvas.style.width = tw + 'px';
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+  } catch (e) {
+    p.thumbDone = false;
+  }
+}
+function renderAllThumbs() {
+  state.pages.forEach(p => { p.thumbDone = false; });
+  ensureThumbs();
+}
+function highlightThumb(n) {
+  const items = thumbView.children;
+  for (let i = 0; i < items.length; i++) {
+    items[i].classList.toggle('active', i + 1 === n);
+  }
+}
+
+/* ---------------- Outline ---------------- */
+async function buildOutline() {
+  outlineView.innerHTML = '';
+  try {
+    const outline = await state.pdf.getOutline();
+    if (!outline || !outline.length) {
+      outlineView.innerHTML = '<div style="padding:14px;color:var(--muted);font-size:13px">此 PDF 不包含书签目录</div>';
+      return;
+    }
+    const ul = document.createElement('div');
+    renderOutlineItems(outline, ul, 0);
+    outlineView.appendChild(ul);
+  } catch (e) {
+    outlineView.innerHTML = '<div style="padding:14px;color:var(--muted);font-size:13px">读取书签失败</div>';
+  }
+}
+function renderOutlineItems(items, container, depth) {
+  for (const item of items) {
+    const div = document.createElement('div');
+    div.className = 'outline-item';
+    div.style.paddingLeft = (8 + depth * 14) + 'px';
+    div.textContent = item.title || '(无标题)';
+    div.title = item.title || '';
+    div.addEventListener('click', () => jumpToDest(item));
+    container.appendChild(div);
+    if (item.items && item.items.length) {
+      const child = document.createElement('div');
+      child.className = 'outline-children';
+      renderOutlineItems(item.items, child, depth + 1);
+      container.appendChild(child);
+    }
+  }
+}
+async function jumpToDest(item) {
+  try {
+    const dest = await state.pdf.getDestination(item.dest);
+    const idx = await state.pdf.getPageIndex(dest);
+    goToPage(idx + 1);
+  } catch (e) {
+    showToast('无法跳转到该位置', true);
+  }
+}
+
+/* ---------------- Search ---------------- */
+async function indexTextsBackground() {
+  state.pageTexts = [];
+  for (let i = 0; i < state.numPages; i++) {
+    try {
+      const page = await state.pages[i].api;
+      const tc = await page.getTextContent();
+      state.pageTexts[i] = tc.items.map(t => t.str || '').join(' ');
+    } catch (e) {
+      state.pageTexts[i] = '';
+    }
+    if (i % 20 === 0) await new Promise(r => setTimeout(r, 0));
+  }
+}
+function runSearch() {
+  const q = searchInput.value;
+  state.search.q = q;
+  state.search.matches = [];
+  state.search.idx = -1;
+  if (!q) {
+    state.pages.forEach((p, i) => { if (p.spans.length) applySearchHighlight(i); });
+    updateSearchCount();
+    renderNear();
+    return;
+  }
+  const lower = q.toLowerCase();
+  for (let i = 0; i < state.numPages; i++) {
+    const text = state.pageTexts[i] || '';
+    const hay = state.search.caseSens ? text : text.toLowerCase();
+    let from = 0, count = 0;
+    const needle = state.search.caseSens ? q : lower;
+    while (true) {
+      const idx = hay.indexOf(needle, from);
+      if (idx === -1) break;
+      count++; from = idx + needle.length;
+    }
+    for (let k = 0; k < count; k++) state.search.matches.push({ page: i, local: k });
+  }
+  if (state.search.matches.length) searchStep(1);
+  updateSearchCount();
+  renderNear();
+}
+function searchStep(dir) {
+  const n = state.search.matches.length;
+  if (!n) return;
+  state.search.idx = (state.search.idx + dir + n) % n;
+  const m = state.search.matches[state.search.idx];
+  goToPage(m.page + 1);
+  setTimeout(() => {
+    const p = state.pages[m.page];
+    if (p && p.hits.length) {
+      const span = p.hits[Math.min(m.local, p.hits.length - 1)];
+      if (span) span.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+  }, 250);
+  updateSearchCount();
+}
+function updateSearchCount() {
+  const total = state.search.matches.length;
+  searchCount.textContent = state.search.q
+    ? (state.search.idx >= 0 ? (state.search.idx + 1) + ' / ' + total : '0 / ' + total)
+    : '输入关键词进行搜索';
+}
+function clearSearchUI() {
+  searchInput.value = '';
+  state.search.q = '';
+  state.search.matches = [];
+  state.search.idx = -1;
+  updateSearchCount();
+  searchbar.classList.remove('show');
+}
+function showSearch() {
+  searchbar.classList.add('show');
+  searchInput.focus();
+  searchInput.select();
+}
+
+/* ---------------- Print ---------------- */
+async function printAll() {
+  if (!state.pdf) return;
+  const w = window.open('', '_blank');
+  if (!w) { showToast('请允许弹出窗口以进行打印', true); return; }
+  setLoading(true, '正在渲染所有页面…');
+  try {
+    const images = [];
+    for (let i = 1; i <= state.numPages; i++) {
+      const page = await state.pdf.getPage(i);
+      const vp = page.getViewport({ scale: 1.5, rotation: state.rotation });
+      const cv = document.createElement('canvas');
+      cv.width = vp.width; cv.height = vp.height;
+      await page.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise;
+      images.push(cv.toDataURL('image/jpeg', 0.92));
+      if (i % 5 === 0) await new Promise(r => setTimeout(r, 0));
+    }
+    w.document.write(
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' +
+      (state.filename || 'print') +
+      '</title><style>@page{margin:0}body{margin:0}img{width:100%;display:block;page-break-after:always;}</style></head><body>' +
+      images.map(d => '<img src="' + d + '">').join('') +
+      '<script>window.onload=function(){setTimeout(function(){window.print();window.onafterprint=function(){window.close();};},300);}<\/script>' +
+      '</body></html>');
+    w.document.close();
+  } catch (e) {
+    w.close();
+    showToast('打印失败：' + e.message, true);
+  } finally {
+    setLoading(false);
+  }
+}
+
+/* ---------------- Download ---------------- */
+function download() {
+  if (!state.data) return;
+  const blob = new Blob([state.data], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = state.filename || 'document.pdf';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ---------------- Fullscreen ---------------- */
+function toggleFullscreen() {
+  const app = document.getElementById('app');
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else if (app.requestFullscreen) {
+    app.requestFullscreen().catch(() => showToast('无法进入全屏', true));
+  }
+}
+
+/* ---------------- Status ---------------- */
+function updateStatusBar() {
+  statusZoom.textContent = state.pages.length
+    ? '缩放 ' + Math.round(state.pages[state.pageNum - 1].scale * 100) + '%'
+    : '';
+  statusMode.textContent = state.scrollMode === 'single' ? '单页模式' : '连续滚动';
+}
+
+/* ---------------- Sidebar ---------------- */
+function setSidebar(open) {
+  sidebar.classList.toggle('collapsed', !open);
+  if (open) setTimeout(ensureThumbs, 60);
+}
+function toggleSidebar() {
+  const open = sidebar.classList.contains('collapsed');
+  setSidebar(open);
+}
+function switchTab(tab) {
+  document.querySelectorAll('.side-tab').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  thumbView.style.display = tab === 'thumb' ? 'block' : 'none';
+  outlineView.style.display = tab === 'outline' ? 'block' : 'none';
+  if (tab === 'thumb') setTimeout(ensureThumbs, 60);
+  if (tab === 'outline' && !outlineView.children.length) buildOutline();
+}
+
+/* ---------------- Events ---------------- */
+$('btnOpen').addEventListener('click', () => $('fileInput').click());
+$('btnWelcomeOpen').addEventListener('click', () => $('fileInput').click());
+$('fileInput').addEventListener('change', e => {
+  if (e.target.files[0]) openFile(e.target.files[0]);
+  e.target.value = '';
+});
+$('btnWelcomeUrl').addEventListener('click', () => {
+  const url = prompt('输入 PDF 文件的网址：', '');
+  if (url) openUrl(url);
+});
+$('btnOpenUrl').addEventListener('click', () => {
+  const url = prompt('输入 PDF 文件的网址：', '');
+  if (url) openUrl(url);
+});
+$('btnDownload').addEventListener('click', download);
+$('btnPrint').addEventListener('click', printAll);
+$('btnPrev').addEventListener('click', () => goToPage(state.pageNum - 1));
+$('btnNext').addEventListener('click', () => goToPage(state.pageNum + 1));
+pageInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') goToPage(parseInt(pageInput.value, 10) || 1);
+});
+$('btnZoomIn').addEventListener('click', zoomIn);
+$('btnZoomOut').addEventListener('click', zoomOut);
+zoomLabel.addEventListener('click', fitWidth);
+$('btnFitWidth').addEventListener('click', fitWidth);
+$('btnFitPage').addEventListener('click', fitPage);
+$('btnRotateCw').addEventListener('click', rotateCw);
+$('btnRotateCcw').addEventListener('click', rotateCcw);
+$('btnScrollMode').addEventListener('click', () => {
+  state.scrollMode = state.scrollMode === 'single' ? 'continuous' : 'single';
+  relayout();
+  updateStatusBar();
+});
+$('btnThumbs').addEventListener('click', () => {
+  if (sidebar.classList.contains('collapsed')) { setSidebar(true); switchTab('thumb'); }
+  else setSidebar(false);
+});
+$('btnOutline').addEventListener('click', () => {
+  if (sidebar.classList.contains('collapsed')) { setSidebar(true); switchTab('outline'); }
+  else setSidebar(false);
+});
+document.querySelectorAll('.side-tab').forEach(b =>
+  b.addEventListener('click', () => switchTab(b.dataset.tab)));
+$('btnSearch').addEventListener('click', showSearch);
+$('btnSearchClose').addEventListener('click', clearSearchUI);
+$('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); searchStep(e.shiftKey ? -1 : 1); }
+  if (e.key === 'Escape') clearSearchUI();
+});
+$('searchInput').addEventListener('input', () => {
+  state.search.caseSens = caseSens.checked;
+  runSearch();
+});
+caseSens.addEventListener('change', () => { state.search.caseSens = caseSens.checked; runSearch(); });
+$('btnSearchPrev').addEventListener('click', () => searchStep(-1));
+$('btnSearchNext').addEventListener('click', () => searchStep(1));
+$('btnFullscreen').addEventListener('click', toggleFullscreen);
+document.addEventListener('fullscreenchange', () => {
+  $('btnFullscreen').classList.toggle('on', !!document.fullscreenElement);
+});
+$('btnDark').addEventListener('click', () => {
+  state.dark = !state.dark;
+  document.body.classList.toggle('dark', state.dark);
+  $('btnDark').textContent = state.dark ? '☀️' : '🌙';
+  localStorage.setItem('pdfview.dark', state.dark ? '1' : '0');
+});
+$('btnHelp').addEventListener('click', () => $('help').classList.add('show'));
+$('btnHelpClose').addEventListener('click', () => $('help').classList.remove('show'));
+$('help').addEventListener('click', e => { if (e.target === $('help')) $('help').classList.remove('show'); });
+
+/* Drag & drop */
+const dz = $('dropzone');
+['dragover', 'dragenter'].forEach(ev => window.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => window.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('over'); }));
+window.addEventListener('drop', e => {
+  const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+  if (file) openFile(file);
+});
+dz.addEventListener('click', () => $('fileInput').click());
+
+/* Sidebar resizer */
+const resizer = $('resizer');
+let resizing = false;
+resizer.addEventListener('mousedown', e => {
+  resizing = true;
+  resizer.classList.add('dragging');
+  e.preventDefault();
+});
+document.addEventListener('mousemove', e => {
+  if (!resizing) return;
+  const w = Math.max(130, Math.min(420, e.clientX));
+  sidebar.style.width = w + 'px';
+});
+document.addEventListener('mouseup', () => { resizing = false; resizer.classList.remove('dragging'); });
+
+/* Scroll / resize */
+let scrollRaf = false;
+viewer.addEventListener('scroll', () => {
+  if (scrollRaf) return;
+  scrollRaf = true;
+  requestAnimationFrame(() => {
+    scrollRaf = false;
+    renderNear();
+    currentPageFromScroll();
+  });
+});
+thumbView.addEventListener('scroll', () => { if (scrollRaf) return; scrollRaf = true; requestAnimationFrame(() => { scrollRaf = false; ensureThumbs(); }); });
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => relayout(), 120);
+});
+
+/* Keyboard */
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  const typing = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
+  if (e.key === 'Escape') {
+    if (searchbar.classList.contains('show')) { clearSearchUI(); return; }
+    if ($('help').classList.contains('show')) { $('help').classList.remove('show'); return; }
+    if (document.fullscreenElement) document.exitFullscreen();
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && !typing) {
+    const k = e.key.toLowerCase();
+    if (k === 'f') { e.preventDefault(); showSearch(); }
+    else if (k === 'p') { e.preventDefault(); printAll(); }
+    else if (k === 's') { e.preventDefault(); download(); }
+    else if (k === 'o') { e.preventDefault(); $('fileInput').click(); }
+    return;
+  }
+  if (typing) return;
+  if (e.key === '?') { $('help').classList.add('show'); return; }
+  switch (e.key) {
+    case 'ArrowLeft': case 'PageUp': goToPage(state.pageNum - 1); e.preventDefault(); break;
+    case 'ArrowRight': case 'PageDown': case ' ': goToPage(state.pageNum + 1); e.preventDefault(); break;
+    case 'Home': goToPage(1); e.preventDefault(); break;
+    case 'End': goToPage(state.numPages); e.preventDefault(); break;
+    case '+': case '=': zoomIn(); break;
+    case '-': case '_': zoomOut(); break;
+    case '0': fitWidth(); break;
+    case '1': fitPage(); break;
+    case 'r': case 'R': rotate(e.shiftKey ? -90 : 90); break;
+    case 'm': case 'M':
+      state.scrollMode = state.scrollMode === 'single' ? 'continuous' : 'single';
+      relayout(); updateStatusBar(); break;
+    case 't': case 'T': toggleSidebar(); switchTab('thumb'); break;
+    case 'o': case 'O': toggleSidebar(); switchTab('outline'); break;
+    case 's': case 'S': showSearch(); break;
+    case 'f': case 'F': toggleFullscreen(); break;
+    case 'g': case 'G': pageInput.focus(); pageInput.select(); break;
+  }
+});
+
+/* Welcome dropzone also handles drop on whole screen while welcome visible */
+setSidebar(false);
+switchTab('thumb');
+})();
+</script>
+</body>
+</html>
