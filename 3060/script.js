@@ -216,6 +216,9 @@ const websiteData = [
                     { name: "音频剪辑", url: "https://wrf00123.github.io/wrf/tool4.html", desc: "工具" },
                     { name: "安全检查", url: "https://wrf00123.github.io/wrf/tool5.html", desc: "工具" },
                     { name: "组织结构血脉图", url: "https://wrf00123.github.io/wrf/tool6.html", desc: "工具" },
+                    { name: "地图旅行规划", url: "https://wrf00123.github.io/wrf/tool8.html", desc: "工具" }, 
+                    { name: "沉浸式时钟", url: "https://wrf00123.github.io/wrf/tool9.html", desc: "工具" }, 
+                    { name: "名片生成", url: "https://wrf00123.github.io/wrf/tool10.html", desc: "工具" }, 
                        
                 ]
             },
