@@ -204,8 +204,17 @@ const websiteData = [
                     { name: "方方格子不显示", url: "http://ffcell.com/WenKu/Data/2016051616004881.html", desc: "方方格子不显示教程" }
                 ]
             },
-            {
+             {
                 id: 11,
+                title: "开发工具",
+                icon: "fa-cloud",
+                websites: [
+                    { name: "文本对比", url: "https://wrf00123.github.io/wrf/tool1.html", desc: "工具" },
+                    { name: "PDF水印移除", url: "https://wrf00123.github.io/wrf/tool2.html", desc: "工具" },
+                ]
+            },
+            {
+                id: 12,
                 title: "学习网站",
                 icon: "fa-bolt",
                 websites: [
