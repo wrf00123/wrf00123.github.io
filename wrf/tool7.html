@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>批量 PDF 打印助手</title>
+<style>
+:root{--bg:#f4f6f9;--panel:#ffffff;--panel2:#eef1f5;--text:#1c2430;--muted:#6b7686;--border:#dde3ea;--accent:#2563eb;--accent2:#1d4ed8;--danger:#dc2626;--ok:#16a34a;--shadow:0 6px 24px rgba(15,23,42,.12);--radius:10px;}
+html[data-theme="dark"]{--bg:#0f1420;--panel:#171e2b;--panel2:#1f2837;--text:#e6ebf2;--muted:#93a0b4;--border:#2b3648;--accent:#3b82f6;--accent2:#60a5fa;--danger:#ef4444;--ok:#22c55e;--shadow:0 6px 24px rgba(0,0,0,.45);}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;display:flex;flex-direction:column;transition:background .2s,color .2s}
+button{font:inherit;cursor:pointer;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:8px;padding:7px 12px;transition:background .15s,border-color .15s}
+button:hover{background:var(--panel2);border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button.primary:hover{background:var(--accent2)}
+button.danger{background:transparent;border-color:transparent;color:var(--danger)}
+button.danger:hover{background:rgba(220,38,38,.12)}
+button:disabled{opacity:.5;cursor:not-allowed}
+select,input[type=text],input[type=number]{font:inherit;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 8px;outline:none}
+select:focus,input:focus{border-color:var(--accent)}
+input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+input[type=number]{width:72px}
+header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:700;display:flex;align-items:center;gap:8px}
+.logo{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:800}
+.spacer{flex:1}
+.iconbtn{padding:6px 9px;font-size:13px}
+main{flex:1;display:flex;min-height:0;gap:14px;padding:14px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;min-width:0}
+.left{width:520px;max-width:58%}
+.left .panel{width:100%;height:100%}
+.panel-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.panel-head b{font-size:14px}
+.panel-head .sub{color:var(--muted);font-size:12px;margin-left:4px}
+.right{flex:1;overflow:auto}
+.dropzone{border:2px dashed var(--border);border-radius:10px;margin:12px;padding:22px;text-align:center;color:var(--muted);cursor:pointer;transition:border-color .2s,background .2s}
+.dropzone:hover,.dropzone.over{border-color:var(--accent);background:rgba(37,99,235,.06)}
+.dropzone .big{font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px}
+#list{flex:1;overflow:auto;padding:6px 10px 10px}
+.empty{color:var(--muted);text-align:center;padding:40px 10px;line-height:1.8}
+.item{border:1px solid var(--border);border-radius:9px;background:var(--panel2);margin-bottom:8px;overflow:hidden}
+.item.dragging{opacity:.4}
+.item.drag-over{border-top:2px solid var(--accent)}
+.item-head{display:flex;align-items:center;gap:9px;padding:8px 10px;cursor:pointer}
+.item-head:hover{background:rgba(37,99,235,.05)}
+.item-head .cb{flex:none}
+.thumb{width:44px;height:56px;flex:none;border:1px solid var(--border);border-radius:4px;background:#fff;object-fit:cover;overflow:hidden}
+.thumb.placeholder{background:var(--panel);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:11px}
+.item-mid{flex:1;min-width:0}
+.item-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-meta{color:var(--muted);font-size:12px;margin-top:2px}
+.badge{display:inline-block;font-size:11px;padding:1px 6px;border-radius:10px;background:rgba(37,99,235,.12);color:var(--accent);margin-left:6px}
+.badge.err{background:rgba(220,38,38,.12);color:var(--danger)}
+.item-acts{display:flex;gap:2px;align-items:center;flex:none}
+.item-acts button{padding:5px 7px;font-size:12px;line-height:1}
+.item-body{border-top:1px dashed var(--border);padding:9px 10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;background:var(--panel)}
+.item-body label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+.item-body .chkrow{flex-direction:row;align-items:center;gap:6px;margin-top:14px}
+.item-body select,.item-body input[type=number]{width:100%}
+.footer{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid var(--border);flex-wrap:wrap;background:var(--panel);font-size:13px}
+.footer .stat{color:var(--muted)}
+.footer .stat b{color:var(--text)}
+.settings{display:flex;flex-direction:column;gap:13px;padding:14px}
+.set-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.set-row > label{min-width:96px;color:var(--muted);font-size:13px}
+.hint{font-size:12px;color:var(--muted);line-height:1.7}
+.details{border:1px solid var(--border);border-radius:9px;overflow:hidden;background:var(--panel2)}
+.details summary{cursor:pointer;padding:9px 12px;font-weight:600;list-style:none}
+.details summary::after{content:" ▾";color:var(--muted)}
+.details[open] summary::after{content:" ▴"}
+.details .body{padding:4px 14px 12px;color:var(--muted);font-size:12.5px;line-height:1.9}
+#statusbar{display:flex;align-items:center;gap:12px;padding:8px 16px;border-top:1px solid var(--border);background:var(--panel);font-size:13px;flex-wrap:wrap}
+#statusbar .stat{color:var(--muted)}
+#statusbar .stat b{color:var(--text)}
+#toast{position:fixed;left:50%;bottom:64px;transform:translateX(-50%);background:#111827;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:99;max-width:80vw}
+#toast.show{opacity:1}
+#banner{display:none;margin:12px 16px 0;padding:10px 14px;border-radius:9px;background:rgba(217,119,6,.14);border:1px solid rgba(217,119,6,.6);color:#b45309;font-size:13px;line-height:1.7}
+html[data-theme="dark"] #banner{color:#fbbf24}
+#banner.show{display:block}
+#jobPanel{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);width:min(620px,92vw);background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;z-index:90;display:none}
+#jobPanel.show{display:block}
+#jobPanel .t{font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+#jobPanel .s{color:var(--muted);font-size:12.5px;margin-bottom:9px}
+.pbar{height:9px;border-radius:5px;background:var(--panel2);overflow:hidden;margin-bottom:9px}
+.pbar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3b82f6,#8b5cf6);transition:width .2s;border-radius:5px}
+#jobPanel .btns{display:flex;gap:8px;justify-content:flex-end}
+.modal{position:fixed;inset:0;background:rgba(10,14,22,.6);z-index:120;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal.show{display:flex}
+.modal-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);width:min(900px,94vw);height:min(660px,92vh);display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.modal-head .title{font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.modal-body{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;background:var(--panel2);position:relative}
+.modal-body canvas{max-width:100%;max-height:100%;box-shadow:0 4px 20px rgba(0,0,0,.25);background:#fff}
+.modal-foot{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid var(--border);flex-wrap:wrap}
+#confirmOverlay{position:fixed;inset:0;background:rgba(10,14,22,.55);z-index:130;display:none;align-items:center;justify-content:center}
+#confirmOverlay.show{display:flex}
+.confirm-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:420px;width:88vw;box-shadow:var(--shadow)}
+.confirm-box .t{font-weight:600;margin-bottom:10px}
+.confirm-box .btns{display:flex;gap:8px;justify-content:flex-end}
+.logbox{font-family:Consolas,monospace;font-size:12px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px;max-height:220px;overflow:auto;white-space:pre-wrap;color:var(--text);line-height:1.7}
+.logbox .err{color:var(--danger)}
+.logbox .warn{color:#d97706}
+.logbox .ok{color:var(--ok)}
+@media (max-width:900px){main{flex-direction:column}.left{width:100%;max-width:100%;height:46vh}.right{height:auto}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="logo">P</span>批量 PDF 打印助手</h1>
+  <span class="spacer"></span>
+  <button id="btnAddFile" class="primary">＋ 添加 PDF 文件</button>
+  <button id="btnSelectAll" class="iconbtn">全选</button>
+  <button id="btnInvertSel" class="iconbtn">反选</button>
+  <select id="sortSel" title="排序方式">
+    <option value="manual">手动排序</option>
+    <option value="name">按名称排序</option>
+    <option value="size">按大小排序</option>
+  </select>
+  <button id="btnClear" class="iconbtn">清空列表</button>
+  <button id="btnPrint" class="primary">开始打印</button>
+  <button id="btnTheme" class="iconbtn" title="切换主题">主题</button>
+</header>
+
+<div id="banner">PDF 引擎未能从网络加载：精细控制（Canvas）与"合并打印"功能当前不可用，已自动切换到"原生插件"模式（可整本打印）。请检查网络连接后刷新页面重试。</div>
+
+<main>
+  <section class="left">
+    <div class="panel">
+      <div class="panel-head">
+        <b>文件列表</b><span class="sub">拖拽 PDF 文件到任意位置即可添加</span>
+      </div>
+      <div class="dropzone" id="dropzone">
+        <div class="big">点击或拖拽添加 PDF 文件</div>
+        <div>支持多选、可批量打印、支持排序 / 删除 / 预览</div>
+      </div>
+      <div id="list"></div>
+      <div class="footer">
+        <span class="stat">文件 <b id="statFiles">0</b></span>
+        <span class="stat">总页数 <b id="statPages">—</b></span>
+        <span class="stat">预计打印 <b id="statSheets">0</b> 张</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="right">
+    <div class="panel">
+      <div class="panel-head"><b>打印设置</b><span class="sub">设置会自动保存到浏览器</span></div>
+      <div class="settings">
+        <div class="set-row"><label>打印方式</label>
+          <select id="engineSel">
+            <option value="canvas">精细控制（Canvas 渲染）</option>
+            <option value="native">原生插件（浏览器内置渲染，最高兼容）</option>
+          </select>
+          <span class="hint">精细控制可设置页码范围/份数/方向/缩放；原生模式使用浏览器 PDF 插件打印，忽略页码范围等设置。</span>
+        </div>
+        <div class="set-row"><label>纸张大小</label>
+          <select id="paperSel">
+            <option value="A4">A4 (210×297mm)</option>
+            <option value="A3">A3 (297×420mm)</option>
+            <option value="A5">A5 (148×210mm)</option>
+            <option value="Letter">Letter (8.5×11in)</option>
+            <option value="Legal">Legal (8.5×14in)</option>
+            <option value="Tabloid">Tabloid (11×17in)</option>
+          </select>
+        </div>
+        <div class="set-row"><label>页面方向</label>
+          <select id="orientSel">
+            <option value="auto">自动（跟随原 PDF）</option>
+            <option value="portrait">强制纵向</option>
+            <option value="landscape">强制横向</option>
+          </select>
+        </div>
+        <div class="set-row"><label>全局份数</label>
+          <input type="number" id="copiesIn" min="1" max="99" value="1">
+        </div>
+        <div class="set-row"><label>全局页码范围</label>
+          <input type="text" id="rangeIn" placeholder="留空=全部，如 1-3,5,8-10">
+        </div>
+        <div class="set-row"><label>页边距</label>
+          <select id="marginSel">
+            <option value="0">无（0）</option>
+            <option value="0.25">窄（0.25in）</option>
+            <option value="0.4">常规（0.4in）</option>
+            <option value="0.75">宽（0.75in）</option>
+          </select>
+        </div>
+        <div class="set-row"><label>缩放方式</label>
+          <select id="fitSel">
+            <option value="fit">适合页面（铺满，可能拉伸）</option>
+            <option value="shrink">缩小到合适（不放大）</option>
+            <option value="actual">实际尺寸（1:1）</option>
+            <option value="custom">自定义比例</option>
+          </select>
+          <span style="display:flex;align-items:center;gap:6px">自定义 <input type="number" id="customIn" min="10" max="400" value="100"> %</span>
+        </div>
+        <div class="set-row"><label>渲染质量</label>
+          <select id="dpiSel">
+            <option value="96">草稿（96 DPI，快）</option>
+            <option value="150" selected>标准（150 DPI）</option>
+            <option value="200">高质量（200 DPI，慢）</option>
+          </select>
+        </div>
+        <div class="set-row"><label>灰度打印</label>
+          <input type="checkbox" id="grayChk">
+          <span class="hint">勾选后以黑白输出，可节省彩色墨水。</span>
+        </div>
+        <div class="set-row"><label>先合并再打印</label>
+          <input type="checkbox" id="mergeChk">
+          <span class="hint">使用 pdf-lib 将所有选中文件合并为单个 PDF 后打印，仅需一次打印对话框。需联网加载依赖。</span>
+        </div>
+        <div class="set-row"><label>自动继续</label>
+          <input type="checkbox" id="autoContChk" checked>
+          <span class="hint">勾选后，每个文件打印对话框关闭后自动继续下一个。</span>
+        </div>
+        <div class="set-row">
+          <button class="primary" id="btnPrint2">开始打印全部</button>
+          <button id="btnResetSettings">恢复默认设置</button>
+        </div>
+        <details class="details">
+          <summary>使用说明与提示</summary>
+          <div class="body">
+            1. 点击"添加 PDF 文件"或直接把 PDF 拖入窗口，可一次选择多个文件。<br>
+            2. 每个文件可单独设置页码范围、份数、方向、顺序（点击文件行的 ▼ 展开）。<br>
+            3. 双击文件行或点击"预览"可查看 PDF 内容；点击 ▲/▼ 调整顺序，点击 ✕ 删除。<br>
+            4. "开始打印"会按列表顺序逐个弹出打印对话框，请确认打印机与份数。<br>
+            5. 双面打印、色彩模式、纸张来源等高级选项由系统打印对话框提供，本工具无法控制。<br>
+            6. 若"打印方式"选择"原生插件"，将使用浏览器内置 PDF 插件打印，保真度最高，但无法设置页码范围。<br>
+            6.5 精细控制与合并功能依赖 PDF 引擎（pdf.js / pdf-lib），需联网加载（已内置多 CDN 自动切换）。离线时自动降级为"原生插件"模式，仍可整本打印。<br>
+            7. 加密的 PDF 会弹出密码输入框，一次输入后本次会话不再询问。<br>
+            8. 快捷键：Delete 删除选中、Ctrl+A 全选、Ctrl+P 开始打印。<br>
+            9. 所有设置自动保存于浏览器 localStorage，下次打开自动恢复。
+          </div>
+        </details>
+        <details class="details">
+          <summary>打印日志</summary>
+          <div class="body">
+            <div class="logbox" id="logBox">暂无记录。</div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="btnCopyLog">复制日志</button>
+              <button id="btnClearLog">清空日志</button>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer id="statusbar">
+  <span class="stat">任务：<b id="stTask">空闲</b></span>
+  <span class="stat">引擎：<b id="stEngine">—</b></span>
+  <span class="stat">文件总数：<b id="stFiles">0</b></span>
+</footer>
+
+<input type="file" id="fileInput" accept=".pdf" multiple style="display:none">
+
+<div id="jobPanel">
+  <div class="t"><span id="jobIcon">●</span><span id="jobTitle">准备中…</span></div>
+  <div class="s" id="jobSub"></div>
+  <div class="pbar"><i id="jobBar"></i></div>
+  <div class="btns">
+    <button id="btnSkip">跳过当前文件</button>
+    <button id="btnCancelJob" class="danger">取消打印</button>
+  </div>
+</div>
+
+<div class="modal" id="previewModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span class="title" id="previewName">预览</span>
+      <button id="btnPzOut" class="iconbtn">-</button>
+      <span id="previewZoom" style="min-width:44px;text-align:center">100%</span>
+      <button id="btnPzIn" class="iconbtn">+</button>
+      <button id="btnPzFit" class="iconbtn">适应</button>
+      <button id="btnPrevPage" class="iconbtn">‹ 上一页</button>
+      <input type="number" id="pageJumpIn" min="1" value="1" style="width:58px">
+      <span id="previewTotal">/ 1</span>
+      <button id="btnNextPage" class="iconbtn">下一页 ›</button>
+      <span class="spacer"></span>
+      <button id="previewClose" class="iconbtn">关闭 ✕</button>
+    </div>
+    <div class="modal-body"><canvas id="previewCanvas"></canvas></div>
+  </div>
+</div>
+
+<div id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="t" id="confirmText">打印对话框已处理完毕，是否继续？</div>
+    <div class="btns">
+      <button id="btnConfirmYes" class="primary">继续</button>
+      <button id="btnConfirmCancel">取消打印</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+window.__engines = { pdfjs:false, pdflib:false, pdfjsUrl:null, done:false };
+function __tryLoad(list, cb){
+  var i = 0;
+  function next(){
+    if(i >= list.length){ cb(false, null); return; }
+    var url = list[i++];
+    var s = document.createElement('script');
+    s.src = url;
+    s.onload = function(){ cb(true, url); };
+    s.onerror = function(){ s.remove(); next(); };
+    document.head.appendChild(s);
+  }
+  next();
+}
+function __initEngines(){
+  if(document.getElementById('pba-engine-loader')) return;
+  var marker = document.createElement('script');
+  marker.id = 'pba-engine-loader';
+  document.head.appendChild(marker);
+  __tryLoad([
+    'https://cdn.staticfile.org/pdf.js/3.11.174/pdf.min.js',
+    'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+    'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'
+  ], function(ok, url){
+    window.__engines.pdfjs = ok;
+    window.__engines.pdfjsUrl = url;
+    __tryLoad([
+      'https://cdn.staticfile.org/pdf-lib/1.17.1/pdf-lib.min.js',
+      'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js',
+      'https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js'
+    ], function(ok2){
+      window.__engines.pdflib = ok2;
+      window.__engines.done = true;
+      if(typeof window.onEnginesReady === 'function') window.onEnginesReady();
+    });
+  });
+}
+if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', __initEngines); }
+else { __initEngines(); }
+</script>
+<script>
+(function(){
+"use strict";
+
+var CDN_OK = (typeof window.pdfjsLib !== 'undefined');
+var MERGE_OK = (typeof window.PDFLib !== 'undefined');
+var pdfjs = window.pdfjsLib || null;
+if (pdfjs) { pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; }
+
+window.addEventListener('error', function(e){
+  try{ toast('脚本错误：' + (e.message || '未知')); addLog('脚本错误：' + (e.message || '未知'), 'err'); }catch(_){}
+});
+window.addEventListener('unhandledrejection', function(e){
+  var m = (e.reason && e.reason.message) ? e.reason.message : String(e.reason || '未知');
+  try{ toast('异步错误：' + m); addLog('异步错误：' + m, 'err'); }catch(_){}
+});
+
+window.onEnginesReady = function(){
+  CDN_OK = typeof window.pdfjsLib !== 'undefined';
+  MERGE_OK = typeof window.PDFLib !== 'undefined';
+  pdfjs = window.pdfjsLib || null;
+  if(pdfjs){
+    if(window.__engines && window.__engines.pdfjsUrl){
+      pdfjs.GlobalWorkerOptions.workerSrc = window.__engines.pdfjsUrl.replace(/pdf\.min\.js(\?.*)?$/i, 'pdf.worker.min.js');
+    } else {
+      pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  }
+  applySettings();
+  setEngineStatus();
+  updateStats();
+  var b = $('#banner');
+  if(b){ b.classList.toggle('show', !CDN_OK); }
+  if(CDN_OK){
+    toast('PDF 引擎已就绪，可以打印');
+    state.items.forEach(function(it){
+      if(!it.numPages && !it.err){ analyzeItem(it); }
+    });
+  }
+};
+
+var PAPERS = {
+  A4:{name:'A4',short:8.27,long:11.69},
+  A3:{name:'A3',short:11.69,long:16.54},
+  A5:{name:'A5',short:5.83,long:8.27},
+  Letter:{name:'Letter',short:8.5,long:11},
+  Legal:{name:'Legal',short:8.5,long:14},
+  Tabloid:{name:'Tabloid',short:11,long:17}
+};
+
+var DEFAULTS = {
+  engine:'canvas', paper:'A4', orientation:'auto', copies:1, range:'',
+  margin:0.4, fit:'fit', customScale:100, dpi:150, grayscale:false,
+  merge:false, autoContinue:true
+};
+
+function loadLS(k){ try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch(e){ return null; } }
+function saveLS(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+
+var state = {
+  items: [], settings: Object.assign({}, DEFAULTS, loadLS('pba_settings') || {}),
+  theme: loadLS('pba_theme') || 'auto',
+  printing: false, cancelled: false, logs: [],
+  pwdMap: {}, sortMode: 'manual', dragId: null
+};
+
+var $ = function(s){ return document.querySelector(s); };
+var $$ = function(s){ return document.querySelectorAll(s); };
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function uid(){ return 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function fmtSize(b){ if(b==null) return '—'; if(b<1024) return b+' B'; if(b<1048576) return (b/1024).toFixed(1)+' KB'; return (b/1048576).toFixed(2)+' MB'; }
+
+function toast(msg){ var t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove('show'); },2600); }
+
+function applyTheme(t){
+  var effective = t;
+  if(t==='auto'){ effective = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+  document.documentElement.setAttribute('data-theme', effective);
+  $('#btnTheme').textContent = t === 'dark' ? '亮色主题' : '暗色主题';
+}
+
+function cycleTheme(){
+  var order = ['auto','light','dark'];
+  var i = order.indexOf(state.theme);
+  state.theme = order[(i+1)%3];
+  saveLS('pba_theme', state.theme);
+  applyTheme(state.theme);
+}
+
+function addLog(msg, level){
+  var t = new Date().toLocaleTimeString('zh-CN', {hour12:false});
+  state.logs.push({t:t, msg:String(msg), level:level||'info'});
+  renderLog();
+}
+
+function renderLog(){
+  var box = $('#logBox');
+  if(!state.logs.length){ box.innerHTML = '暂无记录。'; return; }
+  box.innerHTML = state.logs.map(function(l){
+    return '<div class="'+esc(l.level)+'">['+esc(l.t)+'] '+esc(l.msg)+'</div>';
+  }).join('');
+}
+
+function setEngineStatus(){
+  $('#stEngine').textContent = state.settings.engine === 'canvas' ? '精细控制(Canvas)' : '原生插件';
+  if(!CDN_OK){
+    $('#stEngine').textContent = '引擎未加载，将使用原生模式';
+    state.settings.engine = 'native';
+    $('#engineSel').value = 'native';
+  }
+  $('#mergeChk').disabled = !MERGE_OK;
+  if(!MERGE_OK){ $('#mergeChk').checked = false; state.settings.merge = false; }
+  var b = $('#banner');
+  if(b && window.__engines && window.__engines.done){ b.classList.toggle('show', !CDN_OK); }
+}
+
+function updateStats(){
+  var n = state.items.length;
+  var pages = 0, sheets = 0, known = true;
+  state.items.forEach(function(it){
+    if(it.numPages == null){ known = false; pages = 0; }
+    else pages += it.numPages;
+  });
+  if(known){
+    state.items.forEach(function(it){
+      var copies = it.s.copies > 0 ? it.s.copies : state.settings.copies;
+      sheets += (it.numPages||0) * copies;
+    });
+  }
+  $('#statFiles').textContent = n;
+  $('#statPages').textContent = known ? pages : '…';
+  $('#statSheets').textContent = known ? sheets : '…';
+  $('#stFiles').textContent = n;
+}
+
+function loadPdf(item){
+  if(item._pdfPromise) return item._pdfPromise;
+  var p = new Promise(function(resolve, reject){
+    if(!pdfjs){ reject(new Error('PDF 引擎未加载')); return; }
+    if(!(item.ab instanceof ArrayBuffer)){ reject(new Error('文件数据无效')); return; }
+    var task = pdfjs.getDocument({ data: item.ab.slice(0) });
+    task.onPassword = function(cb, reason){
+      var saved = state.pwdMap[item.id];
+      if(saved && reason !== 1){ cb(saved); return; }
+      var msg = reason === 1 ? '密码不正确，请重试：' : '该 PDF 已加密，请输入密码：';
+      var input = prompt(msg, saved || '');
+      if(input == null){ try{ task.destroy(); }catch(e){} reject(new Error('已取消密码输入')); return; }
+      state.pwdMap[item.id] = input;
+      cb(input);
+    };
+    task.promise.then(resolve, reject);
+  });
+  item._pdfPromise = p;
+  p.catch(function(){ item._pdfPromise = null; });
+  return p;
+}
+
+function releaseItem(item){
+  if(!item || !item._pdfPromise) return;
+  item._pdfPromise.then(function(pdf){
+    if(pdf && typeof pdf.destroy === 'function'){ try{ pdf.destroy(); }catch(e){} }
+  }, function(){});
+  item._pdfPromise = null;
+}
+
+function analyzeItem(item){
+  loadPdf(item).then(function(pdf){
+    item.numPages = pdf.numPages;
+    return pdf.getPage(1).then(function(page){
+      var vp1 = page.getViewport({scale:1});
+      var scale = Math.min(1.5, 120 / vp1.width);
+      var vp = page.getViewport({scale:scale});
+      var c = document.createElement('canvas');
+      c.width = vp.width; c.height = vp.height;
+      return page.render({canvasContext:c.getContext('2d'), viewport:vp}).promise.then(function(){
+        item.thumb = c.toDataURL('image/jpeg', 0.8);
+      });
+    });
+  }).catch(function(e){
+    item.err = e && e.message || '加载失败';
+    addLog(item.name + ' 加载失败：' + item.err, 'err');
+  }).finally(function(){ renderList(); updateStats(); });
+}
+
+function effectiveSettings(item){
+  var g = state.settings;
+  return {
+    engine: g.engine,
+    paper: g.paper,
+    orientation: item.s.orientation === 'auto' ? g.orientation : item.s.orientation,
+    copies: item.s.copies > 0 ? item.s.copies : g.copies,
+    range: item.s.range !== '' ? item.s.range : g.range,
+    reverse: item.s.reverse,
+    margin: g.margin, fit: g.fit, customScale: g.customScale, dpi: g.dpi,
+    grayscale: g.grayscale || item.s.grayscale
+  };
+}
+
+function parseRange(str, max){
+  var pages = [];
+  var s = String(str||'').trim();
+  if(!s){ for(var i=1;i<=max;i++) pages.push(i); return pages; }
+  var seen = {};
+  var parts = s.split(/[\s,;，；]+/).filter(Boolean);
+  parts.forEach(function(p){
+    var m = /^\s*(\d*)\s*-\s*(\d*)\s*$/.exec(p);
+    if(m){
+      var a = m[1] === '' ? 1 : parseInt(m[1],10);
+      var b = m[2] === '' ? max : parseInt(m[2],10);
+      var lo = Math.max(1, Math.min(a,b));
+      var hi = Math.min(max, Math.max(a,b));
+      for(var j=lo;j<=hi;j++){ if(!seen[j]){ seen[j]=1; pages.push(j); } }
+    } else if(/^\d+$/.test(p)){
+      var n = parseInt(p,10);
+      if(n>=1 && n<=max && !seen[n]){ seen[n]=1; pages.push(n); }
+    }
+  });
+  if(!pages.length){ for(var k=1;k<=max;k++) pages.push(k); }
+  return pages;
+}
+
+function layoutForPage(page, s, paper){
+  var vp1 = page.getViewport({scale:1});
+  var nW = vp1.width, nH = vp1.height;
+  var natLand = nW > nH;
+  var orient = s.orientation === 'auto' ? (natLand ? 'landscape' : 'portrait') : s.orientation;
+  var rotation = ((orient==='landscape') !== natLand) ? 90 : 0;
+  var pgW = orient==='landscape' ? paper.long : paper.short;
+  var pgH = orient==='landscape' ? paper.short : paper.long;
+  var margin = +s.margin || 0;
+  var cW = Math.max(0.5, pgW - 2*margin);
+  var cH = Math.max(0.5, pgH - 2*margin);
+  var effW = rotation ? nH : nW;
+  var effH = rotation ? nW : nH;
+  var aspect = effW / effH;
+  var natWin = effW / 72, natHin = effH / 72;
+  var win, hin, renderScale;
+  if(s.fit === 'actual'){ win = natWin; hin = natHin; }
+  else if(s.fit === 'custom'){ var k = (s.customScale||100)/100; win = natWin*k; hin = natHin*k; }
+  else {
+    var fw = Math.min(cW, cH*aspect);
+    var fh = fw/aspect;
+    if(s.fit === 'shrink' && natWin <= cW && natHin <= cH){ win = natWin; hin = natHin; }
+    else { win = fw; hin = fh; }
+  }
+  if(win > cW){ var r1 = cW/win; win *= r1; hin *= r1; }
+  if(hin > cH){ var r2 = cH/hin; win *= r2; hin *= r2; }
+  var dpi = +s.dpi || 150;
+  renderScale = (win * dpi) / effW;
+  var pxW = Math.max(1, Math.round(effW * renderScale));
+  var pxH = Math.max(1, Math.round(effH * renderScale));
+  var pad = Math.max(0, (cH - hin) / 2);
+  return {pxW:pxW, pxH:pxH, renderScale:renderScale, rotation:rotation, win:win, hin:hin, pad:pad};
+}
+
+function renderPageToImage(pdf, pn, s, paper){
+  return pdf.getPage(pn).then(function(page){
+    var L = layoutForPage(page, s, paper);
+    var c = document.createElement('canvas');
+    c.width = L.pxW; c.height = L.pxH;
+    var ctx = c.getContext('2d');
+    if(s.grayscale){ ctx.filter = 'grayscale(1)'; }
+    var vp = page.getViewport({scale:L.renderScale, rotation:L.rotation});
+    return page.render({canvasContext:ctx, viewport:vp}).promise.then(function(){
+      return { src: c.toDataURL('image/png'), w: L.win, h: L.hin, pad: L.pad };
+    });
+  });
+}
+
+function firstPageOrient(pdf, s){
+  return pdf.getPage(1).then(function(page){
+    var vp1 = page.getViewport({scale:1});
+    var natLand = vp1.width > vp1.height;
+    if(s.orientation === 'auto') return natLand ? 'landscape' : 'portrait';
+    return s.orientation;
+  });
+}
+
+function buildPrintAreaHtml(images, paper, orient, marginIn){
+  var pw = orient==='landscape' ? paper.long : paper.short;
+  var ph = orient==='landscape' ? paper.short : paper.long;
+  return images.map(function(im){
+    var p = (im.pad).toFixed(3);
+    return '<div class="pg"><img src="'+im.src+'" style="width:'+(im.w).toFixed(3)+'in;height:'+(im.h).toFixed(3)+'in;margin:'+p+'in auto '+p+'in;"></div>';
+  }).join('');
+}
+
+function printViaMain(images, paper, orient, marginIn, resolve){
+  var style = document.createElement('style');
+  style.id = 'pba-print-style';
+  style.textContent =
+    '@page{size:' + (orient==='landscape'?paper.long:paper.short).toFixed(2) + 'in ' + (orient==='landscape'?paper.short:paper.long).toFixed(2) + 'in;margin:' + (+marginIn).toFixed(2) + 'in;}' +
+    '@media print{ body>*:not(#pba-print-area){display:none!important;}' +
+    '#pba-print-area{display:block!important;} #pba-print-area .pg{page-break-after:always;}' +
+    '#pba-print-area .pg:last-child{page-break-after:auto;} #pba-print-area img{display:block;} }' +
+    '@media screen{ #pba-print-area{display:none!important;} }';
+  document.head.appendChild(style);
+  var area = document.createElement('div');
+  area.id = 'pba-print-area';
+  area.innerHTML = buildPrintAreaHtml(images, paper, orient, marginIn);
+  document.body.appendChild(area);
+  var done = false;
+  var finish = function(){
+    if(done) return; done = true;
+    window.removeEventListener('afterprint', finish);
+    try{ document.getElementById('pba-print-area').remove(); }catch(e){}
+    try{ document.getElementById('pba-print-style').remove(); }catch(e){}
+    resolve();
+  };
+  window.addEventListener('afterprint', finish);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    try{ window.print(); }catch(e){ addLog('调用打印失败：'+e.message,'err'); }
+    setTimeout(function(){ finish(); }, state.settings.autoContinue ? 2500 : 1500);
+  }); });
+}
+
+function printNativeItem(item, copies){
+  return new Promise(function(resolve){
+    var url = URL.createObjectURL(new Blob([item.ab], {type:'application/pdf'}));
+    var embeds = [];
+    for(var k=0;k<copies;k++) embeds.push('<embed src="'+url+'#toolbar=0&navpanes=0" type="application/pdf" style="width:100%;height:100%;">');
+    var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;width:100%;height:100%;}embed{display:block;border:0;}</style></head><body>'+embeds.join('')+'</body></html>';
+    var iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:2px;height:2px;border:0;visibility:hidden;';
+    document.body.appendChild(iframe);
+    var hurl = URL.createObjectURL(new Blob([html], {type:'text/html;charset=utf-8'}));
+    iframe.src = hurl;
+    iframe.onload = function(){
+      try{ iframe.contentWindow.focus(); iframe.contentWindow.print(); }catch(e){ addLog('原生打印失败：'+e.message,'err'); }
+      setTimeout(function(){
+        try{ iframe.remove(); }catch(e){}
+        URL.revokeObjectURL(url); URL.revokeObjectURL(hurl);
+        resolve();
+      }, 1000);
+    };
+  });
+}
+
+function setJob(title, sub, frac){
+  $('#jobTitle').textContent = title;
+  $('#jobSub').textContent = sub || '';
+  $('#jobBar').style.width = Math.max(0, Math.min(100, (frac||0)*100)).toFixed(1) + '%';
+}
+
+function showJob(on){ $('#jobPanel').classList.toggle('show', !!on); }
+function showConfirm(msg, onYes, onNo){
+  $('#confirmText').textContent = msg;
+  $('#confirmOverlay').classList.add('show');
+  var y = $('#btnConfirmYes'), n = $('#btnConfirmCancel');
+  var h = function(e){ e.preventDefault(); $('#confirmOverlay').classList.remove('show'); y.removeEventListener('click', h1); n.removeEventListener('click', h2); if(e.target===y && onYes) onYes(); else if(onNo) onNo(); };
+  var h1 = function(e){ h(e); };
+  var h2 = function(e){ h(e); };
+  y.addEventListener('click', h1); n.addEventListener('click', h2);
+}
+
+function afterPrintStep(resolve){
+  if(state.settings.autoContinue){
+    setTimeout(resolve, 150);
+  } else {
+    showConfirm('该文件打印对话框已处理完毕，是否继续下一个任务？', resolve, function(){ state.cancelled = true; resolve(); });
+  }
+}
+
+function printItem(item, idx, total){
+  return new Promise(function(resolve, reject){
+    var eff = effectiveSettings(item);
+    var pagesCount = 0;
+    var copies = eff.copies || 1;
+    var label = '[' + (idx+1) + '/' + total + '] ' + item.name;
+    loadPdf(item).then(function(pdf){
+      if(state.cancelled){ resolve(); return; }
+      if(eff.engine === 'native'){
+        setJob('打印中：'+label, '使用浏览器原生插件打印 ' + copies + ' 份…（请在弹出的打印对话框确认）', (idx)/Math.max(1,total));
+        return printNativeItem(item, copies).then(function(){
+          addLog(label + ' 原生打印完成（' + copies + ' 份）', 'ok');
+          pagesCount = pdf.numPages;
+          updateStats();
+          return afterPrintStep(resolve);
+        });
+      }
+      var pages = parseRange(eff.range, pdf.numPages);
+      if(eff.reverse) pages.reverse();
+      var paper = PAPERS[eff.paper] || PAPERS.A4;
+      return firstPageOrient(pdf, eff).then(function(orient){
+        var images = [];
+        var totalShots = pages.length * copies;
+        var shot = 0;
+        function nextShot(){
+          if(state.cancelled){ resolve(); return; }
+          if(shot >= totalShots){
+            setJob('打印中：'+label, '正在发送打印任务…', 1);
+            var g0 = (idx)/Math.max(1,total);
+            printViaMain(images, paper, orient, eff.margin, function(){
+              pagesCount = pages.length;
+              addLog(label + ' 打印完成：' + pages.length + ' 页 × ' + copies + ' 份', 'ok');
+              updateStats();
+              afterPrintStep(resolve);
+            });
+            return;
+          }
+          var copyNo = Math.floor(shot / pages.length);
+          var pn = pages[shot % pages.length];
+          setJob('打印中：'+label, '渲染第 ' + (copyNo+1) + '/' + copies + ' 份 · 第 ' + pn + '/' + pdf.numPages + ' 页（' + (shot+1) + '/' + totalShots + '）', (g0 + (shot/totalShots)/Math.max(1,total)) * 0.5);
+          renderPageToImage(pdf, pn, eff, paper).then(function(im){
+            images.push(im);
+            shot++;
+            setTimeout(nextShot, 0);
+          }).catch(function(e){
+            addLog(label + ' 第 ' + pn + ' 页渲染失败：' + (e&&e.message), 'err');
+            shot++;
+            setTimeout(nextShot, 0);
+          });
+        }
+        nextShot();
+      });
+    }).catch(function(e){
+      addLog(label + ' 失败：' + (e&&e.message), 'err');
+      updateStats();
+      resolve();
+    });
+  });
+}
+
+function printMerged(items){
+  return new Promise(function(resolve, reject){
+    setJob('合并中', '正在将 ' + items.length + ' 个文件合并为单个 PDF…', 0.2);
+    if(!window.PDFLib){ addLog('pdf-lib 未加载，无法合并', 'err'); resolve(); return; }
+    var PDFLib = window.PDFLib;
+    PDFLib.PDFDocument.create().then(function(out){
+      var chain = Promise.resolve();
+      items.forEach(function(it){
+        chain = chain.then(function(){
+          return PDFLib.PDFDocument.load(it.ab, {ignoreEncryption:true, updateMetadata:false}).then(function(src){
+            return out.copyPages(src, src.getPageIndices()).then(function(ps){
+              ps.forEach(function(p){ out.addPage(p); });
+            });
+          }).catch(function(e){
+            addLog('合并时跳过文件 ' + it.name + '：' + (e&&e.message), 'warn');
+          });
+        });
+      });
+      chain.then(function(){
+        return out.save({useObjectStreams:false});
+      }).then(function(bytes){
+        setJob('合并完成', '正在打印合并后的 PDF…', 0.5);
+        var merged = {
+          id: uid(), name: '已合并打印.pdf', size: bytes.length, ab: bytes,
+          numPages: null, s:{range:'', copies:0, orientation:'auto', reverse:false, grayscale:false}
+        };
+        return printItem(merged, 0, 1).then(function(){
+          releaseItem(merged);
+          addLog('合并打印完成（' + items.length + ' 个文件）', 'ok');
+          resolve();
+        });
+      }).catch(function(e){ addLog('合并失败：' + (e&&e.message), 'err'); resolve(); });
+    }).catch(function(e){ addLog('合并失败：' + (e&&e.message), 'err'); resolve(); });
+  });
+}
+
+function startPrint(){
+  if(state.printing) return;
+  var items = state.items.filter(function(i){ return i.sel; });
+  if(!items.length){ items = state.items.slice(); }
+  if(!items.length){ toast('请先添加 PDF 文件'); return; }
+  if(state.settings.engine === 'canvas' && !CDN_OK){
+    toast('Canvas 精细控制引擎未加载，请检查网络后刷新，或改用"原生插件"模式');
+    return;
+  }
+  state.printing = true; state.cancelled = false;
+  $('#btnPrint').textContent = '取消打印';
+  $('#btnPrint2').disabled = true;
+  showJob(true);
+  setJob('准备中', '共 ' + items.length + ' 个文件', 0);
+  var total = items.length;
+  var p = Promise.resolve();
+  if(state.settings.merge){
+    p = p.then(function(){ return printMerged(items); });
+  } else {
+    items.forEach(function(it, i){
+      p = p.then(function(){
+        if(state.cancelled) return;
+        setJob('准备', '解析文件 [' + (i+1) + '/' + total + '] ' + it.name, i/total);
+        return printItem(it, i, total).then(function(){ releaseItem(it); });
+      });
+    });
+  }
+  p.then(function(){
+    addLog('打印任务结束' + (state.cancelled ? '（已取消）' : ''), 'info');
+  }).catch(function(e){
+    addLog('打印出错：' + (e&&e.message), 'err');
+  }).finally(function(){
+    state.printing = false;
+    showJob(false);
+    $('#btnPrint').textContent = '开始打印';
+    $('#btnPrint2').disabled = false;
+    setJob('', '', 0);
+    $('#stTask').textContent = '空闲';
+    updateStats();
+  });
+}
+
+function cancelPrint(){
+  state.cancelled = true;
+  $('#jobTitle').textContent = '正在取消…';
+}
+
+function renderList(){
+  var box = $('#list');
+  if(!state.items.length){
+    box.innerHTML = '<div class="empty">还没有添加文件。<br>点击上方按钮或把 PDF 拖到窗口里开始。</div>';
+    updateStats();
+    return;
+  }
+  var items = state.items;
+  if(state.sortMode === 'name'){ items = items.slice().sort(function(a,b){ return a.name.localeCompare(b.name,'zh'); }); }
+  else if(state.sortMode === 'size'){ items = items.slice().sort(function(a,b){ return b.size - a.size; }); }
+  box.innerHTML = items.map(function(it){
+    var meta = (it.numPages != null ? it.numPages + ' 页' : '解析中…') + ' · ' + fmtSize(it.size);
+    if(it.err) meta += ' · <span style="color:var(--danger)">' + esc(it.err) + '</span>';
+    var eff = effectiveSettings(it);
+    var badge = '';
+    if(eff.range) badge += '<span class="badge">页码 ' + esc(eff.range) + '</span>';
+    if(eff.copies > 1) badge += '<span class="badge">×' + eff.copies + '</span>';
+    var thumb = it.thumb ? '<img class="thumb" src="' + it.thumb + '" alt="">' : '<div class="thumb placeholder">PDF</div>';
+    var body = it.expanded ? '<div class="item-body">' +
+      '<label>页码范围<input type="text" class="f-range" data-id="' + it.id + '" placeholder="留空=全局（'+esc(eff.range||'全部')+'）" value="' + esc(it.s.range) + '"></label>' +
+      '<label>份数（0=跟随全局）<input type="number" class="f-copies" data-id="' + it.id + '" min="0" max="99" value="' + (it.s.copies||0) + '"></label>' +
+      '<label>方向<select class="f-orient" data-id="' + it.id + '">' +
+        '<option value="auto"' + (it.s.orientation==='auto'?' selected':'') + '>跟随全局</option>' +
+        '<option value="portrait"' + (it.s.orientation==='portrait'?' selected':'') + '>纵向</option>' +
+        '<option value="landscape"' + (it.s.orientation==='landscape'?' selected':'') + '>横向</option></select></label>' +
+      '<label>顺序<select class="f-rev" data-id="' + it.id + '">' +
+        '<option value="0"' + (!it.s.reverse?' selected':'') + '>正常</option>' +
+        '<option value="1"' + (it.s.reverse?' selected':'') + '>逆序</option></select></label>' +
+      '<label class="chkrow"><input type="checkbox" class="f-gray" data-id="' + it.id + '"' + (it.s.grayscale?' checked':'') + '> 灰度打印</label>' +
+      '</div>' : '';
+    return '<div class="item" data-id="' + it.id + '" draggable="true">' +
+      '<div class="item-head">' +
+        '<input type="checkbox" class="cb" data-id="' + it.id + '"' + (it.sel?' checked':'') + '>' +
+        thumb +
+        '<div class="item-mid"><div class="item-name">' + esc(it.name) + badge + '</div><div class="item-meta">' + meta + '</div></div>' +
+        '<div class="item-acts">' +
+          '<button class="iconbtn" data-act="expand" data-id="' + it.id + '" title="展开设置">' + (it.expanded?'▲':'▼') + '</button>' +
+          '<button class="iconbtn" data-act="preview" data-id="' + it.id + '">预览</button>' +
+          '<button class="iconbtn" data-act="up" data-id="' + it.id + '" title="上移">▲</button>' +
+          '<button class="iconbtn" data-act="down" data-id="' + it.id + '" title="下移">▼</button>' +
+          '<button class="danger iconbtn" data-act="del" data-id="' + it.id + '" title="删除">✕</button>' +
+        '</div>' +
+      '</div>' + body + '</div>';
+  }).join('');
+  updateStats();
+}
+
+$('#list').addEventListener('click', function(e){
+  var t = e.target.closest('[data-act]');
+  if(!t) return;
+  var id = t.getAttribute('data-id');
+  var act = t.getAttribute('data-act');
+  var it = findItem(id);
+  if(!it) return;
+  if(act === 'expand'){ it.expanded = !it.expanded; renderList(); }
+  else if(act === 'preview'){ openPreview(it); }
+  else if(act === 'del'){ removeItem(id); }
+  else if(act === 'up'){ moveItem(id, -1); }
+  else if(act === 'down'){ moveItem(id, 1); }
+});
+
+$('#list').addEventListener('change', function(e){
+  var el = e.target;
+  if(!el.dataset) return;
+  var id = el.getAttribute('data-id');
+  var it = findItem(id);
+  if(!it) return;
+  if(el.classList.contains('cb')){ it.sel = el.checked; updateStats(); }
+  else if(el.classList.contains('f-range')){ it.s.range = el.value.trim(); }
+  else if(el.classList.contains('f-copies')){ it.s.copies = Math.max(0, parseInt(el.value,10)||0); updateStats(); }
+  else if(el.classList.contains('f-orient')){ it.s.orientation = el.value; }
+  else if(el.classList.contains('f-rev')){ it.s.reverse = el.value === '1'; }
+  else if(el.classList.contains('f-gray')){ it.s.grayscale = el.checked; }
+});
+
+$('#list').addEventListener('dblclick', function(e){
+  var h = e.target.closest('.item');
+  if(!h) return;
+  var it = findItem(h.getAttribute('data-id'));
+  if(it) openPreview(it);
+});
+
+$('#list').addEventListener('dragstart', function(e){
+  var item = e.target.closest('.item');
+  if(!item) return;
+  state.dragId = item.getAttribute('data-id');
+  item.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+});
+$('#list').addEventListener('dragover', function(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  var item = e.target.closest('.item');
+  if(item && item.getAttribute('data-id') !== state.dragId){
+    $$('.item').forEach(function(x){ x.classList.remove('drag-over'); });
+    item.classList.add('drag-over');
+  }
+});
+$('#list').addEventListener('drop', function(e){
+  e.preventDefault();
+  var target = e.target.closest('.item');
+  if(target && state.dragId){
+    var from = state.items.findIndex(function(i){ return i.id === state.dragId; });
+    var to = state.items.findIndex(function(i){ return i.id === target.getAttribute('data-id'); });
+    if(from >= 0 && to >= 0 && from !== to){
+      var it = state.items.splice(from,1)[0];
+      state.items.splice(to,0,it);
+    }
+  }
+  state.dragId = null;
+  $$('.item').forEach(function(x){ x.classList.remove('dragging','drag-over'); });
+  renderList();
+});
+
+function findItem(id){ for(var i=0;i<state.items.length;i++) if(state.items[i].id === id) return state.items[i]; return null; }
+
+function removeItem(id){
+  var it = findItem(id);
+  if(it) releaseItem(it);
+  state.items = state.items.filter(function(i){ return i.id !== id; });
+  addLog('已删除文件：' + id, 'info');
+  renderList();
+}
+
+function moveItem(id, dir){
+  var i = state.items.findIndex(function(x){ return x.id === id; });
+  var j = i + dir;
+  if(i < 0 || j < 0 || j >= state.items.length) return;
+  var t = state.items[i]; state.items[i] = state.items[j]; state.items[j] = t;
+  renderList();
+}
+
+function addFiles(fileList){
+  var files = Array.prototype.slice.call(fileList);
+  var added = 0;
+  files.forEach(function(file){
+    if(!/\.pdf$/i.test(file.name)){ toast('已跳过非 PDF 文件：' + file.name); return; }
+    if(state.items.some(function(i){ return i.name === file.name && i.size === file.size; })){
+      toast('已存在相同文件：' + file.name); return;
+    }
+    file.arrayBuffer().then(function(ab){
+      var item = {
+        id: uid(), name: file.name, size: file.size, ab: ab,
+        numPages: null, thumb: null, err: null, sel: true, expanded: false,
+        s:{range:'', copies:0, orientation:'auto', reverse:false, grayscale:false}
+      };
+      state.items.push(item);
+      addLog('已添加：' + item.name + '（' + fmtSize(item.size) + '）', 'info');
+      renderList();
+      analyzeItem(item);
+      added++;
+    });
+  });
+}
+
+$('#btnAddFile').addEventListener('click', function(){ $('#fileInput').click(); });
+$('#dropzone').addEventListener('click', function(){ $('#fileInput').click(); });
+$('#fileInput').addEventListener('change', function(e){ addFiles(e.target.files); e.target.value = ''; });
+
+var dz = $('#dropzone');
+['dragenter','dragover'].forEach(function(ev){
+  window.addEventListener(ev, function(e){ e.preventDefault(); dz.classList.add('over'); });
+});
+window.addEventListener('dragleave', function(e){ if(!e.relatedTarget) dz.classList.remove('over'); });
+window.addEventListener('drop', function(e){
+  e.preventDefault();
+  dz.classList.remove('over');
+  if(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+});
+window.addEventListener('dragover', function(e){ e.preventDefault(); });
+
+$('#btnSelectAll').addEventListener('click', function(){ state.items.forEach(function(i){ i.sel = true; }); renderList(); });
+$('#btnInvertSel').addEventListener('click', function(){ state.items.forEach(function(i){ i.sel = !i.sel; }); renderList(); });
+$('#btnClear').addEventListener('click', function(){
+  if(!state.items.length) return;
+  if(confirm('确定要清空列表吗？')){
+    state.items.forEach(function(it){ releaseItem(it); });
+    state.items = [];
+    addLog('已清空列表', 'info');
+    renderList();
+  }
+});
+$('#sortSel').addEventListener('change', function(e){ state.sortMode = e.target.value; renderList(); });
+
+function readSettings(){
+  var g = state.settings;
+  g.engine = $('#engineSel').value;
+  g.paper = $('#paperSel').value;
+  g.orientation = $('#orientSel').value;
+  g.copies = Math.max(1, parseInt($('#copiesIn').value,10)||1);
+  g.range = $('#rangeIn').value.trim();
+  g.margin = parseFloat($('#marginSel').value)||0;
+  g.fit = $('#fitSel').value;
+  g.customScale = Math.max(10, Math.min(400, parseInt($('#customIn').value,10)||100));
+  g.dpi = parseInt($('#dpiSel').value,10)||150;
+  g.grayscale = $('#grayChk').checked;
+  g.merge = MERGE_OK && $('#mergeChk').checked;
+  g.autoContinue = $('#autoContChk').checked;
+  saveLS('pba_settings', g);
+  setEngineStatus();
+}
+
+function applySettings(){
+  var g = state.settings;
+  $('#engineSel').value = g.engine;
+  $('#paperSel').value = g.paper;
+  $('#orientSel').value = g.orientation;
+  $('#copiesIn').value = g.copies;
+  $('#rangeIn').value = g.range;
+  $('#marginSel').value = String(g.margin);
+  $('#fitSel').value = g.fit;
+  $('#customIn').value = g.customScale;
+  $('#dpiSel').value = String(g.dpi);
+  $('#grayChk').checked = !!g.grayscale;
+  $('#mergeChk').checked = !!(g.merge && MERGE_OK);
+  $('#autoContChk').checked = g.autoContinue !== false;
+}
+
+var setEls = ['engineSel','paperSel','orientSel','copiesIn','rangeIn','marginSel','fitSel','customIn','dpiSel','grayChk','mergeChk','autoContChk'];
+setEls.forEach(function(id){
+  $('#'+id).addEventListener('change', readSettings);
+});
+$('#customIn').addEventListener('input', readSettings);
+$('#btnResetSettings').addEventListener('click', function(){
+  state.settings = Object.assign({}, DEFAULTS);
+  applySettings(); readSettings();
+  toast('已恢复默认设置');
+});
+
+$('#btnPrint').addEventListener('click', function(){
+  if(state.printing){ cancelPrint(); } else { startPrint(); }
+});
+$('#btnPrint2').addEventListener('click', startPrint);
+$('#btnSkip').addEventListener('click', function(){ state.cancelled = true; $('#jobTitle').textContent = '跳过中…'; });
+$('#btnCancelJob').addEventListener('click', cancelPrint);
+
+$('#btnCopyLog').addEventListener('click', function(){
+  var txt = state.logs.map(function(l){ return '['+l.t+'] ['+l.level+'] '+l.msg; }).join('\n');
+  if(!txt) txt = '无记录';
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(function(){ toast('日志已复制'); }, function(){ toast('复制失败'); }); }
+  else toast('复制失败');
+});
+$('#btnClearLog').addEventListener('click', function(){ state.logs = []; renderLog(); });
+
+$('#btnTheme').addEventListener('click', cycleTheme);
+
+var preview = {
+  item: null, pdf: null, page: 1, zoom: 1, fit: true
+};
+
+function openPreview(item){
+  if(!item) return;
+  $('#previewModal').classList.add('show');
+  $('#previewName').textContent = item.name + '（' + (item.numPages!=null?item.numPages:'…') + ' 页）';
+  preview.item = item; preview.page = 1; preview.zoom = 1; preview.fit = true;
+  loadPdf(item).then(function(pdf){
+    preview.pdf = pdf;
+    $('#previewTotal').textContent = '/ ' + pdf.numPages;
+    $('#pageJumpIn').max = pdf.numPages;
+    renderPreviewPage();
+  }).catch(function(e){
+    $('#previewName').textContent = '预览失败：' + (e&&e.message);
+  });
+}
+
+function renderPreviewPage(){
+  var c = $('#previewCanvas');
+  if(!preview.pdf || !preview.item) return;
+  var body = document.querySelector('.modal-body');
+  preview.pdf.getPage(preview.page).then(function(page){
+    var vp1 = page.getViewport({scale:1});
+    var scale;
+    if(preview.fit){
+      scale = (body.clientWidth - 24) / vp1.width;
+    } else {
+      scale = preview.zoom;
+    }
+    scale = Math.max(0.1, Math.min(4, scale));
+    var vp = page.getViewport({scale:scale});
+    c.width = vp.width; c.height = vp.height;
+    page.render({canvasContext:c.getContext('2d'), viewport:vp}).promise.then(function(){});
+    $('#previewZoom').textContent = Math.round(scale*100) + '%';
+  });
+  $('#pageJumpIn').value = preview.page;
+}
+
+$('#btnPrevPage').addEventListener('click', function(){ if(preview.pdf && preview.page > 1){ preview.page--; renderPreviewPage(); } });
+$('#btnNextPage').addEventListener('click', function(){ if(preview.pdf && preview.page < preview.pdf.numPages){ preview.page++; renderPreviewPage(); } });
+$('#pageJumpIn').addEventListener('change', function(){
+  var n = parseInt(this.value,10);
+  if(preview.pdf && n >= 1 && n <= preview.pdf.numPages){ preview.page = n; renderPreviewPage(); }
+});
+$('#btnPzIn').addEventListener('click', function(){ preview.fit = false; preview.zoom = Math.min(4, (preview.zoom||1) * 1.25); renderPreviewPage(); });
+$('#btnPzOut').addEventListener('click', function(){ preview.fit = false; preview.zoom = Math.max(0.1, (preview.zoom||1) / 1.25); renderPreviewPage(); });
+$('#btnPzFit').addEventListener('click', function(){ preview.fit = true; renderPreviewPage(); });
+$('#previewClose').addEventListener('click', function(){ $('#previewModal').classList.remove('show'); preview.pdf = null; preview.item = null; });
+
+document.addEventListener('keydown', function(e){
+  if(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) return;
+  if(e.key === 'Delete'){
+    var ids = state.items.filter(function(i){ return i.sel; }).map(function(i){ return i.id; });
+    if(ids.length){
+      state.items.forEach(function(i){ if(ids.indexOf(i.id) !== -1) releaseItem(i); });
+      state.items = state.items.filter(function(i){ return ids.indexOf(i.id) === -1; });
+      renderList();
+    }
+  }
+  else if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a'){ e.preventDefault(); state.items.forEach(function(i){ i.sel = true; }); renderList(); }
+  else if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p'){ e.preventDefault(); startPrint(); }
+});
+
+applyTheme(state.theme);
+applySettings();
+setEngineStatus();
+renderLog();
+renderList();
+
+})();
+</script>
+</body>
+</html>
