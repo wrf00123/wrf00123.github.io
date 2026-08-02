@@ -212,10 +212,11 @@ const websiteData = [
                     { name: "文本对比", url: "https://wrf00123.github.io/wrf/tool1.html", desc: "工具" },
                     { name: "PDF水印移除", url: "https://wrf00123.github.io/wrf/tool2.html", desc: "工具" },
                     { name: "PDF预览", url: "https://wrf00123.github.io/wrf/tool3.html", desc: "工具" },
+                    { name: "批量PDF打印助手", url: "https://wrf00123.github.io/wrf/tool7.html", desc: "工具" },    
                     { name: "音频剪辑", url: "https://wrf00123.github.io/wrf/tool4.html", desc: "工具" },
                     { name: "安全检查", url: "https://wrf00123.github.io/wrf/tool5.html", desc: "工具" },
                     { name: "组织结构血脉图", url: "https://wrf00123.github.io/wrf/tool6.html", desc: "工具" },
-                            
+                       
                 ]
             },
             {
