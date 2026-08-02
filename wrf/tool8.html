@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>地图旅行规划器</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-fullscreen@1.0.2/dist/leaflet.fullscreen.css">
+<style>
+:root {
+  --bg: #f3f5f9;
+  --panel: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+  --accent-2: #10b981;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08);
+  --marker-bg: #2563eb;
+}
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --border: #334155;
+  --accent: #3b82f6;
+  --accent-2: #34d399;
+  --danger: #f87171;
+  --warn: #fbbf24;
+  --shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+}
+header {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: #fff;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+header h1 { font-size: 18px; margin: 0; display: flex; align-items: center; gap: 8px; }
+header h1 .icon { font-size: 22px; }
+header .spacer { flex: 1; }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  transition: all .15s;
+  white-space: nowrap;
+}
+.btn:hover { background: rgba(255,255,255,.3); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--border); }
+.btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+.btn-small { padding: 4px 8px; font-size: 12px; border-radius: 6px; }
+main { flex: 1; display: flex; min-height: 0; }
+#sidebar {
+  width: 400px;
+  min-width: 300px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  padding: 14px;
+}
+#map { flex: 1; min-width: 0; }
+section { margin-bottom: 16px; }
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+.card h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.card h3 .count { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: normal; }
+label { font-size: 12px; color: var(--muted); display: block; margin: 6px 0 4px; }
+input[type="text"], input[type="date"], input[type="number"], select, textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+.row { display: flex; gap: 8px; }
+.row > * { flex: 1; }
+.searchbox { position: relative; }
+.searchbox input { padding-right: 34px; }
+.searchbox button { position: absolute; right: 4px; top: 4px; }
+.suggestions {
+  position: absolute;
+  z-index: 1000;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  display: none;
+}
+.suggestions .item { padding: 8px 10px; cursor: pointer; font-size: 13px; border-bottom: 1px solid var(--border); }
+.suggestions .item:hover { background: var(--bg); }
+.suggestions .item .sub { font-size: 11px; color: var(--muted); }
+.wplist { list-style: none; margin: 0; padding: 0; }
+.wplist li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  animation: slideIn .2s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
+.wp-num {
+  width: 24px; height: 24px; min-width: 24px;
+  background: var(--marker-bg); color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: bold;
+}
+.wp-info { flex: 1; min-width: 0; }
+.wp-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wp-meta { font-size: 11px; color: var(--muted); }
+.wp-actions { display: flex; gap: 4px; }
+.wp-actions .btn { padding: 3px 6px; font-size: 11px; }
+.legend-row { display: flex; justify-content: space-between; font-size: 13px; padding: 4px 0; border-bottom: 1px dashed var(--border); }
+.legend-row:last-child { border-bottom: none; }
+.legend-row .val { font-weight: 600; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.stat-box { background: var(--panel); border-radius: 8px; padding: 10px; text-align: center; border: 1px solid var(--border); }
+.stat-box .num { font-size: 20px; font-weight: bold; color: var(--accent); }
+.stat-box .lbl { font-size: 11px; color: var(--muted); }
+.itin-day { margin-bottom: 12px; }
+.itin-day-head { font-weight: 700; font-size: 13px; color: var(--accent); margin-bottom: 6px; display: flex; justify-content: space-between; }
+.itin-stop { display: flex; gap: 8px; align-items: baseline; font-size: 13px; padding: 4px 0; }
+.itin-stop .dot { width: 8px; height: 8px; min-width: 8px; border-radius: 50%; background: var(--accent); margin-top: 6px; }
+.itin-stop .travel { font-size: 11px; color: var(--muted); }
+.weather-card { display: flex; align-items: center; gap: 10px; padding: 8px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; font-size: 13px; }
+.weather-card .wicon { font-size: 22px; }
+.weather-card .wtemp { font-weight: 700; }
+.weather-card .wdate { color: var(--muted); font-size: 12px; }
+.budget-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.budget-row label { margin: 0; width: 46px; min-width: 46px; }
+.budget-row input { flex: 1; }
+.budget-total { font-size: 15px; font-weight: 700; color: var(--accent); text-align: right; margin-top: 6px; }
+.toggle { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+.toggle .btn { background: var(--panel); color: var(--text); border: 1px solid var(--border); }
+.toggle .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.toast-wrap { position: fixed; top: 14px; right: 14px; z-index: 3000; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  background: var(--panel); color: var(--text);
+  padding: 10px 14px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  font-size: 13px; border-left: 4px solid var(--accent);
+  animation: slideIn .25s ease;
+  max-width: 320px;
+}
+.toast.warn { border-left-color: var(--warn); }
+.toast.err { border-left-color: var(--danger); }
+.toast.ok { border-left-color: var(--accent-2); }
+.wp-marker { display: flex; align-items: center; justify-content: center; }
+.wp-marker .pin {
+  width: 26px; height: 26px; background: var(--accent); color: #fff;
+  border-radius: 50% 50% 50% 0; transform: rotate(-45deg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.3);
+}
+.wp-marker .pin span { transform: rotate(45deg); }
+.drag-hint { position: absolute; left: 10px; bottom: 24px; z-index: 1000; background: rgba(0,0,0,.65); color: #fff; font-size: 11px; padding: 6px 10px; border-radius: 6px; pointer-events: none; }
+.loading-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: transparent; z-index: 2000; }
+.loading-bar.active { background: var(--accent); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: .4; } 50% { opacity: 1; } }
+details.card { padding: 10px 12px; }
+details.card > summary { cursor: pointer; font-size: 14px; font-weight: 700; list-style: none; display: flex; align-items: center; gap: 6px; }
+details.card > summary::-webkit-details-marker { display: none; }
+details.card > summary::after { content: "▸"; margin-left: auto; transition: transform .2s; }
+details.card[open] > summary::after { transform: rotate(90deg); }
+details.card > summary:hover { color: var(--accent); }
+.hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.budget-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.empty { color: var(--muted); font-size: 12px; text-align: center; padding: 12px; }
+@media (max-width: 820px) {
+  main { flex-direction: column; }
+  #sidebar { width: 100%; max-height: 45vh; border-right: none; border-bottom: 1px solid var(--border); }
+  #map { height: 55vh; }
+}
+@media print {
+  header, #sidebar, .drag-hint, .toast-wrap, .leaflet-control-container { display: none !important; }
+  main { display: block; }
+  #map { display: none !important; }
+  body { background: #fff; }
+  #print-area { display: block !important; }
+}
+#print-area { display: none; }
+.print-day { margin-bottom: 16px; page-break-inside: avoid; }
+.print-day h3 { border-bottom: 2px solid #333; padding-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="loading-bar" id="loadingBar"></div>
+<header>
+  <h1><span class="icon">🗺️</span><span id="titleText">地图旅行规划器</span></h1>
+  <div class="spacer"></div>
+  <div class="toolbar">
+    <button class="btn" id="btnSave" title="保存到浏览器">💾 保存</button>
+    <button class="btn" id="btnLoad" title="从浏览器加载">📂 加载</button>
+    <button class="btn" id="btnExport" title="导出为 JSON 文件">📤 导出</button>
+    <button class="btn" id="btnImport" title="从 JSON 文件导入">📥 导入</button>
+    <button class="btn" id="btnSample" title="载入示例计划">✨ 示例</button>
+    <button class="btn" id="btnPrint" title="打印行程单">🖨️ 打印</button>
+    <button class="btn" id="btnClear" title="清空全部">🗑️ 清空</button>
+    <button class="btn" id="btnTheme" title="切换深色/浅色模式">🌙 深色</button>
+    <input type="file" id="fileInput" accept=".json" style="display:none">
+  </div>
+</header>
+<main>
+  <div id="sidebar">
+    <section>
+      <details class="card" open>
+        <summary>📋 计划信息</summary>
+        <div style="margin-top:8px">
+          <div class="row">
+            <div>
+              <label>计划名称</label>
+              <input type="text" id="planName" value="我的旅行计划">
+            </div>
+          </div>
+          <div class="row">
+            <div>
+              <label>开始日期</label>
+              <input type="date" id="startDate">
+            </div>
+            <div>
+              <label>结束日期</label>
+              <input type="date" id="endDate">
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+            <label style="margin:0">出行方式</label>
+            <select id="routeMode" style="width:auto">
+              <option value="driving">🚗 驾车</option>
+              <option value="walking">🚶 步行</option>
+              <option value="cycling">🚲 骑行</option>
+            </select>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details class="card" open>
+        <summary>🔍 搜索地点</summary>
+        <div style="margin-top:8px">
+          <div class="searchbox">
+            <input type="text" id="searchInput" placeholder="输入地点名称，如：巴黎、东京塔…" autocomplete="off">
+            <button class="btn btn-small" id="btnLocate" title="定位当前位置">📍</button>
+            <div class="suggestions" id="suggestions"></div>
+          </div>
+          <div class="hint">回车添加第一条结果，或点击“地图上点选添加”后直接在地图上单击。</div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details class="card" open>
+        <summary>📍 途经点 <span class="count" id="wpCount">0 个</span></summary>
+        <div style="margin-top:8px">
+          <div class="toggle" style="margin-bottom:8px">
+            <button class="btn btn-primary" id="btnAddMode">🖱️ 地图点选添加</button>
+            <button class="btn btn-ghost" id="btnOptimize">🧭 优化路线 (TSP)</button>
+            <button class="btn btn-ghost" id="btnUndo" title="撤销优化">↩️ 撤销</button>
+          </div>
+          <div class="toggle" style="margin-bottom:8px">
+            <label style="display:flex;align-items:center;gap:6px;margin:0;color:var(--text);font-size:13px;width:auto">
+              <input type="checkbox" id="chkRoundTrip"> 返回起点 (环形路线)
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;margin:0;color:var(--text);font-size:13px;width:auto">
+              <input type="checkbox" id="chkAvoidHW" checked> 避免高速
+            </label>
+          </div>
+          <ul class="wplist" id="wpList"></ul>
+          <div class="empty" id="wpEmpty">还没有途经点，请搜索、点选地图或加载示例。</div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details class="card" open>
+        <summary>📏 路线统计</summary>
+        <div style="margin-top:8px">
+          <div class="stat-grid">
+            <div class="stat-box"><div class="num" id="statDist">--</div><div class="lbl">总里程</div></div>
+            <div class="stat-box"><div class="num" id="statTime">--</div><div class="lbl">预计总时长</div></div>
+            <div class="stat-box"><div class="num" id="statStop">0</div><div class="lbl">途经点</div></div>
+            <div class="stat-box"><div class="num" id="statDays">--</div><div class="lbl">行程天数</div></div>
+          </div>
+          <div class="legend-row" style="margin-top:8px"><span>日均里程</span><span class="val" id="statAvg">--</span></div>
+          <div class="legend-row"><span>交通费用估算</span><span class="val" id="statCost">--</span></div>
+          <div class="hint">费用估算按驾车 0.8 元/公里、骑行 0、步行 0 粗略计算。</div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details class="card" open>
+        <summary>📅 每日行程</summary>
+        <div style="margin-top:8px">
+          <div class="row" style="margin-bottom:8px">
+            <div>
+              <label>每日节奏</label>
+              <select id="paceSelect">
+                <option value="relaxed">🦥 悠闲 (≤2h/天)</option>
+                <option value="normal" selected>😊 适中 (≤4h/天)</option>
+                <option value="busy">🏃 紧凑 (≤6h/天)</option>
+              </select>
+            </div>
+            <div>
+              <label>分配方式</label>
+              <div class="row" style="margin-top:18px">
+                <button class="btn btn-primary btn-small" id="btnAutoPlan">🔄 自动分配</button>
+              </div>
+            </div>
+          </div>
+          <div id="itinerary"></div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details class="card">
+        <summary>☀️ 天气预报</summary>
+        <div style="margin-top:8px">
+          <button class="btn btn-primary btn-small" id="btnWeather" style="margin-bottom:8px">🌤️ 加载途经点天气</button>
+          <div id="weatherBox"></div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details class="card">
+        <summary>💰 预算规划</summary>
+        <div style="margin-top:8px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+            <label style="margin:0;width:auto">币种</label>
+            <input type="text" id="currency" value="¥" style="width:70px">
+          </div>
+          <div class="budget-row"><label>交通</label><input type="number" id="bTrans" min="0" step="100" value="0"></div>
+          <div class="budget-row"><label>住宿</label><input type="number" id="bHotel" min="0" step="100" value="0"></div>
+          <div class="budget-row"><label>餐饮</label><input type="number" id="bFood" min="0" step="100" value="0"></div>
+          <div class="budget-row"><label>门票</label><input type="number" id="bTickets" min="0" step="100" value="0"></div>
+          <div class="budget-row"><label>其他</label><input type="number" id="bOther" min="0" step="100" value="0"></div>
+          <div class="budget-total-row">
+            <span style="font-size:12px;color:var(--muted)">人均预算 (× 同行人数 <input type="number" id="people" value="1" min="1" style="width:60px;display:inline-block;padding:4px 6px">)</span>
+            <span class="budget-total" id="budgetTotal">¥ 0</span>
+          </div>
+          <div class="legend-row" style="margin-top:6px"><span>日均预算</span><span class="val" id="budgetPerDay">¥ 0</span></div>
+        </div>
+      </details>
+    </section>
+
+    <div class="card" style="margin-top:16px">
+      <h3>💡 使用提示</h3>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8">
+        ① 搜索或点击地图添加途经点<br>
+        ② 拖拽地图上的标记可微调位置<br>
+        ③ “优化路线”自动规划最短顺序<br>
+        ④ “每日行程”按日期自动分配并生成行程单<br>
+        ⑤ 数据保存在浏览器本地，可导出 JSON 备份
+      </div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+  <div class="drag-hint">拖拽标记可调整位置 · 单击地图添加途经点</div>
+</main>
+
+<div id="print-area"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-fullscreen@1.0.2/dist/Leaflet.fullscreen.min.js"></script>
+<script>
+// ============ 状态 ============
+const MODE_SPEED = { driving: 60, walking: 5, cycling: 15 }; // km/h 用于估算
+const MODE_COST = { driving: 0.8, walking: 0, cycling: 0 };
+const PACE_BUDGET = { relaxed: 2 * 3600, normal: 4 * 3600, busy: 6 * 3600 };
+const WEATHER_CODES = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌦️',56:'🌧️',57:'🌧️',
+  61:'🌧️',63:'🌧️',65:'🌧️',66:'🌧️',67:'🌧️',71:'🌨️',73:'🌨️',75:'🌨️',77:'🌨️',80:'🌦️',81:'🌦️',82:'⛈️',85:'🌨️',86:'🌨️',95:'⛈️',96:'⛈️',99:'⛈️'
+};
+const CITIES = { 北京:[39.9042,116.4074], 上海:[31.2304,121.4737], 广州:[23.1291,113.2644], 杭州:[30.2741,120.1551], 成都:[30.5728,104.0668] };
+
+let state = {
+  planName: '我的旅行计划',
+  startDate: null, endDate: null,
+  waypoints: [],   // {id,name,lat,lng,notes,day}
+  routeMode: 'driving',
+  roundTrip: false,
+  avoidHW: true,
+  pace: 'normal',
+  currency: '¥',
+  budget: { transport:0, hotel:0, food:0, tickets:0, other:0 },
+  people: 1
+};
+let markers = {}, routeLayer = null, legDurations = [];
+let addMode = false, lastOrder = null, dragTarget = null, weatherCache = {};
+
+// ============ DOM 引用 ============
+const $ = id => document.getElementById(id);
+const mapEl = $('map');
+
+// ============ 地图初始化 ============
+const baseLayers = {
+  '高德地图': L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}', { subdomains: ['1','2','3','4'], maxZoom: 18, attribution: '© 高德地图' }),
+  '高德卫星': L.tileLayer('https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}', { subdomains: ['1','2','3','4'], maxZoom: 18, attribution: '© 高德地图' }),
+  '高德路网': L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', { subdomains: ['1','2','3','4'], maxZoom: 18, attribution: '© 高德地图' }),
+  '浅色地图': L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19, attribution: '© CARTO' }),
+  '地形地图': L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom: 17, attribution: '© OpenTopoMap' })
+};
+const map = L.map(mapEl, { center: [35.0, 110.0], zoom: 4 });
+baseLayers['高德地图'].addTo(map);
+L.control.layers(baseLayers, null, { position: 'topright', collapsed: true }).addTo(map);
+if (L.control.fullscreen) L.control.fullscreen({ position: 'topright' }).addTo(map);
+
+// ============ 工具函数 ============
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function toast(msg, type='') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  $('toastWrap').appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity .3s'; setTimeout(()=>t.remove(),300); }, 3000);
+}
+function setLoading(on) { $('loadingBar').classList.toggle('active', on); }
+function haversine(a, b) {
+  const R = 6371, dLat = (b.lat-a.lat)*Math.PI/180, dLng = (b.lng-a.lng)*Math.PI/180;
+  const h = Math.sin(dLat/2)**2 + Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function fmtDist(m) { return m >= 1000 ? (m/1000).toFixed(1)+' 公里' : Math.round(m)+' 米'; }
+function fmtDur(s) {
+  if (s < 60) return Math.round(s)+' 秒';
+  if (s < 3600) return Math.round(s/60)+' 分钟';
+  const h = Math.floor(s/3600), m = Math.round((s%3600)/60);
+  return h+' 小时'+(m?' '+m+' 分钟':'');
+}
+function dayCount() {
+  if (!state.startDate || !state.endDate) return 0;
+  const s = new Date(state.startDate), e = new Date(state.endDate);
+  return Math.max(0, Math.round((e - s) / 86400000) + 1);
+}
+function datesBetween() {
+  const out = [];
+  if (!state.startDate || !state.endDate) return out;
+  let d = new Date(state.startDate);
+  const end = new Date(state.endDate);
+  while (d <= end) { out.push(d.toISOString().slice(0,10)); d.setDate(d.getDate()+1); }
+  return out;
+}
+function estimateTravel(a, b) {
+  const km = haversine(a, b);
+  const speed = MODE_SPEED[state.routeMode] || 60;
+  return (km / speed) * 3600;
+}
+function estimateCostTotalKm() {
+  return (state.waypoints.length < 2) ? 0 : state.waypoints.slice(0,-1).reduce((s, wp, i) =>
+    s + haversine(wp, state.waypoints[i+1]), 0) * MODE_COST[state.routeMode] || 0;
+}
+
+// ============ 搜索 ============
+let searchTimer = null;
+$('searchInput').addEventListener('input', () => {
+  clearTimeout(searchTimer);
+  const q = $('searchInput').value.trim();
+  if (q.length < 2) { hideSuggestions(); return; }
+  searchTimer = setTimeout(() => geocode(q), 400);
+});
+$('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const first = $('suggestions').querySelector('.item');
+    if (first) { first.click(); }
+    else { geocodeAndAdd($('searchInput').value.trim()); }
+  }
+});
+document.addEventListener('click', e => { if (!e.target.closest('.searchbox')) hideSuggestions(); });
+
+async function geocode(q) {
+  try {
+    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) +
+      '&format=json&limit=6&addressdetails=1';
+    const res = await fetch(url, { headers: { 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.5' } });
+    const data = await res.json();
+    renderSuggestions(data);
+  } catch (e) { hideSuggestions(); }
+}
+function renderSuggestions(items) {
+  const box = $('suggestions');
+  box.innerHTML = '';
+  if (!items || !items.length) { box.style.display='none'; return; }
+  items.forEach(it => {
+    const d = document.createElement('div');
+    d.className = 'item';
+    const addr = it.address ? [it.address.city||it.address.town||it.address.village||it.address.state||'', it.address.country||''].filter(Boolean).join(', ') : '';
+    d.innerHTML = `<div>${it.display_name.split(',').slice(0,2).join(',')}</div><div class="sub">${addr||it.display_name}</div>`;
+    d.onclick = () => {
+      addWaypoint(it.display_name.split(',')[0], parseFloat(it.lat), parseFloat(it.lon));
+      $('searchInput').value = '';
+      hideSuggestions();
+    };
+    box.appendChild(d);
+  });
+  box.style.display = 'block';
+}
+function hideSuggestions() { $('suggestions').style.display='none'; }
+async function geocodeAndAdd(q) {
+  if (!q) return;
+  try {
+    const url = 'https://nominatim.openstreetmap.org/search?q=' + encodeURIComponent(q) + '&format=json&limit=1';
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.length) { addWaypoint(data[0].display_name.split(',')[0], parseFloat(data[0].lat), parseFloat(data[0].lon)); $('searchInput').value=''; }
+    else toast('未找到该地点', 'warn');
+  } catch(e) { toast('搜索失败，请重试', 'err'); }
+}
+
+// ============ 途经点管理 ============
+function addWaypoint(name, lat, lng, opts = {}) {
+  state.waypoints.push({ id: uid(), name: name || '未命名地点', lat, lng, notes: opts.notes || '', day: opts.day ?? null });
+  renderMarkers(); renderList(); computeRoute();
+  toast('已添加：' + name, 'ok');
+  if (addMode) addMode = false, refreshAddBtn();
+}
+function removeWaypoint(id) {
+  state.waypoints = state.waypoints.filter(w => w.id !== id);
+  renderMarkers(); renderList(); computeRoute();
+}
+function moveWaypoint(id, dir) {
+  const i = state.waypoints.findIndex(w => w.id === id);
+  const j = i + dir;
+  if (j < 0 || j >= state.waypoints.length) return;
+  [state.waypoints[i], state.waypoints[j]] = [state.waypoints[j], state.waypoints[i]];
+  renderMarkers(); renderList(); computeRoute();
+}
+function markerIcon(n) {
+  return L.divIcon({
+    className: 'wp-marker', html: `<div class="pin"><span>${n}</span></div>`,
+    iconSize: [26,26], iconAnchor: [13,26]
+  });
+}
+function renderMarkers() {
+  Object.values(markers).forEach(m => m.remove());
+  markers = {};
+  state.waypoints.forEach((w, i) => {
+    const mk = L.marker([w.lat, w.lng], { icon: markerIcon(i+1), draggable: true, title: w.name })
+      .addTo(map)
+      .bindPopup(`<b>${i+1}. ${escapeHtml(w.name)}</b><br>${w.lat.toFixed(5)}, ${w.lng.toFixed(5)}`);
+    mk.on('dragstart', () => { dragTarget = w.id; });
+    mk.on('drag', e => {
+      const ll = e.target.getLatLng();
+      markers[dragTarget].setLatLng(ll);
+      if (routeLayer) { drawRoutePreview(); }
+    });
+    mk.on('dragend', e => {
+      const ll = e.target.getLatLng();
+      const wpt = state.waypoints.find(x => x.id === dragTarget);
+      if (wpt) { wpt.lat = ll.lat; wpt.lng = ll.lng; renderList(); computeRoute(); }
+      dragTarget = null;
+    });
+    mk.on('click', () => { map.panTo([w.lat, w.lng]); });
+    markers[w.id] = mk;
+  });
+  if (state.waypoints.length) {
+    const bounds = L.latLngBounds(state.waypoints.map(w => [w.lat, w.lng]));
+    map.fitBounds(bounds, { padding: [50,50], maxZoom: 13 });
+  }
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function renderList() {
+  const ul = $('wpList');
+  ul.innerHTML = '';
+  $('wpEmpty').style.display = state.waypoints.length ? 'none' : 'block';
+  $('wpCount').textContent = state.waypoints.length + ' 个';
+  const days = dayCount();
+  state.waypoints.forEach((w, i) => {
+    const li = document.createElement('li');
+    const opts = Array.from({length: Math.max(days,1)}, (_,k) => `<option value="${k+1}" ${w.day===k+1?'selected':''}>第${k+1}天</option>`).join('');
+    li.innerHTML = `
+      <div class="wp-num">${i+1}</div>
+      <div class="wp-info">
+        <div class="wp-name" title="${escapeHtml(w.notes||'')}">${escapeHtml(w.name)}</div>
+        <div class="wp-meta">${w.lat.toFixed(4)}, ${w.lng.toFixed(4)}${w.notes?' · '+escapeHtml(w.notes):''}</div>
+        <div style="margin-top:4px">
+          <label style="margin:0;display:inline-block;width:auto;font-size:11px">分配</label>
+          <select class="daySel" style="width:auto;padding:3px 6px;font-size:12px;margin-left:4px">${opts}</select>
+          <button class="btn btn-ghost btn-small notes-btn" title="备注">📝</button>
+        </div>
+      </div>
+      <div class="wp-actions">
+        <button class="btn btn-ghost up" ${i===0?'disabled style="opacity:.3"':''}>↑</button>
+        <button class="btn btn-ghost down" ${i===state.waypoints.length-1?'disabled style="opacity:.3"':''}>↓</button>
+        <button class="btn btn-danger del">✕</button>
+      </div>`;
+    li.querySelector('.up').onclick = () => moveWaypoint(w.id, -1);
+    li.querySelector('.down').onclick = () => moveWaypoint(w.id, 1);
+    li.querySelector('.del').onclick = () => removeWaypoint(w.id);
+    li.querySelector('.daySel').onchange = e => { w.day = parseInt(e.target.value); renderItinerary(); };
+    li.querySelector('.notes-btn').onclick = () => {
+      const v = prompt('为「' + w.name + '」添加备注：', w.notes || '');
+      if (v !== null) { w.notes = v; renderList(); }
+    };
+    ul.appendChild(li);
+  });
+}
+
+// ============ 路线计算 (OSRM) ============
+function clearRoute() { if (routeLayer) { routeLayer.remove(); routeLayer = null; } }
+function drawRoutePreview() {
+  clearRoute();
+  const latlngs = state.waypoints.map(w => [w.lat, w.lng]);
+  routeLayer = L.polyline(latlngs, { color: '#2563eb', weight: 4, opacity: .8, dashArray: '8 8' }).addTo(map);
+}
+async function computeRoute() {
+  if (state.waypoints.length < 2) { clearRoute(); legDurations = []; updateStats(); renderItinerary(); return; }
+  const coords = state.waypoints.map(w => w.lng + ',' + w.lat).join(';');
+  const url = `https://router.project-osrm.org/route/v1/${state.routeMode}/${coords}?overview=full&geometries=geojson&steps=false&alternatives=false`;
+  setLoading(true);
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.code !== 'Ok' || !data.routes || !data.routes.length) throw new Error(data.code);
+    const route = data.routes[0];
+    clearRoute();
+    routeLayer = L.polyline(route.geometry.coordinates.map(c => [c[1], c[0]]), { color: '#2563eb', weight: 5, opacity: .85 }).addTo(map);
+    legDurations = route.legs ? route.legs.map(l => l.duration) : [];
+    updateStats();
+    planDays();
+    renderItinerary();
+  } catch(e) {
+    toast('路径服务不可用，已用直线估算', 'warn');
+    drawRoutePreview();
+    legDurations = [];
+    updateStats();
+    planDays();
+    renderItinerary();
+  }
+  setLoading(false);
+}
+function updateStats() {
+  let totalDist = 0, totalTime = 0;
+  if (state.waypoints.length >= 2) {
+    if (legDurations.length) {
+      totalTime = legDurations.reduce((a,b)=>a+b,0);
+      totalDist = state.waypoints.slice(0,-1).reduce((s,wp,i)=>s+haversine(wp,state.waypoints[i+1])*1000,0);
+    } else {
+      totalDist = state.waypoints.slice(0,-1).reduce((s,wp,i)=>s+haversine(wp,state.waypoints[i+1])*1000,0);
+      totalTime = state.waypoints.slice(0,-1).reduce((s,wp,i)=>s+estimateTravel(wp,state.waypoints[i+1]),0);
+    }
+    if (state.roundTrip) {
+      const last = state.waypoints[state.waypoints.length-1], first = state.waypoints[0];
+      const km = haversine(last, first);
+      totalDist += km*1000; totalTime += (legDurations.length ? km/MODE_SPEED[state.routeMode]*3600 : estimateTravel(last, first));
+    }
+  }
+  $('statDist').textContent = totalDist >= 1000 ? (totalDist/1000).toFixed(1)+'k' : Math.round(totalDist)+'m';
+  $('statTime').textContent = totalTime ? fmtDur(totalTime) : '--';
+  $('statStop').textContent = state.waypoints.length;
+  $('statDays').textContent = dayCount() ? dayCount() + ' 天' : '--';
+  $('statAvg').textContent = (totalDist/1000/dayCount()).toFixed(1) + ' 公里/天';
+  $('statCost').textContent = (estimateCostTotalKm()).toFixed(0) + ' 元';
+}
+
+// ============ 路线优化 (最近邻 + 2-opt) ============
+function optimizeRoute() {
+  const n = state.waypoints.length;
+  if (n < 3) { toast('至少需要 3 个途经点才能优化', 'warn'); return; }
+  lastOrder = state.waypoints.map(w => w.id);
+  const dist = [];
+  for (let i = 0; i < n; i++) { dist[i] = []; for (let j = 0; j < n; j++) dist[i][j] = haversine(state.waypoints[i], state.waypoints[j]); }
+  let order = [0]; const used = new Set([0]);
+  while (order.length < n) {
+    let best = -1, bd = Infinity;
+    const cur = order[order.length-1];
+    for (let j = 0; j < n; j++) if (!used.has(j) && dist[cur][j] < bd) { bd = dist[cur][j]; best = j; }
+    order.push(best); used.add(best);
+  }
+  // 2-opt 改进
+  let improved = true;
+  while (improved) {
+    improved = false;
+    for (let i = 0; i < n-1; i++) {
+      for (let j = i+1; j < n; j++) {
+        const delta = twoOptDelta(order, dist, i, j);
+        if (delta < -1e-9) { order = order.slice(0,i).concat(order.slice(i,j+1).reverse(), order.slice(j+1)); improved = true; }
+      }
+    }
+  }
+  state.waypoints = order.map(i => state.waypoints[i]);
+  renderMarkers(); renderList(); computeRoute();
+  toast('路线已优化 ✓', 'ok');
+}
+function twoOptDelta(order, dist, i, j) {
+  // 对路径 2-opt 的代价变化
+  const a1 = order[i], a2 = order[i+1], b1 = order[j], b2 = (j+1 < order.length) ? order[j+1] : -1;
+  let before = dist[a1][a2] + (b2 !== -1 ? dist[b1][b2] : 0);
+  let after = dist[a1][b1] + (b2 !== -1 ? dist[a2][b2] : 0);
+  return after - before;
+}
+
+// ============ 每日行程规划 ============
+function planDays() {
+  const days = dayCount();
+  if (!days) return;
+  const budget = PACE_BUDGET[state.pace] || 4*3600;
+  let d = 1, cum = 0, prev = null;
+  state.waypoints.forEach(w => {
+    const t = prev ? estimateTravel(prev, w) : 0;
+    if (cum + t > budget && cum > 0 && d < days) { d++; cum = 0; }
+    w.day = d; cum += t; prev = w;
+  });
+}
+function renderItinerary() {
+  const box = $('itinerary');
+  if (!state.waypoints.length) { box.innerHTML = '<div class="empty">添加途经点后自动生成每日行程</div>'; return; }
+  const days = dayCount();
+  if (!days) { box.innerHTML = '<div class="empty">请先在“计划信息”中设置日期范围</div>'; return; }
+  const dates = datesBetween();
+  const groups = {};
+  state.waypoints.forEach(w => { (groups[w.day||1] = groups[w.day||1] || []).push(w); });
+  let html = '';
+  for (let d = 1; d <= Math.min(days, Object.keys(groups).reduce((a,b)=>Math.max(a,+b),1)); d++) {
+    const stops = groups[d] || [];
+    const dateStr = dates[d-1] || '';
+    const dayTime = stops.slice(0,-1).reduce((s,wp,i) => s + estimateTravel(wp, stops[i+1]), 0);
+    html += `<div class="itin-day">
+      <div class="itin-day-head"><span>第 ${d} 天${dateStr ? ' · ' + dateStr : ''}</span><span>${fmtDur(dayTime)}</span></div>`;
+    stops.forEach((wp, i) => {
+      html += `<div class="itin-stop"><span class="dot"></span><div>
+        <b>${i+1}. ${escapeHtml(wp.name)}</b>${wp.notes ? ' <span style="color:var(--muted)">· '+escapeHtml(wp.notes)+'</span>' : ''}
+        ${i < stops.length-1 ? `<div class="travel">→ ${fmtDur(estimateTravel(wp, stops[i+1]))} · ${haversine(wp, stops[i+1]).toFixed(1)} 公里</div>` : ''}
+      </div></div>`;
+    });
+    html += '</div>';
+  }
+  box.innerHTML = html;
+  renderPrint();
+}
+function renderPrint() {
+  const box = $('print-area');
+  let html = `<h1>${escapeHtml(state.planName)}</h1><p style="color:#555">${state.startDate || ''} 至 ${state.endDate || ''} · ${state.waypoints.length} 个地点 · 出行方式:${state.routeMode}</p>`;
+  const dates = datesBetween();
+  const groups = {};
+  state.waypoints.forEach(w => { (groups[w.day||1] = groups[w.day||1] || []).push(w); });
+  const maxDay = Math.max(1, ...Object.keys(groups).map(Number));
+  for (let d = 1; d <= maxDay; d++) {
+    const stops = groups[d] || [];
+    html += `<div class="print-day"><h3>第 ${d} 天 ${dates[d-1] || ''}</h3><ol>`;
+    stops.forEach(wp => { html += `<li>${escapeHtml(wp.name)}${wp.notes ? ' — ' + escapeHtml(wp.notes) : ''}</li>`; });
+    html += '</ol></div>';
+  }
+  const c = state.currency;
+  const total = state.budget.transport + state.budget.hotel + state.budget.food + state.budget.tickets + state.budget.other;
+  html += `<p><b>预算合计：${c}${total.toLocaleString()}</b></p>`;
+  box.innerHTML = html;
+}
+
+// ============ 天气 ============
+$('btnWeather').onclick = async () => {
+  if (!state.waypoints.length) { toast('请先添加途经点', 'warn'); return; }
+  const dates = datesBetween();
+  if (!dates.length) { toast('请先设置日期范围', 'warn'); return; }
+  const box = $('weatherBox');
+  box.innerHTML = '<div class="hint">正在查询天气…</div>';
+  let html = '';
+  for (const w of state.waypoints) {
+    const key = w.id + '|' + w.lat.toFixed(2) + ',' + w.lng.toFixed(2);
+    if (weatherCache[key]) { html += weatherCache[key]; continue; }
+    try {
+      const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + w.lat + '&longitude=' + w.lng +
+        '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=16';
+      const res = await fetch(url);
+      const d = await res.json();
+      let cards = `<div class="weather-card" style="display:block;margin-bottom:4px"><b>${escapeHtml(w.name)}</b></div>`;
+      d.daily.time.forEach((dt, i) => {
+        if (!dates.includes(dt)) return;
+        const wc = WEATHER_CODES[d.daily.weathercode[i]] || '🌡️';
+        cards += `<div class="weather-card"><span class="wicon">${wc}</span>
+          <span class="wdate">${dt}</span>
+          <span class="wtemp">${d.daily.temperature_2m_max[i]}° / ${d.daily.temperature_2m_min[i]}°</span>
+          <span style="margin-left:auto;color:var(--muted)">💧 ${d.daily.precipitation_probability_max[i] ?? 0}%</span></div>`;
+      });
+      weatherCache[key] = cards;
+      html += cards;
+    } catch(e) { html += `<div class="weather-card"><b>${escapeHtml(w.name)}</b><span class="hint">天气获取失败</span></div>`; }
+  }
+  box.innerHTML = html || '<div class="hint">日期范围内无数据（最多预报 16 天）</div>';
+};
+
+// ============ 预算 ============
+const budgetIds = { transport:'bTrans', hotel:'bHotel', food:'bFood', tickets:'bTickets', other:'bOther' };
+function bindBudget() {
+  Object.entries(budgetIds).forEach(([k, id]) => {
+    $(id).oninput = () => { state.budget[k] = parseFloat($(id).value) || 0; updateBudget(); };
+  });
+  $('people').oninput = () => { state.people = Math.max(1, parseInt($('people').value) || 1); updateBudget(); };
+  $('currency').oninput = () => { state.currency = $('currency').value || '¥'; updateBudget(); };
+}
+function updateBudget() {
+  const total = Object.values(state.budget).reduce((a,b)=>a+b,0) * state.people;
+  const c = state.currency || '¥';
+  $('budgetTotal').textContent = c + ' ' + total.toLocaleString();
+  const days = dayCount();
+  $('budgetPerDay').textContent = days ? c + ' ' + (total/days).toFixed(0) : c + ' 0';
+}
+
+// ============ 持久化 / 导出 / 导入 ============
+function savePlan() {
+  syncFromUI();
+  localStorage.setItem('travelPlan', JSON.stringify(state));
+  toast('计划已保存到本地浏览器', 'ok');
+}
+function loadPlan() {
+  const raw = localStorage.getItem('travelPlan');
+  if (!raw) { toast('没有找到已保存的计划', 'warn'); return; }
+  try {
+    state = Object.assign(state, JSON.parse(raw));
+    syncToUI(); refreshAll();
+    toast('计划已加载', 'ok');
+  } catch(e) { toast('保存的数据损坏', 'err'); }
+}
+function exportPlan() {
+  syncFromUI();
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (state.planName || 'travel-plan').replace(/[\\/:*?"<>|]/g, '_') + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('已导出 JSON', 'ok');
+}
+$('btnImport').onclick = () => $('fileInput').click();
+$('fileInput').onchange = e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      state = Object.assign(state, data);
+      syncToUI(); refreshAll();
+      toast('导入成功', 'ok');
+    } catch(err) { toast('导入失败：文件格式错误', 'err'); }
+  };
+  reader.readAsText(f);
+  e.target.value = '';
+};
+function clearAll() {
+  if (!confirm('确定清空所有途经点和设置吗？')) return;
+  state.waypoints = [];
+  state.planName = '我的旅行计划';
+  state.startDate = state.endDate = null;
+  state.budget = { transport:0, hotel:0, food:0, tickets:0, other:0 };
+  weatherCache = {};
+  syncToUI(); refreshAll();
+  toast('已清空', 'ok');
+}
+
+// ============ UI 同步 ============
+function syncFromUI() {
+  state.planName = $('planName').value;
+  state.startDate = $('startDate').value || null;
+  state.endDate = $('endDate').value || null;
+  state.routeMode = $('routeMode').value;
+  state.roundTrip = $('chkRoundTrip').checked;
+  state.avoidHW = $('chkAvoidHW').checked;
+  state.pace = $('paceSelect').value;
+  state.currency = $('currency').value;
+  state.people = Math.max(1, parseInt($('people').value) || 1);
+  Object.entries(budgetIds).forEach(([k, id]) => state.budget[k] = parseFloat($(id).value) || 0);
+}
+function syncToUI() {
+  $('planName').value = state.planName || '';
+  $('startDate').value = state.startDate || '';
+  $('endDate').value = state.endDate || '';
+  $('routeMode').value = state.routeMode || 'driving';
+  $('chkRoundTrip').checked = !!state.roundTrip;
+  $('chkAvoidHW').checked = state.avoidHW !== false;
+  $('paceSelect').value = state.pace || 'normal';
+  $('currency').value = state.currency || '¥';
+  $('people').value = state.people || 1;
+  Object.entries(budgetIds).forEach(([k, id]) => $(id).value = state.budget[k] || 0);
+  $('titleText').textContent = state.planName || '地图旅行规划器';
+}
+function refreshAll() {
+  renderMarkers(); renderList(); renderItinerary(); updateBudget(); updateStats();
+  if (state.waypoints.length >= 2) computeRoute(); else { clearRoute(); }
+}
+
+// ============ 地图点选添加 ============
+function refreshAddBtn() {
+  const b = $('btnAddMode');
+  b.textContent = addMode ? '🖱️ 点击地图添加中…（再次点击取消）' : '🖱️ 地图点选添加';
+  b.classList.toggle('btn-danger', addMode);
+}
+$('btnAddMode').onclick = () => { addMode = !addMode; refreshAddBtn(); };
+map.on('click', e => {
+  if (addMode) {
+    const { lat, lng } = e.latlng;
+    const name = prompt('该地点名称（留空则用坐标）：', '') || lat.toFixed(4)+', '+lng.toFixed(4);
+    addWaypoint(name, lat, lng);
+  }
+});
+
+// ============ 定位 ============
+$('btnLocate').onclick = () => {
+  if (!navigator.geolocation) { toast('浏览器不支持定位', 'warn'); return; }
+  toast('正在定位…');
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude, longitude } = pos.coords;
+    addWaypoint('我的位置', latitude, longitude);
+  }, () => toast('定位失败，请检查权限', 'err'), { enableHighAccuracy: true });
+};
+
+// ============ 其他按钮绑定 ============
+$('btnOptimize').onclick = optimizeRoute;
+$('btnUndo').onclick = () => {
+  if (!lastOrder) { toast('暂无可撤销的操作', 'warn'); return; }
+  const map_ = {}; state.waypoints.forEach(w => map_[w.id] = w);
+  state.waypoints = lastOrder.map(id => map_[id]).filter(Boolean);
+  lastOrder = null;
+  renderMarkers(); renderList(); computeRoute();
+  toast('已撤销优化', 'ok');
+};
+$('btnSave').onclick = savePlan;
+$('btnLoad').onclick = loadPlan;
+$('btnExport').onclick = exportPlan;
+$('btnPrint').onclick = () => { syncFromUI(); renderPrint(); window.print(); };
+$('btnClear').onclick = clearAll;
+$('btnTheme').onclick = () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? '' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  $('btnTheme').textContent = next ? '☀️ 浅色' : '🌙 深色';
+  localStorage.setItem('theme', next);
+  if (next) mapEl.classList.add('darkmap');
+  else mapEl.classList.remove('darkmap');
+};
+['planName','startDate','endDate','routeMode','paceSelect'].forEach(id => {
+  $(id).addEventListener('change', () => { syncFromUI(); $('titleText').textContent = state.planName || '地图旅行规划器'; if (id==='startDate'||id==='endDate'||id==='paceSelect') { planDays(); renderItinerary(); renderList(); renderPrint(); } });
+});
+$('chkRoundTrip').onchange = () => { state.roundTrip = $('chkRoundTrip').checked; computeRoute(); };
+$('chkAvoidHW').onchange = () => { state.avoidHW = $('chkAvoidHW').checked; computeRoute(); };
+$('btnAutoPlan').onclick = () => { planDays(); renderList(); renderItinerary(); toast('已按节奏自动分配每日地点', 'ok'); };
+$('people').addEventListener('input', updateBudget);
+
+// ============ 示例计划 ============
+$('btnSample').onclick = async () => {
+  if (state.waypoints.length && !confirm('载入示例将替换当前计划，继续？')) return;
+  const today = new Date();
+  const fmt = d => d.toISOString().slice(0,10);
+  const name = prompt('请输入示例计划的名称：', '华东城市五日游');
+  if (name === null) return;
+  state.planName = name.trim() || '华东城市五日游';
+  state.startDate = fmt(today);
+  const end = new Date(today); end.setDate(end.getDate()+4);
+  state.endDate = fmt(end);
+  state.routeMode = 'driving';
+  state.waypoints = [
+    { id: uid(), name: '上海', lat: 31.2304, lng: 121.4737, notes: '外滩夜景', day: 1 },
+    { id: uid(), name: '苏州', lat: 31.2989, lng: 120.5853, notes: '拙政园、平江路', day: 2 },
+    { id: uid(), name: '杭州', lat: 30.2741, lng: 120.1551, notes: '西湖、灵隐寺', day: 3 },
+    { id: uid(), name: '绍兴', lat: 30.0303, lng: 120.5822, notes: '鲁迅故里', day: 4 },
+    { id: uid(), name: '南京', lat: 32.0603, lng: 118.7969, notes: '中山陵、夫子庙', day: 5 }
+  ];
+  state.budget = { transport: 1200, hotel: 2000, food: 1500, tickets: 800, other: 500 };
+  state.pace = 'normal';
+  syncToUI(); refreshAll();
+  toast('示例计划已载入 🎉', 'ok');
+};
+
+// ============ 初始化 ============
+function init() {
+  const saved = localStorage.getItem('travelPlan');
+  if (saved) {
+    try { state = Object.assign(state, JSON.parse(saved)); } catch(e) {}
+  }
+  const theme = localStorage.getItem('theme');
+  if (theme === 'dark') { document.documentElement.setAttribute('data-theme','dark'); $('btnTheme').textContent = '☀️ 浅色'; }
+  syncToUI();
+  bindBudget();
+  if (!state.startDate) { const t = new Date(); const f = d => d.toISOString().slice(0,10); const e = new Date(t); e.setDate(e.getDate()+4); state.startDate = f(t); state.endDate = f(e); $('startDate').value = state.startDate; $('endDate').value = state.endDate; }
+  refreshAll();
+  if (!state.waypoints.length) $('btnSample').click();
+}
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>沉浸式时钟桌面</title>
+<style>
+  :root {
+    --bg: radial-gradient(ellipse at center, #0b1026 0%, #05070f 100%);
+    --accent: #38bdf8;
+    --accent2: #818cf8;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --panel: rgba(15, 23, 42, 0.72);
+    --panel-border: rgba(148, 163, 184, 0.15);
+    --danger: #f87171;
+  }
+  [data-theme="night"] {
+    --bg: radial-gradient(ellipse at center, #0b1026 0%, #05070f 100%);
+    --accent: #38bdf8; --accent2: #818cf8;
+  }
+  [data-theme="sunset"] {
+    --bg: radial-gradient(ellipse at center, #431407 0%, #1c0a02 100%);
+    --accent: #fb923c; --accent2: #f472b6;
+  }
+  [data-theme="forest"] {
+    --bg: radial-gradient(ellipse at center, #052e16 0%, #020c06 100%);
+    --accent: #4ade80; --accent2: #34d399;
+  }
+  [data-theme="ocean"] {
+    --bg: radial-gradient(ellipse at center, #0c4a6e 0%, #04121d 100%);
+    --accent: #22d3ee; --accent2: #60a5fa;
+  }
+  [data-theme="mono"] {
+    --bg: radial-gradient(ellipse at center, #1f2937 0%, #0a0a0a 100%);
+    --accent: #e5e7eb; --accent2: #9ca3af;
+  }
+  [data-theme="candy"] {
+    --bg: radial-gradient(ellipse at center, #4c1d95 0%, #14051f 100%);
+    --accent: #f0abfc; --accent2: #a78bfa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    transition: background 1.2s ease;
+    user-select: none;
+  }
+
+  /* 星空背景 */
+  #stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  /* 主时钟区 */
+  #clock-area {
+    position: fixed; inset: 0; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px;
+  }
+
+  #time-row { display: flex; align-items: center; gap: 24px; }
+  #digital-time {
+    font-size: clamp(88px, 22vw, 220px);
+    font-weight: 200;
+    letter-spacing: 4px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 60px rgba(255,255,255,0.08);
+    line-height: 1;
+  }
+  #ampm {
+    font-size: clamp(20px, 4vw, 40px);
+    color: var(--muted);
+    font-weight: 400;
+  }
+  #date-line {
+    font-size: clamp(18px, 3.4vw, 30px);
+    color: var(--text);
+    opacity: 0.85;
+    letter-spacing: 2px;
+  }
+  #date-line .cn { color: var(--accent); font-weight: 500; }
+  #sub-line {
+    font-size: clamp(13px, 2vw, 16px);
+    color: var(--muted);
+    letter-spacing: 6px;
+  }
+  #seconds-mono {
+    font-size: clamp(14px, 2vw, 18px);
+    color: var(--muted);
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  #greeting {
+    font-size: clamp(15px, 2.4vw, 20px);
+    color: var(--accent2);
+    opacity: 0.9;
+    letter-spacing: 3px;
+    margin-bottom: -6px;
+  }
+
+  /* 指针表 */
+  #analog-wrap { display: none; margin-bottom: 10px; }
+  #analog-wrap.show { display: block; }
+  #analog {
+    position: relative;
+    width: min(46vw, 240px);
+    aspect-ratio: 1;
+    border: 3px solid rgba(148,163,184,0.35);
+    border-radius: 50%;
+    background: rgba(2,6,23,0.35);
+    box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,255,255,0.04);
+  }
+  #analog .tick {
+    position: absolute; left: 50%; top: 50%;
+    width: 2px; height: 8px; background: rgba(148,163,184,0.5);
+    transform-origin: 50% 0;
+  }
+  #analog .tick.major { height: 14px; width: 3px; background: rgba(226,232,240,0.8); }
+  #analog .hand {
+    position: absolute; left: 50%; top: 50%;
+    transform-origin: 50% 100%;
+    border-radius: 6px;
+  }
+  #h-hand { width: 8px; height: 26%; background: var(--accent); }
+  #m-hand { width: 6px; height: 38%; background: var(--accent2); }
+  #s-hand { width: 2px; height: 42%; background: var(--danger); }
+  #s-hand::after {
+    content: ""; position: absolute; bottom: -6px; left: 50%;
+    transform: translateX(-50%);
+    width: 8px; height: 8px; border-radius: 50%; background: var(--danger);
+  }
+  #analog .center { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 12px; height: 12px; border-radius: 50%; background: var(--text); }
+
+  /* 控件栏 */
+  #controls {
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    z-index: 20; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    opacity: 0; transition: opacity .3s;
+    pointer-events: none;
+  }
+  body.menu-open #controls, body:hover #controls { opacity: 1; pointer-events: auto; }
+  .btn {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    color: var(--text);
+    padding: 8px 16px; border-radius: 999px;
+    font-size: 13px; cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: background .2s, transform .1s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: rgba(56,189,248,0.18); border-color: var(--accent); }
+  .btn:active { transform: scale(0.96); }
+  .btn.active { background: var(--accent); color: #05070f; border-color: var(--accent); font-weight: 600; }
+
+  /* 全屏按钮右下 */
+  #fullscreen-btn { position: fixed; right: 20px; bottom: 20px; z-index: 20; }
+
+  /* 时钟小部件网格 */
+  #widgets {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px; padding: 16px 20px;
+    max-height: 46vh; overflow-y: auto;
+    background: linear-gradient(to top, rgba(2,6,23,0.55), transparent);
+  }
+  .widget {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    backdrop-filter: blur(10px);
+    min-height: 70px;
+    transition: transform .2s;
+  }
+  .widget:hover { transform: translateY(-3px); }
+  .widget .w-title { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
+  .widget .w-time { font-size: 22px; font-weight: 300; font-variant-numeric: tabular-nums; }
+  .widget .w-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .widget .w-big { font-size: 30px; font-weight: 200; }
+
+  /* 面板 */
+  #panel {
+    position: fixed; top: 0; right: -460px; width: 440px; max-width: 92vw;
+    height: 100vh; z-index: 30;
+    background: rgba(3,7,18,0.92);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid var(--panel-border);
+    transition: right .35s ease;
+    overflow-y: auto;
+    padding: 24px;
+  }
+  #panel.open { right: 0; }
+  #panel h2 { font-size: 18px; margin-bottom: 4px; letter-spacing: 1px; }
+  #panel .sec { margin-top: 22px; }
+  #panel .sec h3 {
+    font-size: 12px; color: var(--accent); letter-spacing: 2px;
+    border-bottom: 1px solid var(--panel-border); padding-bottom: 6px; margin-bottom: 12px;
+  }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .row label { font-size: 14px; color: var(--text); opacity: .9; }
+  select, input[type="text"], input[type="number"], input[type="time"], input[type="date"] {
+    background: rgba(15,23,42,0.8); border: 1px solid var(--panel-border);
+    color: var(--text); padding: 6px 10px; border-radius: 8px; font-size: 14px;
+    outline: none; width: 160px;
+  }
+  select:focus, input:focus { border-color: var(--accent); }
+  input[type="color"] { width: 44px; height: 34px; border: 1px solid var(--panel-border); border-radius: 8px; background: transparent; padding: 2px; cursor: pointer; }
+  input[type="range"] { width: 160px; accent-color: var(--accent); }
+  /* toggle */
+  .switch { position: relative; width: 44px; height: 24px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0; background: #334155; border-radius: 999px;
+    transition: .3s; cursor: pointer;
+  }
+  .slider::before {
+    content: ""; position: absolute; width: 18px; height: 18px;
+    left: 3px; top: 3px; background: white; border-radius: 50%; transition: .3s;
+  }
+  .switch input:checked + .slider { background: var(--accent); }
+  .switch input:checked + .slider::before { transform: translateX(20px); }
+
+  .theme-swatches { display: flex; gap: 10px; }
+  .swatch {
+    width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent; transition: transform .15s;
+  }
+  .swatch:hover { transform: scale(1.15); }
+  .swatch.active { border-color: #fff; }
+
+  /* 倒计时 / 秒表 / 闹钟 */
+  .timer-display {
+    font-size: 48px; font-weight: 200; text-align: center;
+    font-variant-numeric: tabular-nums; letter-spacing: 3px; margin: 10px 0;
+  }
+  .timer-controls { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .timer-presets { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+  .alarm-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(15,23,42,0.7); border: 1px solid var(--panel-border);
+    padding: 10px 12px; border-radius: 10px; margin-bottom: 8px;
+  }
+  .alarm-item .ai-time { font-size: 20px; font-weight: 300; font-variant-numeric: tabular-nums; }
+  .alarm-item .ai-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .danger-btn { color: var(--danger); }
+
+  /* 通知/闹钟响铃 */
+  #alarm-overlay {
+    position: fixed; inset: 0; z-index: 100; display: none;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; flex-direction: column; gap: 24px;
+  }
+  #alarm-overlay.show { display: flex; }
+  #alarm-overlay .msg { font-size: clamp(30px, 6vw, 56px); font-weight: 200; letter-spacing: 3px; text-align: center; }
+  #alarm-overlay .btn { font-size: 18px; padding: 14px 34px; }
+
+  /* toast */
+  #toast {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--panel-border);
+    padding: 10px 22px; border-radius: 999px; z-index: 90;
+    opacity: 0; pointer-events: none; transition: opacity .3s; backdrop-filter: blur(10px);
+  }
+  #toast.show { opacity: 1; }
+
+  /* 右键菜单 */
+  #ctx-menu {
+    position: fixed; z-index: 200; background: rgba(3,7,18,0.95);
+    border: 1px solid var(--panel-border); border-radius: 12px;
+    padding: 6px; display: none; min-width: 180px; backdrop-filter: blur(16px);
+  }
+  #ctx-menu.show { display: block; }
+  #ctx-menu .item {
+    padding: 9px 14px; border-radius: 8px; font-size: 14px; cursor: pointer;
+  }
+  #ctx-menu .item:hover { background: rgba(56,189,248,0.18); }
+
+  /* 隐藏光标 */
+  body.hide-cursor, body.hide-cursor * { cursor: none !important; }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.3); border-radius: 4px; }
+
+  /* 数字动画 */
+  @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+  #digital-time { animation: pop 1s ease; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body data-theme="night">
+
+<!-- 星空 -->
+<canvas id="stars"></canvas>
+
+<!-- 主时钟 -->
+<div id="clock-area">
+  <div id="greeting"></div>
+  <div id="analog-wrap"><div id="analog"></div></div>
+  <div id="time-row">
+    <div id="digital-time">--:--</div>
+    <div id="ampm"></div>
+  </div>
+  <div id="date-line"></div>
+  <div id="seconds-mono"></div>
+  <div id="sub-line"></div>
+</div>
+
+<!-- 顶部控件 -->
+<div id="controls">
+  <button class="btn" id="btn-analog">🕘 指针模式</button>
+  <button class="btn" id="btn-settings">⚙️ 设置</button>
+  <button class="btn" id="btn-fullscreen">⛶ 全屏</button>
+  <button class="btn" id="btn-weather">🌤 天气</button>
+  <button class="btn" id="btn-timer">⏱ 计时器</button>
+  <button class="btn" id="btn-alarm">⏰ 闹钟</button>
+  <button class="btn" id="btn-stopwatch">⏱ 秒表</button>
+  <button class="btn" id="btn-world">🌍 世界时间</button>
+</div>
+
+<!-- 底部小部件 -->
+<div id="widgets"></div>
+
+<!-- 全屏按钮 -->
+<button class="btn" id="fullscreen-btn">⛶ 全屏</button>
+
+<!-- 设置面板 -->
+<div id="panel">
+  <h2>⚙️ 设置</h2>
+  <div class="sec">
+    <h3>主题外观</h3>
+    <div class="row"><label>主题色</label>
+      <div class="theme-swatches" id="theme-swatches">
+        <div class="swatch active" data-theme="night" style="background:linear-gradient(135deg,#38bdf8,#818cf8)" title="夜晚"></div>
+        <div class="swatch" data-theme="sunset" style="background:linear-gradient(135deg,#fb923c,#f472b6)" title="日落"></div>
+        <div class="swatch" data-theme="forest" style="background:linear-gradient(135deg,#4ade80,#34d399)" title="森林"></div>
+        <div class="swatch" data-theme="ocean" style="background:linear-gradient(135deg,#22d3ee,#60a5fa)" title="海洋"></div>
+        <div class="swatch" data-theme="mono" style="background:linear-gradient(135deg,#e5e7eb,#9ca3af)" title="单色"></div>
+        <div class="swatch" data-theme="candy" style="background:linear-gradient(135deg,#f0abfc,#a78bfa)" title="糖果"></div>
+      </div>
+    </div>
+    <div class="row"><label>强调色</label><input type="color" id="accent-color" value="#38bdf8"></div>
+    <div class="row"><label>辅助色</label><input type="color" id="accent2-color" value="#818cf8"></div>
+    <div class="row"><label>星空粒子</label>
+      <label class="switch"><input type="checkbox" id="opt-stars" checked><span class="slider"></span></label>
+    </div>
+    <div class="row"><label>隐藏光标</label>
+      <label class="switch"><input type="checkbox" id="opt-hidecursor"><span class="slider"></span></label>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h3>时间格式</h3>
+    <div class="row"><label>24 小时制</label>
+      <label class="switch"><input type="checkbox" id="opt-hour24" checked><span class="slider"></span></label>
+    </div>
+    <div class="row"><label>显示秒数</label>
+      <label class="switch"><input type="checkbox" id="opt-showsec" checked><span class="slider"></span></label>
+    </div>
+    <div class="row"><label>显示日期行</label>
+      <label class="switch"><input type="checkbox" id="opt-showdate" checked><span class="slider"></span></label>
+    </div>
+    <div class="row"><label>农历</label>
+      <label class="switch"><input type="checkbox" id="opt-lunar" checked><span class="slider"></span></label>
+    </div>
+    <div class="row"><label>数字字号 <span id="size-val">220</span>px</label>
+      <input type="range" id="opt-size" min="80" max="320" value="220">
+    </div>
+  </div>
+
+  <div class="sec">
+    <h3>天气</h3>
+    <div class="row"><label>城市</label><input type="text" id="weather-city" placeholder="如: Beijing" value="Beijing"></div>
+    <div class="row"><label>自动定位</label>
+      <label class="switch"><input type="checkbox" id="opt-geo"><span class="slider"></span></label>
+    </div>
+    <button class="btn" id="btn-weather-refresh">🔄 刷新天气</button>
+  </div>
+
+  <div class="sec">
+    <h3>倒计时器</h3>
+    <div class="timer-presets">
+      <button class="btn" data-min="1">1分</button>
+      <button class="btn" data-min="3">3分</button>
+      <button class="btn" data-min="5">5分</button>
+      <button class="btn" data-min="10">10分</button>
+      <button class="btn" data-min="25">25分</button>
+      <button class="btn" data-min="60">60分</button>
+    </div>
+    <div class="row"><label>自定义分钟</label><input type="number" id="timer-custom" min="1" max="600" value="10"></div>
+    <div id="timer-display" class="timer-display">10:00</div>
+    <div class="timer-controls">
+      <button class="btn" id="timer-start">▶ 开始</button>
+      <button class="btn" id="timer-pause">⏸ 暂停</button>
+      <button class="btn" id="timer-reset">↺ 重置</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h3>闹钟</h3>
+    <div class="row"><label>时间</label><input type="time" id="alarm-time" value="07:00"></div>
+    <div class="row"><label>标签</label><input type="text" id="alarm-label" placeholder="起床" value="起床"></div>
+    <div class="row"><label>重复</label>
+      <select id="alarm-repeat">
+        <option value="once">仅一次</option>
+        <option value="daily">每天</option>
+        <option value="weekdays">工作日</option>
+        <option value="weekends">周末</option>
+      </select>
+    </div>
+    <button class="btn" id="alarm-add">➕ 添加闹钟</button>
+    <div id="alarm-list" style="margin-top:12px"></div>
+  </div>
+
+  <div class="sec">
+    <h3>秒表</h3>
+    <div id="stopwatch-display" class="timer-display">00:00.00</div>
+    <div class="timer-controls">
+      <button class="btn" id="sw-start">▶ 开始</button>
+      <button class="btn" id="sw-lap">🏁 计次</button>
+      <button class="btn" id="sw-reset">↺ 复位</button>
+    </div>
+    <div id="lap-list" style="margin-top:12px; max-height:160px; overflow-y:auto"></div>
+  </div>
+
+  <div class="sec">
+    <h3>世界时间</h3>
+    <div class="row"><label>添加城市</label>
+      <select id="world-city">
+        <option value="America/New_York">纽约 New York</option>
+        <option value="Europe/London">伦敦 London</option>
+        <option value="Europe/Paris">巴黎 Paris</option>
+        <option value="Europe/Moscow">莫斯科 Moscow</option>
+        <option value="Asia/Dubai">迪拜 Dubai</option>
+        <option value="Asia/Tokyo">东京 Tokyo</option>
+        <option value="Asia/Seoul">首尔 Seoul</option>
+        <option value="Asia/Singapore">新加坡 Singapore</option>
+        <option value="Asia/Kolkata">新德里 Delhi</option>
+        <option value="Asia/Shanghai">上海 Shanghai</option>
+        <option value="Australia/Sydney">悉尼 Sydney</option>
+        <option value="Pacific/Auckland">奥克兰 Auckland</option>
+      </select>
+    </div>
+    <button class="btn" id="world-add">➕ 添加城市</button>
+    <div id="world-list" style="margin-top:12px"></div>
+  </div>
+
+  <div class="sec">
+    <h3>数据</h3>
+    <div class="row">
+      <button class="btn" id="btn-reset">↺ 恢复默认</button>
+      <button class="btn" id="btn-clear">🗑 清除数据</button>
+    </div>
+    <p style="font-size:12px; color:var(--muted); margin-top:10px">所有设置自动保存到本地浏览器。</p>
+  </div>
+</div>
+
+<!-- 闹钟响铃遮罩 -->
+<div id="alarm-overlay">
+  <div class="msg" id="alarm-msg">⏰ 时间到！</div>
+  <div>
+    <button class="btn" id="alarm-dismiss">✋ 停止</button>
+    <button class="btn" id="alarm-snooze">😴 再睡5分钟</button>
+  </div>
+</div>
+
+<!-- 右键菜单 -->
+<div id="ctx-menu">
+  <div class="item" data-act="analog">🕘 指针模式</div>
+  <div class="item" data-act="settings">⚙️ 打开设置</div>
+  <div class="item" data-act="fullscreen">⛶ 切换全屏</div>
+  <div class="item" data-act="timer">⏱ 倒计时</div>
+  <div class="item" data-act="alarm">⏰ 闹钟</div>
+  <div class="item" data-act="stopwatch">⏱ 秒表</div>
+  <div class="item" data-act="hidecursor">🖱 切换光标</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ================= 工具函数 ================= */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const pad = n => String(n).padStart(2, "0");
+const toast = msg => { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("show"), 2200); };
+
+const store = {
+  get(k, def) { try { const v = localStorage.getItem("imclock_" + k); return v === null ? def : JSON.parse(v); } catch (e) { return def; } },
+  set(k, v) { try { localStorage.setItem("imclock_" + k, JSON.stringify(v)); } catch (e) {} }
+};
+
+/* ================= 农历（简化，1900-2100） ================= */
+const LUNAR_INFO = [
+  0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+  0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+  0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+  0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+  0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+  0x06ca0,0x0b550,0x15355,0x04da0,0x0a5d0,0x14573,0x052d0,0x0a9a8,0x0e950,0x06aa0,
+  0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+  0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b5a0,0x195a6,
+  0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+  0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,
+  0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,
+  0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,
+  0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,
+  0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,
+  0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,
+  0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06b20,0x1a6c4,0x0aae0,
+  0x092e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,
+  0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,
+  0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,
+  0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252
+];
+const GAN = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+const ZHI = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+const LUNAR_MONTH = ["正","二","三","四","五","六","七","八","九","十","冬","腊"];
+const LUNAR_DAY = ["初一","初二","初三","初四","初五","初六","初七","初八","初九","初十","十一","十二","十三","十四","十五","十六","十七","十八","十九","二十","廿一","廿二","廿三","廿四","廿五","廿六","廿七","廿八","廿九","三十"];
+
+function lunar(date) {
+  let offset = (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(1900, 0, 31)) / 86400000;
+  let temp, i = 0;
+  for (i = 1900; i < 2101 && offset > 0; i++) {
+    temp = lYearDays(i);
+    offset -= temp;
+  }
+  if (offset < 0) { offset += temp; i--; }
+  const year = i;
+  let leap = leapMonth(i), isLeap = false;
+  let days = leapDays(i);
+  for (let j = 1; j < 13 && offset > 0; j++) {
+    if (leap > 0 && j === (leap + 1) && isLeap === false) { --j; isLeap = true; days = leapDays(year); }
+    else { days = monthDays(year, j); }
+    if (isLeap === true && j === (leap + 1)) isLeap = false;
+    offset -= days;
+  }
+  if (offset === 0 && leap > 0 && i === leap + 1) { if (isLeap) { isLeap = false; } else { isLeap = true; --i; } }
+  if (offset < 0) { offset += days; --i; }
+  const month = i, day = offset + 1;
+  const ganzhiYear = GAN[(year - 4) % 10] + ZHI[(year - 4) % 12];
+  const ox = day === 1 ? (isLeap ? "闰" + LUNAR_MONTH[month - 1] + "月" : LUNAR_MONTH[month - 1] + "月") : "";
+  return { year: year, ganzhiYear, month: LUNAR_MONTH[month - 1], isLeap, day: day === 1 ? ox : LUNAR_DAY[day - 1], ox };
+}
+function lYearDays(y) { let sum = 348; for (let i = 0x8000; i > 0x8; i >>= 1) sum += (LUNAR_INFO[y - 1900] & i) ? 1 : 0; return sum + leapDays(y); }
+function leapMonth(y) { return LUNAR_INFO[y - 1900] & 0xf; }
+function leapDays(y) { return leapMonth(y) ? ((LUNAR_INFO[y - 1900] & 0x10000) ? 30 : 29) : 0; }
+function monthDays(y, m) { return (LUNAR_INFO[y - 1900] & (0x10000 >> m)) ? 30 : 29; }
+
+/* ================= 星空 ================= */
+const canvas = $("#stars"), ctx = canvas.getContext("2d");
+let stars = [], starCount = 140;
+function initStars() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  stars = Array.from({ length: starCount }, () => ({
+    x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+    r: Math.random() * 1.6 + 0.3, tw: Math.random() * Math.PI * 2, sp: Math.random() * 0.02 + 0.005
+  }));
+}
+function drawStars() {
+  ctx.clearRect(0, 0, innerWidth, innerHeight);
+  const theme = document.body.dataset.theme;
+  ctx.fillStyle = "#fff";
+  for (const s of stars) {
+    s.tw += s.sp;
+    const a = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(s.tw));
+    ctx.globalAlpha = a;
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(drawStars);
+}
+
+/* ================= 状态 ================= */
+const state = {
+  hour24: store.get("hour24", true),
+  showSec: store.get("showsec", true),
+  showDate: store.get("showdate", true),
+  showLunar: store.get("showlunar", true),
+  size: store.get("size", 220),
+  theme: store.get("theme", "night"),
+  accent: store.get("accent", "#38bdf8"),
+  accent2: store.get("accent2", "#818cf8"),
+  stars: store.get("stars", true),
+  hideCursor: store.get("hidecursor", false),
+  digitalMode: store.get("digital", true),
+  city: store.get("city", "Beijing"),
+  geo: store.get("geo", false),
+  weather: store.get("weather", null),
+  alarms: store.get("alarms", []),
+  world: store.get("world", ["America/New_York", "Europe/London", "Asia/Tokyo", "Australia/Sydney"]),
+};
+
+/* ================= 主时钟 ================= */
+const WEEK = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+let globalHour = 0;
+
+function tick() {
+  const now = new Date();
+  let h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+  globalHour = h;
+  const showAmPm = !state.hour24;
+  const hh = state.hour24 ? pad(h) : pad(((h + 11) % 12) + 1);
+  $("#digital-time").textContent = (state.showSec ? hh + ":" + pad(m) + ":" + pad(s) : hh + ":" + pad(m));
+  $("#ampm").textContent = showAmPm ? (h < 12 ? "AM" : "PM") : "";
+  $("#ampm").style.display = showAmPm ? "" : "none";
+
+  // 日期行
+  const y = now.getFullYear(), mo = now.getMonth() + 1, d = now.getDate();
+  let line = `${y}年${mo}月${d}日 ${WEEK[now.getDay()]}`;
+  if (state.showLunar) {
+    const lu = lunar(now);
+    line += `　<span class="cn">${lu.ganzhiYear}年 ${lu.ox || (lu.month + "月" + lu.day)}</span>`;
+  }
+  $("#date-line").innerHTML = line;
+  $("#date-line").style.display = state.showDate ? "" : "none";
+
+  // 问候语
+  let g = "晚安";
+  if (h >= 5 && h < 9) g = "早安";
+  else if (h >= 9 && h < 12) g = "上午好";
+  else if (h >= 12 && h < 14) g = "中午好";
+  else if (h >= 14 && h < 18) g = "下午好";
+  else if (h >= 18 && h < 23) g = "晚上好";
+  $("#greeting").textContent = g + " ☀";
+
+  // 毫秒/进度条
+  const secEl = $("#seconds-mono");
+  if (state.showSec) {
+    secEl.textContent = `▓`.repeat(Math.round((now.getMilliseconds() / 1000) * 30)) + "░".repeat(30 - Math.round((now.getMilliseconds() / 1000) * 30));
+  } else {
+    secEl.textContent = "▓".repeat(Math.round((s / 60) * 30)) + "░".repeat(30 - Math.round((s / 60) * 30));
+  }
+
+  // 指针
+  const hd = (h % 12) * 30 + m * 0.5, md = m * 6 + s * 0.1, sd = s * 6;
+  $("#h-hand").style.transform = `translate(-50%, -100%) rotate(${hd}deg)`;
+  $("#m-hand").style.transform = `translate(-50%, -100%) rotate(${md}deg)`;
+  $("#s-hand").style.transform = `translate(-50%, -100%) rotate(${sd}deg)`;
+
+  // 底部小部件
+  renderWidgets();
+  updateWorld();
+  checkAlarms(h, m, s);
+
+  setTimeout(tick, state.showSec ? 50 : 1000);
+}
+
+/* ================= 指针表盘 ================= */
+function buildAnalog() {
+  const a = $("#analog");
+  for (let i = 0; i < 60; i++) {
+    const t = document.createElement("div");
+    t.className = "tick" + (i % 5 === 0 ? " major" : "");
+    const ang = i * 6 * Math.PI / 180;
+    const radius = 48;
+    const x = 50 + radius * Math.sin(ang), y = 50 - radius * Math.cos(ang);
+    t.style.left = x + "%"; t.style.top = y + "%";
+    t.style.transform = `translate(-50%,-50%) rotate(${i * 6}deg)`;
+    a.appendChild(t);
+  }
+  ["h-hand", "m-hand", "s-hand"].forEach(id => {
+    const el = document.createElement("div");
+    el.id = id; el.className = "hand"; a.appendChild(el);
+  });
+  const c = document.createElement("div");
+  c.className = "center"; a.appendChild(c);
+}
+buildAnalog();
+
+/* ================= 小部件（倒计时/秒表/天气/世界） ================= */
+function renderWidgets() {
+  const w = $("#widgets");
+  let html = "";
+
+  // 秒表小部件
+  html += `<div class="widget" data-focus="stopwatch"><div class="w-title">⏱ 秒表</div><div class="w-big" style="font-variant-numeric:tabular-nums">${formatStopwatch(swElapsed)}</div><div class="w-sub">${swRunning ? "运行中" : (swElapsed > 0 ? "已暂停" : "就绪")}</div></div>`;
+
+  // 倒计时小部件
+  html += `<div class="widget" data-focus="timer"><div class="w-title">⏳ 倒计时</div><div class="w-big" style="font-variant-numeric:tabular-nums">${timerRunning || timerRemaining < timerTotal ? formatTimer(timerRemaining) : (timerTotal ? formatTimer(timerTotal) : "10:00")}</div><div class="w-sub">${timerRunning ? "运行中" : "待机"}</div></div>`;
+
+  // 天气小部件
+  if (state.weather && state.weather.current) {
+    const wt = state.weather;
+    html += `<div class="widget" data-focus="weather"><div class="w-title">🌤 ${wt.city} 天气</div><div class="w-time">${wt.current.temp}°C ${wt.current.emoji}</div><div class="w-sub">体感 ${wt.current.feels}°C · ${wt.current.desc}</div></div>`;
+  } else {
+    html += `<div class="widget" data-focus="weather"><div class="w-title">🌤 天气</div><div class="w-time">--°C</div><div class="w-sub">点击刷新获取</div></div>`;
+  }
+
+  // 世界时钟（前4个）
+  const wl = state.world.slice(0, 4);
+  for (const tz of wl) {
+    const t = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+    const hh = t.getHours(), mm = t.getMinutes();
+    const label = tz.split("/").pop().replace(/_/g, " ");
+    html += `<div class="widget" data-focus="world"><div class="w-title">🌍 ${label}</div><div class="w-time">${pad(hh)}:${pad(mm)}</div><div class="w-sub">${WEEK[t.getDay()]}</div></div>`;
+  }
+
+  w.innerHTML = html;
+  w.querySelectorAll(".widget").forEach(el => el.addEventListener("click", () => {
+    const f = el.dataset.focus;
+    if (f === "weather") { fetchWeather(); return; }
+    if (f === "stopwatch") { openPanel(); $("#panel").scrollTop = $("#panel").offsetHeight * 0.7; }
+    if (f === "timer") { openPanel(); $("#panel").scrollTop = $("#panel").offsetHeight * 0.35; }
+    if (f === "world") { openPanel(); $("#panel").scrollTop = $("#panel").offsetHeight * 0.85; }
+  }));
+}
+
+/* ================= 天气（Open-Meteo 免费接口） ================= */
+const WMO = {
+  0:["☀️","晴"],1:["🌤","基本晴朗"],2:["⛅","局部多云"],3:["☁️","阴"],
+  45:["🌫","雾"],48:["🌫","雾凇"],51:["🌦","毛毛雨"],53:["🌦","毛毛雨"],55:["🌧","毛毛雨"],
+  61:["🌧","小雨"],63:["🌧","中雨"],65:["🌧","大雨"],71:["🌨","小雪"],73:["🌨","中雪"],75:["❄️","大雪"],
+  80:["🌦","阵雨"],81:["🌧","强阵雨"],82:["⛈","强阵雨"],95:["⛈","雷阵雨"],96:["⛈","雷阵雨+冰雹"],99:["⛈","雷阵雨+冰雹"]
+};
+async function fetchWeather() {
+  toast("获取天气中…");
+  let lat, lon, name = state.city;
+  try {
+    if (state.geo) {
+      const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej));
+      lat = pos.coords.latitude; lon = pos.coords.longitude;
+      const rg = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&timezone=auto`);
+      const rd = await rg.json();
+      name = (rd.timezone || "本地").split("/").pop().replace(/_/g, " ");
+    } else {
+      const g = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(state.city)}&count=1&language=zh`);
+      const gd = await g.json();
+      if (!gd.results || !gd.results.length) throw new Error("城市未找到");
+      lat = gd.results[0].latitude; lon = gd.results[0].longitude;
+      name = gd.results[0].name;
+    }
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto`);
+    const data = await res.json();
+    const cw = data.current_weather;
+    const [emoji, desc] = WMO[cw.weathercode] || ["🌡", "未知"];
+    state.weather = {
+      city: name,
+      current: { temp: Math.round(cw.temperature), feels: Math.round(cw.temperature), emoji, desc },
+      daily: (data.daily.weathercode || []).slice(0, 5).map((code, i) => ({
+        emoji: (WMO[code] || ["🌡",""])[0],
+        max: Math.round(data.daily.temperature_2m_max[i]),
+        min: Math.round(data.daily.temperature_2m_min[i])
+      }))
+    };
+    store.set("weather", state.weather);
+    toast(`天气更新：${name} ${state.weather.current.temp}°C`);
+  } catch (e) {
+    toast("天气获取失败: " + e.message);
+  }
+}
+
+/* ================= 倒计时 ================= */
+let timerTotal = store.get("timerTotal", 600);
+let timerRemaining = timerTotal;
+let timerRunning = false;
+let timerInterval = null;
+function formatTimer(sec) {
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+function updateTimerDisplay() {
+  $("#timer-display").textContent = formatTimer(timerRemaining);
+}
+function timerStart() {
+  if (timerRemaining <= 0) return;
+  timerRunning = true;
+  timerInterval = setInterval(() => {
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) {
+      timerStop();
+      fireAlarm("⏳ 倒计时结束！", "timer");
+    }
+  }, 1000);
+}
+function timerStop() { timerRunning = false; clearInterval(timerInterval); }
+$("#timer-start").onclick = () => { if (!timerRunning) timerStart(); };
+$("#timer-pause").onclick = () => { timerStop(); };
+$("#timer-reset").onclick = () => { timerStop(); timerRemaining = timerTotal; updateTimerDisplay(); };
+$$(".timer-presets .btn").forEach(b => b.onclick = () => {
+  timerStop(); timerTotal = parseInt(b.dataset.min) * 60; timerRemaining = timerTotal;
+  store.set("timerTotal", timerTotal); updateTimerDisplay();
+});
+$("#timer-custom").onchange = e => {
+  const v = parseInt(e.target.value) || 10;
+  timerStop(); timerTotal = Math.min(600, Math.max(1, v)) * 60; timerRemaining = timerTotal;
+  store.set("timerTotal", timerTotal); updateTimerDisplay();
+};
+
+/* ================= 秒表 ================= */
+let swRunning = false, swElapsed = 0, swInterval = null, swStartTs = 0;
+const laps = [];
+function formatStopwatch(ms) {
+  const m = Math.floor(ms / 60000), s = Math.floor((ms % 60000) / 1000), c = Math.floor((ms % 1000) / 10);
+  return `${pad(m)}:${pad(s)}.${pad(c)}`;
+}
+function updateSwDisplay() {
+  $("#stopwatch-display").textContent = formatStopwatch(swElapsed);
+}
+$("#sw-start").onclick = () => {
+  if (!swRunning) {
+    swRunning = true; swStartTs = Date.now() - swElapsed;
+    swInterval = setInterval(() => { swElapsed = Date.now() - swStartTs; updateSwDisplay(); }, 10);
+    $("#sw-start").textContent = "⏸ 暂停";
+  } else {
+    swRunning = false; clearInterval(swInterval);
+    $("#sw-start").textContent = "▶ 开始";
+  }
+};
+$("#sw-lap").onclick = () => {
+  if (!swRunning) return;
+  laps.push(swElapsed);
+  $("#lap-list").innerHTML = laps.map((l, i) => `<div class="alarm-item"><span style="color:var(--muted)">第 ${i + 1} 圈</span><span style="font-variant-numeric:tabular-nums">${formatStopwatch(l)}</span></div>`).join("") + $("#lap-list").innerHTML;
+};
+$("#sw-reset").onclick = () => {
+  swRunning = false; clearInterval(swInterval); swElapsed = 0; laps.length = 0;
+  $("#sw-start").textContent = "▶ 开始"; $("#lap-list").innerHTML = "";
+  updateSwDisplay();
+};
+
+/* ================= 闹钟 ================= */
+const snoozeMap = {};
+function fireAlarm(msg, tag) {
+  $("#alarm-msg").textContent = msg;
+  $("#alarm-overlay").classList.add("show");
+  if (tag === "alarm") {
+    state.alarms.forEach(a => { if (a.active) snoozeMap[a.id] = a; });
+  }
+}
+function checkAlarms(h, m, s) {
+  if (s !== 0) return;
+  const now = new Date();
+  const day = now.getDay();
+  state.alarms.forEach(a => {
+    if (!a.active) return;
+    const [ah, am] = a.time.split(":").map(Number);
+    if (ah === h && am === m) {
+      let ok = a.repeat === "once" || a.repeat === "daily" ||
+        (a.repeat === "weekdays" && day >= 1 && day <= 5) ||
+        (a.repeat === "weekends" && (day === 0 || day === 6));
+      if (a.repeat === "once" && a.firedToday) ok = false;
+      if (ok) {
+        if (a.repeat === "once") { a.firedToday = true; saveAlarms(); }
+        fireAlarm(`⏰ ${a.label || "闹钟"} 时间到！`, "alarm");
+      }
+    }
+  });
+}
+function renderAlarms() {
+  $("#alarm-list").innerHTML = state.alarms.length ? state.alarms.map(a => `
+    <div class="alarm-item">
+      <div>
+        <div class="ai-time">${a.time}</div>
+        <div class="ai-label">${a.label || "闹钟"} · ${a.repeat === "once" ? "仅一次" : a.repeat === "daily" ? "每天" : a.repeat === "weekdays" ? "工作日" : "周末"}</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <label class="switch"><input type="checkbox" ${a.active ? "checked" : ""} onchange="toggleAlarm('${a.id}', this.checked)"><span class="slider"></span></label>
+        <span class="btn danger-btn" onclick="delAlarm('${a.id}')">✕</span>
+      </div>
+    </div>`).join("") : '<p style="color:var(--muted);font-size:13px">暂无闹钟</p>';
+}
+function saveAlarms() { store.set("alarms", state.alarms); renderAlarms(); }
+window.toggleAlarm = (id, v) => { const a = state.alarms.find(x => x.id === id); if (a) { a.active = v; saveAlarms(); } };
+window.delAlarm = id => { state.alarms = state.alarms.filter(x => x.id !== id); saveAlarms(); };
+$("#alarm-add").onclick = () => {
+  const t = $("#alarm-time").value, label = $("#alarm-label").value, repeat = $("#alarm-repeat").value;
+  if (!t) return toast("请选择时间");
+  state.alarms.push({ id: Date.now() + "", time: t, label, repeat, active: true, firedToday: false });
+  saveAlarms(); toast("闹钟已添加");
+};
+$("#alarm-dismiss").onclick = () => { $("#alarm-overlay").classList.remove("show"); Object.keys(snoozeMap).forEach(k => delete snoozeMap[k]); };
+$("#alarm-snooze").onclick = () => {
+  $("#alarm-overlay").classList.remove("show");
+  setTimeout(() => { $("#alarm-overlay").classList.add("show"); }, 5 * 60000);
+};
+
+/* ================= 世界时间 ================= */
+function renderWorld() {
+  $("#world-list").innerHTML = state.world.map(tz => {
+    const t = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+    const offset = -(t.getTimezoneOffset() - new Date().getTimezoneOffset()) / 60;
+    const label = tz.split("/").pop().replace(/_/g, " ");
+    return `<div class="alarm-item">
+      <div><div class="ai-time">${pad(t.getHours())}:${pad(t.getMinutes())}</div><div class="ai-label">${label} (UTC${offset >= 0 ? "+" : ""}${offset})</div></div>
+      <span class="btn danger-btn" onclick="delWorld('${tz}')">✕</span>
+    </div>`;
+  }).join("");
+}
+window.delWorld = tz => { state.world = state.world.filter(x => x !== tz); store.set("world", state.world); renderWorld(); };
+$("#world-add").onclick = () => {
+  const tz = $("#world-city").value;
+  if (!state.world.includes(tz)) { state.world.push(tz); store.set("world", state.world); renderWorld(); }
+  toast("城市已添加");
+};
+function updateWorld() {
+  // 小部件已用 renderWidgets 更新
+}
+
+/* ================= 设置应用 ================= */
+function applySettings() {
+  document.body.dataset.theme = state.theme;
+  document.documentElement.style.setProperty("--accent", state.accent);
+  document.documentElement.style.setProperty("--accent2", state.accent2);
+  $("#digital-time").style.fontSize = state.size + "px";
+  $("#opt-stars").checked = state.stars;
+  canvas.style.display = state.stars ? "block" : "none";
+  $("#opt-hidecursor").checked = state.hideCursor;
+  document.body.classList.toggle("hide-cursor", state.hideCursor);
+  $("#opt-hour24").checked = state.hour24;
+  $("#opt-showsec").checked = state.showSec;
+  $("#opt-showdate").checked = state.showDate;
+  $("#opt-lunar").checked = state.showLunar;
+  $("#opt-size").value = state.size;
+  $("#size-val").textContent = state.size;
+  $("#opt-geo").checked = state.geo;
+  $("#weather-city").value = state.city;
+  $("#accent-color").value = state.accent;
+  $("#accent2-color").value = state.accent2;
+  $$("#theme-swatches .swatch").forEach(s => s.classList.toggle("active", s.dataset.theme === state.theme));
+  renderAlarms(); renderWorld();
+}
+function saveSettings() {
+  store.set("hour24", state.hour24); store.set("showsec", state.showSec);
+  store.set("showdate", state.showDate); store.set("showlunar", state.showLunar);
+  store.set("size", state.size); store.set("theme", state.theme);
+  store.set("accent", state.accent); store.set("accent2", state.accent2);
+  store.set("stars", state.stars); store.set("hidecursor", state.hideCursor);
+  store.set("city", state.city); store.set("geo", state.geo);
+  store.set("digital", state.digitalMode);
+}
+$$("#theme-swatches .swatch").forEach(s => s.onclick = () => {
+  state.theme = s.dataset.theme; saveSettings(); applySettings();
+});
+$("#accent-color").oninput = e => { state.accent = e.target.value; applySettings(); saveSettings(); };
+$("#accent2-color").oninput = e => { state.accent2 = e.target.value; applySettings(); saveSettings(); };
+$("#opt-stars").onchange = e => { state.stars = e.target.checked; applySettings(); saveSettings(); };
+$("#opt-hidecursor").onchange = e => { state.hideCursor = e.target.checked; applySettings(); saveSettings(); };
+$("#opt-hour24").onchange = e => { state.hour24 = e.target.checked; applySettings(); saveSettings(); };
+$("#opt-showsec").onchange = e => { state.showSec = e.target.checked; applySettings(); saveSettings(); };
+$("#opt-showdate").onchange = e => { state.showDate = e.target.checked; applySettings(); saveSettings(); };
+$("#opt-lunar").onchange = e => { state.showLunar = e.target.checked; applySettings(); saveSettings(); };
+$("#opt-size").oninput = e => { state.size = +e.target.value; $("#size-val").textContent = state.size; applySettings(); saveSettings(); };
+$("#opt-geo").onchange = e => { state.geo = e.target.checked; applySettings(); saveSettings(); fetchWeather(); };
+$("#weather-city").onchange = e => { state.city = e.target.value; saveSettings(); fetchWeather(); };
+$("#btn-weather-refresh").onclick = fetchWeather;
+
+/* ================= 模式切换（数字/指针） ================= */
+function setDigitalMode(on) {
+  state.digitalMode = on;
+  saveSettings();
+  $("#analog-wrap").classList.toggle("show", !on);
+  $("#time-row").style.display = on ? "" : "none";
+  $("#btn-analog").classList.toggle("active", !on);
+  $("#btn-analog").textContent = on ? "🕘 指针模式" : "🔢 数字模式";
+}
+$("#btn-analog").onclick = () => setDigitalMode(!state.digitalMode);
+
+/* ================= 全屏 ================= */
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {});
+  else document.exitFullscreen();
+}
+$("#btn-fullscreen").onclick = toggleFullscreen;
+$("#fullscreen-btn").onclick = toggleFullscreen;
+
+/* ================= 面板 ================= */
+$("#btn-settings").onclick = () => {
+  const p = $("#panel");
+  p.classList.toggle("open");
+  document.body.classList.toggle("menu-open");
+};
+$("#btn-timer").onclick = () => { openPanel(); $("#panel").scrollTop = $("#panel").offsetHeight * 0.35; };
+$("#btn-alarm").onclick = () => { openPanel(); $("#panel").scrollTop = $("#panel").offsetHeight * 0.55; };
+$("#btn-stopwatch").onclick = () => { openPanel(); $("#panel").scrollTop = $("#panel").offsetHeight * 0.7; };
+$("#btn-world").onclick = () => { openPanel(); $("#panel").scrollTop = $("#panel").offsetHeight * 0.85; };
+function openPanel() {
+  $("#panel").classList.add("open");
+  document.body.classList.add("menu-open");
+}
+$("#btn-weather").onclick = fetchWeather;
+
+/* ================= 右键菜单 ================= */
+$("#ctx-menu").addEventListener("click", e => {
+  const act = e.target.dataset.act;
+  if (!act) return;
+  $("#ctx-menu").classList.remove("show");
+  if (act === "analog") setDigitalMode(!state.digitalMode);
+  if (act === "settings") $("#btn-settings").onclick();
+  if (act === "fullscreen") toggleFullscreen();
+  if (act === "timer") $("#btn-timer").onclick();
+  if (act === "alarm") $("#btn-alarm").onclick();
+  if (act === "stopwatch") $("#btn-stopwatch").onclick();
+  if (act === "hidecursor") { state.hideCursor = !state.hideCursor; applySettings(); saveSettings(); }
+});
+document.addEventListener("contextmenu", e => {
+  e.preventDefault();
+  const m = $("#ctx-menu");
+  m.style.left = Math.min(e.clientX, innerWidth - 200) + "px";
+  m.style.top = Math.min(e.clientY, innerHeight - 240) + "px";
+  m.classList.add("show");
+});
+document.addEventListener("click", e => {
+  if (!$("#ctx-menu").contains(e.target)) $("#ctx-menu").classList.remove("show");
+});
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { $("#panel").classList.remove("open"); document.body.classList.remove("menu-open"); $("#alarm-overlay").classList.remove("show"); }
+  if (e.key === "f") toggleFullscreen();
+  if (e.key === "h") $("#btn-settings").onclick();
+});
+
+/* ================= 恢复默认 / 清除 ================= */
+$("#btn-reset").onclick = () => {
+  if (!confirm("确定恢复默认设置？")) return;
+  ["hour24","showsec","showdate","showlunar","size","theme","accent","accent2","stars","hidecursor","city","geo"].forEach(k => localStorage.removeItem("imclock_" + k));
+  Object.assign(state, {
+    hour24: true, showSec: true, showDate: true, showLunar: true, size: 220,
+    theme: "night", accent: "#38bdf8", accent2: "#818cf8", stars: true, hideCursor: false,
+    city: "Beijing", geo: false
+  });
+  applySettings(); saveSettings(); toast("已恢复默认");
+};
+$("#btn-clear").onclick = () => {
+  if (!confirm("确定清除全部本地数据？")) return;
+  localStorage.clear(); location.reload();
+};
+
+/* ================= 初始 ================= */
+function init() {
+  applySettings();
+  setDigitalMode(state.digitalMode);
+  if (state.weather) toast("欢迎回来");
+  fetchWeather();
+}
+window.addEventListener("resize", initStars);
+initStars();
+drawStars();
+init();
+tick();
+</script>
+</body>
+</html>
