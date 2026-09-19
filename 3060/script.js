@@ -1,4 +1,4 @@
-﻿// 数据模型 - 按照您提供的格式
+// 数据模型 - 按照您提供的格式
 const websiteData = [
             {
                 id: 1,
@@ -241,36 +241,107 @@ const websiteData = [
           
         ];
 
+// ===== 皮肤（主题）配置：共 10 款皮肤 =====
+// ===== 皮肤（主题）配置：共 12 款（7 款浅色 + 5 款深色） =====
+const SKINS = [
+    { id: 'ios-light', name: '苹果浅色', dark: false, colors: ['#fbfcfe', '#007aff', '#5ac8fa'] },
+    { id: 'ocean',     name: '海洋蓝',   dark: false, colors: ['#f2fbfd', '#0891b2', '#38bdf8'] },
+    { id: 'forest',    name: '森林绿',   dark: false, colors: ['#f4fcf6', '#16a34a', '#4ade80'] },
+    { id: 'sakura',    name: '樱花粉',   dark: false, colors: ['#fff7fb', '#ff4d79', '#ffa3c0'] },
+    { id: 'sunset',    name: '暖阳橙',   dark: false, colors: ['#fffaf2', '#f97316', '#fbbf24'] },
+    { id: 'graphite',  name: '石墨灰',   dark: false, colors: ['#f8f9fb', '#4b5563', '#9ca3af'] },
+    { id: 'lavender',  name: '薰衣草',   dark: false, colors: ['#faf9ff', '#7c3aed', '#c4b5fd'] },
+    { id: 'ios-dark',  name: '苹果深色', dark: true,  colors: ['#0b0e13', '#0a84ff', '#64d2ff'] },
+    { id: 'midnight',  name: '暗夜紫',   dark: true,  colors: ['#150e2e', '#a78bfa', '#c4b5fd'] },
+    { id: 'nebula',    name: '星云粉',   dark: true,  colors: ['#25091f', '#f472b6', '#f9a8d4'] },
+    { id: 'nord',      name: '极地冰蓝', dark: true,  colors: ['#101a24', '#7dd3fc', '#a5f3fc'] },
+    { id: 'cyber',     name: '赛博绿',   dark: true,  colors: ['#04180f', '#00e39a', '#6bffd0'] }
+];
+
+// 存储键
+const SKIN_STORAGE_KEY = 'bookmarks-skin';
+const THEME_STORAGE_KEY = 'bookmarks-theme'; // 兼容旧版本的主题键
+const FAVORITES_STORAGE_KEY = 'bookmarks-favorites';
+const TASKBAR_STORAGE_KEY = 'bookmarks-taskbar'; // 底部菜单栏显示状态
+const FAVORITES_ID = -1; // "收藏"虚拟分类ID
+
 // 状态管理
-let currentCategory = 0; // 0表示显示全部
+let currentCategory = 0; // 0表示显示全部，-1表示收藏
 let isDarkMode = false;
+let currentSkin = 'ios-light';
 let searchQuery = '';
 let moreMenuSearchQuery = '';
+let hasRenderedOnce = false; // 仅首次渲染时播放入场动画
+let isTaskbarVisible = true; // 底部一级菜单栏是否显示
+// 收藏集合（以网址URL为唯一标识）
+let favoriteUrls = new Set(loadFavorites());
 
 // DOM元素
 const bookmarksContainer = document.getElementById('bookmarksContainer');
 const bottomMenu = document.getElementById('bottomMenu');
 const moreMenu = document.getElementById('moreMenu');
 const moreCategories = document.getElementById('moreCategories');
-const themeToggle = document.getElementById('themeToggle');
-const themeIcon = themeToggle.querySelector('i');
+const skinToggle = document.getElementById('skinToggle');
+const skinPanel = document.getElementById('skinPanel');
+const skinGrid = document.getElementById('skinGrid');
+const settingsToggle = document.getElementById('settingsToggle');
+const settingsPanel = document.getElementById('settingsPanel');
+const settingsFavorites = document.getElementById('settingsFavorites');
+const settingsFavCount = document.getElementById('settingsFavCount');
+const settingsTaskbar = document.getElementById('settingsTaskbar');
+const settingsTaskbarSwitch = document.getElementById('settingsTaskbarSwitch');
+const settingsShortcuts = document.getElementById('settingsShortcuts');
+const shortcutModal = document.getElementById('shortcutModal');
+const shortcutModalClose = document.getElementById('shortcutModalClose');
+const taskbarHandle = document.getElementById('taskbarHandle');
+const searchClear = document.getElementById('searchClear');
+const toastEl = document.getElementById('toast');
 const searchInput = document.getElementById('searchInput');
+
+const searchBox = document.getElementById('searchBox');
 const moreMenuSearch = document.getElementById('moreMenuSearch');
 
-// 初始化
-function init() {
-    renderCategories();
-    renderBookmarks();
-    setupEventListeners();
-    
-    // 检查用户是否已设置主题偏好
-    const savedTheme = localStorage.getItem('bookmarks-theme');
-    if (savedTheme === 'dark') {
-        enableDarkMode();
+// 本地存储的安全读写（隐私模式下 localStorage 可能不可用）
+function storageGet(key) {
+    try {
+        return localStorage.getItem(key);
+    } catch (e) {
+        return null;
     }
 }
 
-// 渲染分类菜单 - 固定8个按钮
+function storageSet(key, value) {
+    try {
+        localStorage.setItem(key, value);
+    } catch (e) {
+        // 忽略存储异常（例如隐私模式 / 存储已满）
+    }
+}
+
+// ===== 通用小工具 =====
+// 转义 HTML，避免数据中的特殊字符破坏页面结构
+function escapeHtml(value) {
+    return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// 初始化
+function init() {
+    renderSkinGrid();
+    initSkin();
+    initTaskbar();
+    renderCategories();
+    renderBookmarks();
+    updateFavoritesCountUI();
+    updateSearchClear();
+    setupEventListeners();
+}
+
+// 渲染分类菜单 - 固定8个按钮（全部 + 前6个分类 + 更多）
 function renderCategories() {
     // 清空底部菜单
     bottomMenu.innerHTML = '';
@@ -400,21 +471,45 @@ function createMenuItem(id, title, icon, isActive) {
     `;
     
     menuItem.addEventListener('click', () => {
-        // 更新当前分类并重新渲染书签
-        currentCategory = id;
-        searchQuery = '';
-        searchInput.value = '';
-        moreMenuSearchQuery = '';
-        moreMenuSearch.value = '';
-        
-        renderBookmarks();
-        updateActiveMenu();
-        
-        // 关闭更多菜单（如果打开）
-        moreMenu.classList.remove('active');
+        selectCategory(id);
     });
     
     return menuItem;
+}
+
+// 统一处理分类切换（含收藏）
+function selectCategory(id) {
+    currentCategory = id;
+    searchQuery = '';
+    searchInput.value = '';
+    moreMenuSearchQuery = '';
+    moreMenuSearch.value = '';
+    
+    renderBookmarks();
+    updateActiveMenu();
+    
+    // 关闭更多菜单（如果打开）
+    moreMenu.classList.remove('active');
+    
+    // 同步"更多"菜单中的高亮状态
+    renderMoreCategories();
+    
+    // 切换分类后回到页面顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 创建"更多"菜单中的分类项
+function createMoreCategoryItem(id, title, icon, count) {
+    const item = document.createElement('div');
+    item.className = `more-category-item ${currentCategory === id ? 'active' : ''}`;
+    item.innerHTML = `
+        <div class="more-category-name">
+            <i class="fas ${icon}"></i> ${title}
+        </div>
+        <div class="more-category-count">${count}</div>
+    `;
+    item.addEventListener('click', () => selectCategory(id));
+    return item;
 }
 
 // 渲染更多分类
@@ -422,29 +517,8 @@ function renderMoreCategories() {
     moreCategories.innerHTML = '';
     
     // 先添加"全部"分类按钮
-    const allCategoryItem = document.createElement('div');
-    allCategoryItem.className = `more-category-item ${currentCategory === 0 ? 'active' : ''}`;
-    allCategoryItem.innerHTML = `
-        <div class="more-category-name">
-            <i class="fas fa-globe"></i> 全部
-        </div>
-        <div class="more-category-count">${websiteData.reduce((sum, cat) => sum + cat.websites.length, 0)}</div>
-    `;
-    allCategoryItem.addEventListener('click', () => {
-        currentCategory = 0;
-        searchQuery = '';
-        searchInput.value = '';
-        moreMenuSearchQuery = '';
-        moreMenuSearch.value = '';
-        
-        renderBookmarks();
-        updateActiveMenu();
-        moreMenu.classList.remove('active');
-        
-        // 重新渲染更多分类（恢复默认视图）
-        renderMoreCategories();
-    });
-    moreCategories.appendChild(allCategoryItem);
+    const totalCount = websiteData.reduce((sum, cat) => sum + cat.websites.length, 0);
+    moreCategories.appendChild(createMoreCategoryItem(0, '全部', 'fa-globe', totalCount));
     
     // 筛选更多分类
     let filteredCategories = [];
@@ -464,8 +538,6 @@ function renderMoreCategories() {
     filteredCategories.forEach(category => {
         // 自动统计网址数量
         const count = category.websites.length;
-        const categoryItem = document.createElement('div');
-        categoryItem.className = `more-category-item ${currentCategory === category.id ? 'active' : ''}`;
         
         // 根据分类名称设置合适的图标
         let icon = category.icon;
@@ -552,27 +624,7 @@ function renderMoreCategories() {
                 icon = "fa-search";
         }
         
-        categoryItem.innerHTML = `
-            <div class="more-category-name">
-                <i class="fas ${icon}"></i> ${category.title}
-            </div>
-            <div class="more-category-count">${count}</div>
-        `;
-        categoryItem.addEventListener('click', () => {
-            currentCategory = category.id;
-            searchQuery = '';
-            searchInput.value = '';
-            moreMenuSearchQuery = '';
-            moreMenuSearch.value = '';
-            
-            renderBookmarks();
-            updateActiveMenu();
-            moreMenu.classList.remove('active');
-            
-            // 重新渲染更多分类（恢复默认视图）
-            renderMoreCategories();
-        });
-        moreCategories.appendChild(categoryItem);
+        moreCategories.appendChild(createMoreCategoryItem(category.id, category.title, icon, count));
     });
     
     // 如果没有匹配的分类且不是空搜索，显示提示
@@ -592,7 +644,7 @@ function renderMoreCategories() {
 function addUrlCollectionButton() {
     // 创建网址征集按钮
     const collectionButton = document.createElement('a');
-    collectionButton.className = 'theme-toggle';
+    collectionButton.className = 'icon-btn';
     collectionButton.href = 'https://www.wjx.top/vm/wAGGMpW.aspx#';
     collectionButton.target = '_blank';
     collectionButton.rel = 'noopener noreferrer';
@@ -634,7 +686,10 @@ function renderBookmarks() {
     // 筛选网址
     let filteredWebsites = [];
     
-    if (currentCategory === 0) {
+    if (currentCategory === FAVORITES_ID) {
+        // 显示所有已收藏的网址
+        filteredWebsites = getAllWebsites().filter(website => favoriteUrls.has(website.url));
+    } else if (currentCategory === 0) {
         // 显示全部网址
         websiteData.forEach(category => {
             filteredWebsites.push(...category.websites.map(website => ({
@@ -687,12 +742,27 @@ function renderBookmarks() {
     if (filteredWebsites.length === 0) {
         const emptyMessage = document.createElement('div');
         emptyMessage.className = 'no-results';
-        emptyMessage.innerHTML = `
-            <i class="fas fa-search"></i>
-            <h3>没有找到网址</h3>
-            <p>${searchQuery ? `未找到与"${searchQuery}"相关的网址` : '当前分类没有网址'}</p>
-        `;
+        if (searchQuery) {
+            emptyMessage.innerHTML = `
+                <i class="fas fa-search"></i>
+                <h3>没有找到网址</h3>
+                <p>未找到与"${searchQuery}"相关的网址</p>
+            `;
+        } else if (currentCategory === FAVORITES_ID) {
+            emptyMessage.innerHTML = `
+                <i class="far fa-heart"></i>
+                <h3>还没有收藏任何网址</h3>
+                <p>点击卡片右上角的爱心图标，即可把常用网址加入收藏</p>
+            `;
+        } else {
+            emptyMessage.innerHTML = `
+                <i class="fas fa-search"></i>
+                <h3>没有找到网址</h3>
+                <p>当前分类没有网址</p>
+            `;
+        }
         bookmarksContainer.appendChild(emptyMessage);
+        hasRenderedOnce = true;
         return;
     }
     
@@ -714,17 +784,110 @@ function renderBookmarks() {
         });
     } else {
         // 显示当前分类的网址或搜索结果
-        const category = currentCategory === 0 
-            ? { 
-                id: 0, 
-                title: searchQuery ? `搜索结果: "${searchQuery}"` : "全部网址", 
-                icon: "fa-globe" 
-              }
-            : websiteData.find(cat => cat.id === currentCategory);
+        let category;
+        if (currentCategory === 0) {
+            category = {
+                id: 0,
+                title: searchQuery ? `搜索结果: "${searchQuery}"` : "全部网址",
+                icon: "fa-globe"
+            };
+        } else if (currentCategory === FAVORITES_ID) {
+            category = {
+                id: FAVORITES_ID,
+                title: searchQuery ? `收藏中搜索: "${searchQuery}"` : "我的收藏",
+                icon: "fa-heart"
+            };
+        } else {
+            category = websiteData.find(cat => cat.id === currentCategory);
+        }
             
         if (category) {
             renderCategorySection(category, filteredWebsites);
         }
+    }
+    
+    hasRenderedOnce = true;
+}
+
+// ===== 收藏功能 =====
+// 读取本地保存的收藏
+function loadFavorites() {
+    try {
+        const raw = storageGet(FAVORITES_STORAGE_KEY);
+        if (!raw) return [];
+        const list = JSON.parse(raw);
+        return Array.isArray(list) ? list.filter(item => typeof item === 'string') : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+// 保存收藏到本地
+function saveFavorites() {
+    storageSet(FAVORITES_STORAGE_KEY, JSON.stringify([...favoriteUrls]));
+}
+
+// 获取所有网址（附带所属分类信息）
+function getAllWebsites() {
+    const all = [];
+    websiteData.forEach(category => {
+        category.websites.forEach(website => {
+            all.push({
+                ...website,
+                categoryId: category.id,
+                categoryTitle: category.title
+            });
+        });
+    });
+    return all;
+}
+
+// 切换收藏状态，返回切换后的状态
+function toggleFavorite(url) {
+    let isFav;
+    if (favoriteUrls.has(url)) {
+        favoriteUrls.delete(url);
+        isFav = false;
+    } else {
+        favoriteUrls.add(url);
+        isFav = true;
+    }
+    saveFavorites();
+    return isFav;
+}
+
+// 更新卡片收藏按钮外观
+function updateFavButton(favBtn, card, isFav) {
+    favBtn.classList.toggle('active', isFav);
+    favBtn.title = isFav ? '取消收藏' : '加入收藏';
+    favBtn.setAttribute('aria-label', favBtn.title);
+    favBtn.innerHTML = `<i class="${isFav ? 'fas' : 'far'} fa-heart"></i>`;
+    card.classList.toggle('is-favorite', isFav);
+    
+    // 播放一次心形跳动动画
+    favBtn.classList.remove('pop');
+    void favBtn.offsetWidth; // 触发重排以重启动画
+    favBtn.classList.add('pop');
+}
+
+// 刷新设置面板中的收藏数量与状态
+function updateFavoritesCountUI() {
+    if (settingsFavCount) {
+        settingsFavCount.textContent = favoriteUrls.size;
+        settingsFavCount.classList.toggle('empty', favoriteUrls.size === 0);
+    }
+    if (settingsFavorites) {
+        settingsFavorites.classList.toggle('active', currentCategory === FAVORITES_ID);
+    }
+}
+
+// 打开"我的收藏"视图（设置面板 / 快捷键 F）
+function openFavorites(silent) {
+    selectCategory(FAVORITES_ID);
+    if (!silent) {
+        toast(favoriteUrls.size > 0
+            ? `我的收藏：共 ${favoriteUrls.size} 个网址`
+            : '还没有收藏任何网址', 'fa-heart');
     }
 }
 
@@ -819,8 +982,10 @@ function renderCategorySection(category, websites) {
             icon = "fa-ellipsis-h";
             break;
         default:
-            // 处理搜索结果和全部网址的情况
-            if (category.title.includes("搜索结果") || category.title.includes("全部网址")) {
+            // 处理搜索结果、全部网址和收藏的情况
+            if (category.title.includes("收藏")) {
+                icon = "fa-heart";
+            } else if (category.title.includes("搜索结果") || category.title.includes("全部网址")) {
                 icon = "fa-globe";
             } else {
                 icon = "fa-search";
@@ -829,26 +994,55 @@ function renderCategorySection(category, websites) {
     
     categoryTitle.innerHTML = `
         <i class="fas ${icon}"></i>
-        <span>${category.title} <span style="color: var(--text-secondary); font-weight: 600;">(${websites.length})</span></span>
+        <span>${escapeHtml(category.title)}</span>
+        <span class="cat-count">${websites.length}</span>
     `;
     fragment.appendChild(categoryTitle);
     
     // 创建网址网格
     const bookmarksGrid = document.createElement('div');
-    bookmarksGrid.className = 'bookmarks-grid';
+    bookmarksGrid.className = 'bookmarks-grid' + (hasRenderedOnce ? '' : ' animate-in');
     
-    // 添加网址卡片 - 不显示网址地址
+    // 添加网址卡片：只展示名称 / 简介 / 分类，不展示网址与首字图标
     websites.forEach((website, index) => {
+        const isFav = favoriteUrls.has(website.url);
         const card = document.createElement('a');
-        card.className = 'bookmark-card';
+        card.className = 'bookmark-card' + (isFav ? ' is-favorite' : '');
         card.href = website.url;
         card.target = '_blank';
         card.rel = 'noopener noreferrer';
+        card.style.animationDelay = `${Math.min(index, 12) * 25}ms`;
         card.innerHTML = `
-            <div class="bookmark-title">${website.name}</div>
-            <div class="bookmark-desc">${website.desc || ''}</div>
-            <div class="bookmark-category">${website.categoryTitle || category.title}</div>
+            <div class="card-top">
+                <span class="fav-btn${isFav ? ' active' : ''}" role="button" tabindex="-1"
+                      title="${isFav ? '取消收藏' : '加入收藏'}" aria-label="${isFav ? '取消收藏' : '加入收藏'}">
+                    <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
+                </span>
+            </div>
+            <div class="bookmark-title">${escapeHtml(website.name)}</div>
+            <div class="bookmark-desc">${escapeHtml(website.desc || '')}</div>
+            <div class="card-foot">
+                <span class="bookmark-category">${escapeHtml(website.categoryTitle || category.title)}</span>
+            </div>
         `;
+        
+        // 收藏按钮：阻止卡片跳转，只切换收藏状态
+        const favBtn = card.querySelector('.fav-btn');
+        favBtn.addEventListener('click', (e) => {
+            // 阻止卡片本身的跳转，只切换收藏状态
+            e.preventDefault();
+            const nowFavorite = toggleFavorite(website.url);
+            updateFavButton(favBtn, card, nowFavorite);
+            toast(nowFavorite ? '已加入收藏' : '已取消收藏', nowFavorite ? 'fa-heart' : 'fa-heart-crack');
+            
+            // 同步设置面板中的收藏数量
+            updateFavoritesCountUI();
+            
+            if (currentCategory === FAVORITES_ID) {
+                // 在收藏列表中取消收藏后自动刷新列表（等心形动画播完）
+                setTimeout(renderBookmarks, 260);
+            }
+        });
         
         bookmarksGrid.appendChild(card);
     });
@@ -866,7 +1060,7 @@ function updateActiveMenu() {
         item.classList.remove('active');
     });
     
-    // 找到对应的菜单项并添加active类
+    // 找到对应的菜单项并添加active类（收藏视图不在菜单栏中，故此处不会命中）
     const menuItems = document.querySelectorAll('.menu-item');
     menuItems.forEach(item => {
         if (parseInt(item.dataset.id) === currentCategory) {
@@ -878,17 +1072,220 @@ function updateActiveMenu() {
     document.querySelectorAll('.more-category-item').forEach(item => {
         item.classList.remove('active');
     });
+    
+    // 收藏视图时高亮设置按钮，提示当前处于收藏页
+    if (settingsToggle) {
+        settingsToggle.classList.toggle('is-active', currentCategory === FAVORITES_ID);
+    }
+    updateFavoritesCountUI();
+}
+
+// ===== 面板控制 =====
+// 关闭全部弹出面板，返回是否有面板被关闭
+function closeAllPanels() {
+    let closed = false;
+    if (closeShortcuts()) closed = true;
+    [skinPanel, settingsPanel].forEach(panel => {
+        if (panel && panel.classList.contains('active')) {
+            panel.classList.remove('active');
+            closed = true;
+        }
+    });
+    if (moreMenu.classList.contains('active')) {
+        moreMenu.classList.remove('active');
+        closed = true;
+    }
+    return closed;
+}
+
+// 打开指定面板（同时关闭其他面板）
+function openPanel(panel) {
+    const wasActive = panel.classList.contains('active');
+    closeAllPanels();
+    if (!wasActive) {
+        panel.classList.add('active');
+    }
+}
+
+// ===== 快捷键支持 =====
+// 判断当前焦点是否在输入框内（此时不响应字母快捷键）
+function isTypingTarget(el) {
+    if (!el) return false;
+    const tag = el.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
+}
+
+// "/" 聚焦搜索框
+function focusSearch() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    searchInput.focus();
+    if (searchInput.value) searchInput.select();
+}
+
+// 清除搜索内容
+function clearSearch(silent) {
+    if (!searchQuery && !searchInput.value) return false;
+    searchInput.value = '';
+    searchQuery = '';
+    updateSearchClear();
+    renderBookmarks();
+    if (!silent) toast('已清除搜索', 'fa-eraser');
+    return true;
+}
+
+// 搜索框清除按钮的显示状态
+function updateSearchClear() {
+    if (!searchClear) return;
+    const hasValue = !!searchInput.value;
+    searchClear.classList.toggle('visible', hasValue);
+    if (searchBox) searchBox.classList.toggle('has-value', hasValue);
+}
+
+// Shift + ? / 设置面板入口：打开快捷键说明弹窗（独立弹窗）
+function openShortcuts() {
+    if (!shortcutModal) return;
+    closeAllPanels();
+    shortcutModal.classList.add('active');
+    shortcutModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    if (shortcutModalClose) shortcutModalClose.focus();
+}
+
+// 关闭快捷键说明弹窗，返回是否真的关闭了
+function closeShortcuts() {
+    if (!shortcutModal || !shortcutModal.classList.contains('active')) return false;
+    shortcutModal.classList.remove('active');
+    shortcutModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    return true;
+}
+
+// 键盘快捷键总入口
+function handleShortcutKeys(e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    
+    const key = e.key;
+    
+    // Esc：优先关闭面板，其次清空搜索
+    if (key === 'Escape') {
+        if (closeAllPanels()) return;
+        if (clearSearch()) return;
+        if (document.activeElement) document.activeElement.blur();
+        return;
+    }
+    
+    // 快捷键弹窗打开时，只响应 Esc 关闭
+    if (shortcutModal && shortcutModal.classList.contains('active')) return;
+
+    // 正在输入时不触发字母快捷键
+    if (isTypingTarget(e.target)) return;
+    
+    // Shift + ? ：打开快捷键说明
+    if (key === '?' || key === '？') {
+        e.preventDefault();
+        openShortcuts();
+        return;
+    }
+    
+    // / ：聚焦搜索框
+    if (key === '/') {
+        e.preventDefault();
+        focusSearch();
+        return;
+    }
+    
+    switch (key.toLowerCase()) {
+        case 't': // 切换皮肤
+            e.preventDefault();
+            cycleSkin();
+            break;
+        case 'f': // 查看收藏
+            e.preventDefault();
+            openFavorites();
+            break;
+        case 'h': // 显示 / 隐藏底部菜单栏
+            e.preventDefault();
+            toggleTaskbar();
+            break;
+        default:
+            break;
+    }
 }
 
 // 设置事件监听器
 function setupEventListeners() {
-    // 主题切换
-    themeToggle.addEventListener('click', toggleTheme);
+    // ===== 顶部按钮 =====
+    // 设置面板（收藏 / 快捷键说明 / 菜单栏开关）
+    settingsToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openPanel(settingsPanel);
+    });
+    settingsPanel.addEventListener('click', (e) => e.stopPropagation());
     
-    // 顶部搜索框
+    // 皮肤面板
+    skinToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openPanel(skinPanel);
+    });
+    skinPanel.addEventListener('click', (e) => e.stopPropagation());
+    
+    // 点击页面其他位置时关闭所有面板
+    document.addEventListener('click', () => {
+        closeAllPanels();
+    });
+    
+    // ===== 设置面板内的操作 =====
+    settingsFavorites.addEventListener('click', () => {
+        settingsPanel.classList.remove('active');
+        openFavorites();
+    });
+    
+    settingsTaskbar.addEventListener('click', () => {
+        toggleTaskbar();
+    });
+
+    // ===== 快捷键说明弹窗 =====
+    if (settingsShortcuts) {
+        settingsShortcuts.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openShortcuts();
+        });
+    }
+    if (shortcutModal) {
+        shortcutModal.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // 点击遮罩空白处关闭
+            if (e.target === shortcutModal) closeShortcuts();
+        });
+    }
+    if (shortcutModalClose) {
+        shortcutModalClose.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeShortcuts();
+        });
+    }
+    
+
+
+    // ===== 品牌 Logo：一键回到「全部」 =====
+    const brandHome = document.getElementById('brandHome');
+    if (brandHome) {
+        brandHome.addEventListener('click', (e) => {
+            e.preventDefault();
+            selectCategory(0);
+        });
+    }
+    // ===== 搜索 =====
     searchInput.addEventListener('input', (e) => {
         searchQuery = e.target.value.trim();
+        updateSearchClear();
         renderBookmarks();
+    });
+    
+    searchClear.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearSearch();
+        searchInput.focus();
     });
     
     // 更多菜单搜索框
@@ -904,12 +1301,14 @@ function setupEventListeners() {
         }
     });
     
-    // 键盘快捷键：ESC关闭更多菜单
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && moreMenu.classList.contains('active')) {
-            moreMenu.classList.remove('active');
-        }
+    // ===== 底部菜单栏折叠 / 唤起 =====
+    taskbarHandle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleTaskbar();
     });
+    
+    // ===== 键盘快捷键 =====
+    document.addEventListener('keydown', handleShortcutKeys);
     
     // 修复更多菜单滚动问题
     moreMenu.addEventListener('wheel', (e) => {
@@ -959,31 +1358,155 @@ function setupEventListeners() {
     }, false);
 }
 
-// 切换主题
-function toggleTheme() {
-    if (isDarkMode) {
-        disableDarkMode();
-    } else {
-        enableDarkMode();
+// ===== 底部菜单栏：折叠隐藏 / 重新唤起 =====
+// 初始化菜单栏显示状态（读取上次的选择）
+function initTaskbar() {
+    setTaskbarVisible(storageGet(TASKBAR_STORAGE_KEY) !== '0', true);
+}
+
+// 设置菜单栏显示 / 隐藏
+function setTaskbarVisible(visible, silent) {
+    isTaskbarVisible = visible;
+    
+    document.body.classList.toggle('menu-hidden', !visible);
+    bottomMenu.classList.toggle('collapsed', !visible);
+    
+    // 手柄在两种状态下复用：展开时朝下、隐藏时朝上并带文字
+    taskbarHandle.classList.toggle('restore', !visible);
+    taskbarHandle.classList.remove('expanded');
+    taskbarHandle.innerHTML = visible
+        ? '<i class="fas fa-chevron-down"></i>'
+        : '<i class="fas fa-chevron-up"></i>';
+    taskbarHandle.title = visible ? '隐藏底部菜单栏（H）' : '显示底部菜单栏（H）';
+    taskbarHandle.setAttribute('aria-label', taskbarHandle.title);
+    
+    // 同步设置面板中的开关
+    if (settingsTaskbarSwitch) {
+        settingsTaskbarSwitch.classList.toggle('on', visible);
+    }
+    if (settingsTaskbar) {
+        settingsTaskbar.setAttribute('aria-checked', String(visible));
+    }
+    
+    // 隐藏菜单栏时收起"更多"面板
+    if (!visible) {
+        moreMenu.classList.remove('active');
+    }
+    
+    storageSet(TASKBAR_STORAGE_KEY, visible ? '1' : '0');
+    
+    if (!silent) {
+        toast(visible ? '已显示底部菜单栏' : '已隐藏底部菜单栏（按 H 可恢复）',
+              visible ? 'fa-eye' : 'fa-eye-slash');
     }
 }
 
-// 启用深色模式
-function enableDarkMode() {
-    document.body.classList.add('dark-mode');
-    document.body.classList.remove('light-mode');
-    themeIcon.className = 'fas fa-sun';
-    isDarkMode = true;
-    localStorage.setItem('bookmarks-theme', 'dark');
+// 切换菜单栏显示状态
+function toggleTaskbar() {
+    setTaskbarVisible(!isTaskbarVisible);
+}
+// ===== 皮肤（主题）系统 =====
+// 初始化皮肤：读取本地设置（兼容旧版仅 light/dark 的主题设置）
+function initSkin() {
+    let saved = storageGet(SKIN_STORAGE_KEY);
+    if (!saved || !SKINS.some(skin => skin.id === saved)) {
+        const legacy = storageGet(THEME_STORAGE_KEY);
+        saved = legacy === 'dark' ? 'ios-dark' : 'ios-light';
+    }
+    applySkin(saved);
 }
 
-// 禁用深色模式
-function disableDarkMode() {
-    document.body.classList.remove('dark-mode');
-    document.body.classList.add('light-mode');
-    themeIcon.className = 'fas fa-moon';
-    isDarkMode = false;
-    localStorage.setItem('bookmarks-theme', 'light');
+// 应用指定皮肤
+function applySkin(skinId) {
+    let skin = SKINS.find(item => item.id === skinId);
+    if (!skin) skin = SKINS[0];
+    
+    currentSkin = skin.id;
+    isDarkMode = skin.dark;
+    
+    document.documentElement.setAttribute('data-theme', skin.id);
+    document.body.classList.toggle('dark-mode', skin.dark);
+    
+    storageSet(SKIN_STORAGE_KEY, skin.id);
+    storageSet(THEME_STORAGE_KEY, skin.dark ? 'dark' : 'light');
+    
+    updateSkinGridActiveState();
+
+
+    // 皮肤切换后重绘卡片，使卡片图标配色跟随新皮肤
+    if (hasRenderedOnce) renderBookmarks();
+}
+
+// 快捷键 T：按顺序循环切换皮肤
+function cycleSkin() {
+    const index = SKINS.findIndex(item => item.id === currentSkin);
+    const next = SKINS[(index + 1) % SKINS.length];
+    applySkin(next.id);
+    toast(`切换到「${next.name}」（按 T 继续切换）`, 'fa-palette');
+}
+
+// 渲染皮肤选择面板
+function renderSkinGrid() {
+    if (!skinGrid) return;
+    skinGrid.innerHTML = '';
+
+    if (skinCountTip) skinCountTip.textContent = SKINS.length + ' 款主题';
+
+    // 按「浅色 / 深色」分组展示，共 12 款
+    ['light', 'dark'].forEach(group => {
+        const list = SKINS.filter(skin => (group === 'dark') === skin.dark);
+        if (!list.length) return;
+
+        const label = document.createElement('div');
+        label.className = 'skin-group';
+        label.innerHTML = group === 'dark'
+            ? '<i class="fas fa-moon"></i> 深色主题'
+            : '<i class="fas fa-sun"></i> 浅色主题';
+        skinGrid.appendChild(label);
+
+        list.forEach(skin => {
+            const item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'skin-swatch';
+            item.dataset.skin = skin.id;
+            item.title = skin.name + '（' + (skin.dark ? '深色' : '浅色') + '）';
+            item.innerHTML = `
+                <span class="skin-preview" style="background:linear-gradient(135deg, ${skin.colors[0]} 0%, ${skin.colors[2]} 100%);--p2:${skin.colors[1]};--p3:${skin.colors[1]};">
+                    <i class="fas fa-check"></i>
+                </span>
+                <span class="skin-info">
+                    <span class="skin-name">${skin.name}</span>
+                    <span class="skin-mode">${skin.dark ? '深色' : '浅色'}</span>
+                </span>
+            `;
+            item.addEventListener('click', () => {
+                applySkin(skin.id);
+                skinPanel.classList.remove('active');
+                toast(`已切换为「${skin.name}」`, 'fa-palette');
+            });
+            skinGrid.appendChild(item);
+        });
+    });
+
+    updateSkinGridActiveState();
+}
+
+// 更新皮肤面板的选中状态
+function updateSkinGridActiveState() {
+    if (!skinGrid) return;
+    skinGrid.querySelectorAll('.skin-swatch').forEach(item => {
+        item.classList.toggle('active', item.dataset.skin === currentSkin);
+    });
+}
+
+// 轻提示
+let toastTimer = null;
+function toast(message, icon) {
+    if (!toastEl) return;
+    toastEl.innerHTML = `<i class="fas ${icon || 'fa-check-circle'}"></i><span>${message}</span>`;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1600);
 }
 
 // 页面加载完成后初始化
