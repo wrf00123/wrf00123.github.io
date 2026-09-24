@@ -283,7 +283,7 @@ const moreCategories = document.getElementById('moreCategories');
 const skinToggle = document.getElementById('skinToggle');
 const skinPanel = document.getElementById('skinPanel');
 const skinGrid = document.getElementById('skinGrid');
-// 【修改】显式声明 skinCountTip，避免依赖 id 隐式全局变量
+// 显式声明 skinCountTip，避免依赖 id 隐式全局变量
 const skinCountTip = document.getElementById('skinCountTip');
 const settingsToggle = document.getElementById('settingsToggle');
 const settingsPanel = document.getElementById('settingsPanel');
@@ -753,7 +753,7 @@ function renderBookmarks() {
             emptyMessage.innerHTML = `
                 <i class="far fa-heart"></i>
                 <h3>还没有收藏任何网址</h3>
-                <p>点击卡片右上角的爱心图标，即可把常用网址加入收藏</p>
+                <p>点击卡片右下角的爱心图标，即可把常用网址加入收藏</p>
             `;
         } else {
             emptyMessage.innerHTML = `
@@ -896,14 +896,14 @@ function openFavorites(silent) {
 function renderCategorySection(category, websites) {
     // 使用文档片段减少DOM操作，避免闪烁
     const fragment = document.createDocumentFragment();
-    
+
     // 创建分类标题 - 全部文字改为灰色
     const categoryTitle = document.createElement('h2');
     categoryTitle.className = 'category-title';
-    
+
     // 根据分类名称设置合适的图标，与菜单栏保持一致
     let icon = category.icon;
-    switch(category.title) {
+    switch (category.title) {
         case "国际标准":
             icon = "fa-flag";
             break;
@@ -992,19 +992,19 @@ function renderCategorySection(category, websites) {
                 icon = "fa-search";
             }
     }
-    
+
     categoryTitle.innerHTML = `
         <i class="fas ${icon}"></i>
         <span>${escapeHtml(category.title)}</span>
         <span class="cat-count">${websites.length}</span>
     `;
     fragment.appendChild(categoryTitle);
-    
+
     // 创建网址网格
     const bookmarksGrid = document.createElement('div');
     bookmarksGrid.className = 'bookmarks-grid' + (hasRenderedOnce ? '' : ' animate-in');
-    
-    // 添加网址卡片：只展示名称 / 简介 / 分类，不展示网址与首字图标
+
+    // 添加网址卡片：名称 / 用途 / 分类 / 收藏按钮（收藏按钮在右下角）
     websites.forEach((website, index) => {
         const isFav = favoriteUrls.has(website.url);
         const card = document.createElement('a');
@@ -1013,43 +1013,44 @@ function renderCategorySection(category, websites) {
         card.target = '_blank';
         card.rel = 'noopener noreferrer';
         card.style.animationDelay = `${Math.min(index, 12) * 25}ms`;
+
+        // 【修改】收藏按钮挪到卡片底部右下角；底部一行左分类右收藏
         card.innerHTML = `
-            <div class="card-top">
+            <div class="bookmark-title">${escapeHtml(website.name)}</div>
+            <div class="bookmark-desc">${escapeHtml(website.desc || '')}</div>
+            <div class="card-foot">
+                <span class="bookmark-category">${escapeHtml(website.categoryTitle || category.title)}</span>
                 <span class="fav-btn${isFav ? ' active' : ''}" role="button" tabindex="-1"
                       title="${isFav ? '取消收藏' : '加入收藏'}" aria-label="${isFav ? '取消收藏' : '加入收藏'}">
                     <i class="${isFav ? 'fas' : 'far'} fa-heart"></i>
                 </span>
             </div>
-            <div class="bookmark-title">${escapeHtml(website.name)}</div>
-            <div class="bookmark-desc">${escapeHtml(website.desc || '')}</div>
-            <div class="card-foot">
-                <span class="bookmark-category">${escapeHtml(website.categoryTitle || category.title)}</span>
-            </div>
         `;
-        
+
         // 收藏按钮：阻止卡片跳转，只切换收藏状态
         const favBtn = card.querySelector('.fav-btn');
         favBtn.addEventListener('click', (e) => {
             // 阻止卡片本身的跳转，只切换收藏状态
             e.preventDefault();
+            e.stopPropagation();
             const nowFavorite = toggleFavorite(website.url);
             updateFavButton(favBtn, card, nowFavorite);
             toast(nowFavorite ? '已加入收藏' : '已取消收藏', nowFavorite ? 'fa-heart' : 'fa-heart-crack');
-            
+
             // 同步设置面板中的收藏数量
             updateFavoritesCountUI();
-            
+
             if (currentCategory === FAVORITES_ID) {
                 // 在收藏列表中取消收藏后自动刷新列表（等心形动画播完）
                 setTimeout(renderBookmarks, 260);
             }
         });
-        
+
         bookmarksGrid.appendChild(card);
     });
-    
+
     fragment.appendChild(bookmarksGrid);
-    
+
     // 一次性添加到DOM，减少重排重绘
     bookmarksContainer.appendChild(fragment);
 }
@@ -1143,7 +1144,7 @@ function updateSearchClear() {
 }
 
 // Shift + ? / 设置面板入口：打开快捷键说明弹窗（独立弹窗）
-// 【修改】不再调用 closeAllPanels()，避免刚打开的弹窗被全局点击监听器立刻关闭
+// 不再调用 closeAllPanels()，避免刚打开的弹窗被全局点击监听器立刻关闭
 function openShortcuts() {
     if (!shortcutModal) return;
 
@@ -1237,7 +1238,7 @@ function setupEventListeners() {
     });
     skinPanel.addEventListener('click', (e) => e.stopPropagation());
     
-    // 【修改】点击页面其他位置时关闭所有面板（面板 / 弹窗 / 更多菜单内部点击不处理）
+    // 点击页面其他位置时关闭所有面板（面板 / 弹窗 / 更多菜单内部点击不处理）
     document.addEventListener('click', (e) => {
         if (e.target.closest &&
             e.target.closest('.panel.active, .modal-backdrop.active, .more-menu.active')) {
@@ -1257,7 +1258,7 @@ function setupEventListeners() {
     });
 
     // ===== 快捷键说明弹窗 =====
-    // 【修改】加入 preventDefault，确保点击不被其它逻辑吞掉
+    // 加入 preventDefault，确保点击不被其它逻辑吞掉
     if (settingsShortcuts) {
         settingsShortcuts.addEventListener('click', (e) => {
             e.preventDefault();
