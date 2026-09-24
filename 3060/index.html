@@ -101,6 +101,20 @@
                         <span class="switch" id="settingsTaskbarSwitch"><span class="switch-knob"></span></span>
                     </button>
 
+                    <!-- 浏览风格：卡片 / 列表 / 紧凑 / 杂志 -->
+                    <div class="settings-block">
+                        <div class="settings-block-head">
+                            <span class="settings-row-icon"><i class="fas fa-table-cells-large"></i></span>
+                            <span class="settings-row-body">
+                                <span class="settings-row-title">浏览风格</span>
+                                <span class="settings-row-desc">切换卡片的排布样式（V 键循环）</span>
+                            </span>
+                        </div>
+                        <div class="layout-picker" id="layoutPicker" role="radiogroup" aria-label="浏览风格">
+                            <!-- 风格选项通过 JavaScript 动态生成 -->
+                        </div>
+                    </div>
+
                     <!-- 快捷键使用说明：点击打开独立弹窗 -->
                     <button class="settings-row" id="settingsShortcuts" type="button">
                         <span class="settings-row-icon"><i class="fas fa-keyboard"></i></span>
@@ -203,6 +217,10 @@
                     <li>
                         <span class="keys"><kbd>H</kbd></span>
                         <span class="shortcut-desc">显示 / 隐藏底部菜单栏</span>
+                    </li>
+                    <li>
+                        <span class="keys"><kbd>V</kbd></span>
+                        <span class="shortcut-desc">切换浏览风格（卡片 / 列表 / 紧凑 / 杂志）</span>
                     </li>
                 </ul>
                 <div class="settings-note">

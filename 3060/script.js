@@ -257,11 +257,20 @@ const SKINS = [
     { id: 'cyber',     name: '赛博绿',   dark: true,  colors: ['#04180f', '#00e39a', '#6bffd0'] }
 ];
 
+// ===== 浏览风格配置：卡片 / 列表 / 紧凑 / 杂志 =====
+const LAYOUTS = [
+    { id: 'card',  name: '卡片', desc: '标准网格卡片' },
+    { id: 'list',  name: '列表', desc: '单列横向排布，信息更易扫读' },
+    { id: 'tight', name: '紧凑', desc: '多列小卡，一屏容纳更多网址' },
+    { id: 'mag',   name: '杂志', desc: '首卡放大，突出视觉重点' }
+];
+
 // 存储键
 const SKIN_STORAGE_KEY = 'bookmarks-skin';
 const THEME_STORAGE_KEY = 'bookmarks-theme'; // 兼容旧版本的主题键
 const FAVORITES_STORAGE_KEY = 'bookmarks-favorites';
 const TASKBAR_STORAGE_KEY = 'bookmarks-taskbar'; // 底部菜单栏显示状态
+const LAYOUT_STORAGE_KEY = 'bookmarks-layout';   // 浏览风格
 const FAVORITES_ID = -1; // "收藏"虚拟分类ID
 
 // 状态管理
@@ -272,6 +281,7 @@ let searchQuery = '';
 let moreMenuSearchQuery = '';
 let hasRenderedOnce = false; // 仅首次渲染时播放入场动画
 let isTaskbarVisible = true; // 底部一级菜单栏是否显示
+let currentLayout = 'card';  // 当前浏览风格
 // 收藏集合（以网址URL为唯一标识）
 let favoriteUrls = new Set(loadFavorites());
 
@@ -291,6 +301,7 @@ const settingsFavorites = document.getElementById('settingsFavorites');
 const settingsFavCount = document.getElementById('settingsFavCount');
 const settingsTaskbar = document.getElementById('settingsTaskbar');
 const settingsTaskbarSwitch = document.getElementById('settingsTaskbarSwitch');
+const layoutPicker = document.getElementById('layoutPicker');
 const settingsShortcuts = document.getElementById('settingsShortcuts');
 const shortcutModal = document.getElementById('shortcutModal');
 const shortcutModalClose = document.getElementById('shortcutModalClose');
@@ -335,6 +346,7 @@ function init() {
     renderSkinGrid();
     initSkin();
     initTaskbar();
+    initLayout();
     renderCategories();
     renderBookmarks();
     updateFavoritesCountUI();
@@ -500,17 +512,115 @@ function selectCategory(id) {
 }
 
 // 创建"更多"菜单中的分类项
+// 点击行为：定位到该分类在"全部"视图中的具体位置，并高亮凸显
 function createMoreCategoryItem(id, title, icon, count) {
     const item = document.createElement('div');
     item.className = `more-category-item ${currentCategory === id ? 'active' : ''}`;
+    // 带上分类 id，便于定位逻辑、外部脚本与调试时识别当前项
+    item.dataset.id = id;
     item.innerHTML = `
         <div class="more-category-name">
             <i class="fas ${icon}"></i> ${title}
         </div>
         <div class="more-category-count">${count}</div>
     `;
-    item.addEventListener('click', () => selectCategory(id));
+    item.addEventListener('click', () => locateCategory(id, title));
     return item;
+}
+
+// ===== 分类定位：滚动到指定分类在页面中的位置并高亮 =====
+let locateTimer = null;
+let scrollFallbackTimer = null;
+
+function locateCategory(id, title) {
+    // "全部"直接回到顶部
+    if (id === 0) {
+        selectCategory(0);
+        toast('已回到顶部（全部网址）', 'fa-globe');
+        return;
+    }
+
+    // 收藏视图不在页面分组中，保持原行为（切到单分类浏览）
+    if (id === FAVORITES_ID) {
+        selectCategory(FAVORITES_ID);
+        return;
+    }
+
+    // 目标必须处于"全部视图"下才存在分类分组；
+    // 若当前在某个单分类 / 搜索 / 收藏视图，先无条件切回全部。
+    const needReset = currentCategory !== 0 || !!searchQuery;
+
+    if (needReset) {
+        currentCategory = 0;
+        searchQuery = '';
+        searchInput.value = '';
+        moreMenuSearchQuery = '';
+        moreMenuSearch.value = '';
+        updateSearchClear();
+        // 关闭更多菜单后再渲染，避免滚动时面板遮挡
+        moreMenu.classList.remove('active');
+        renderBookmarks();
+        updateActiveMenu();
+        renderMoreCategories();
+    } else {
+        moreMenu.classList.remove('active');
+    }
+
+    // 等渲染完成后再定位。
+    // 这里刻意不用 requestAnimationFrame：标签页在后台或被系统降频时 rAF 会被节流，
+    // 定位就会"点了没反应"。改为强制读取一次布局（触发同步回流）后走 setTimeout，
+    // 时序确定，任何环境下都会执行。
+    void document.body.offsetHeight; // 强制布局结算
+    setTimeout(() => scrollToCategoryAnchor(id, title), 0);
+}
+
+// 滚动到分类锚点并播放高亮动画
+function scrollToCategoryAnchor(id, title) {
+    const anchor = document.getElementById('cat-anchor-' + id);
+    if (!anchor) {
+        // 兜底：找不到锚点时切到该分类的单分类视图
+        selectCategory(id);
+        return;
+    }
+
+    // 顶部 sticky 头部会遮住标题，手动预留偏移量
+    const header = document.querySelector('.header');
+    const offset = (header ? header.offsetHeight : 0) + 26;
+    const targetTop = Math.max(anchor.getBoundingClientRect().top + window.pageYOffset - offset, 0);
+
+    // 平滑滚动 + 兜底校准：
+    // 部分环境（无头浏览器 / 系统开启"减少动效"）下，带 behavior:'smooth' 的滚动
+    // 可能被忽略或中途打断，导致"点了没反应"。这里在动画窗口后核对一次位置，
+    // 若没有落到目标附近就直接吸附过去，保证定位一定生效。
+    try {
+        window.scrollTo({ top: targetTop, behavior: 'smooth' });
+    } catch (e) {
+        window.scrollTo(0, targetTop);
+    }
+
+    clearTimeout(scrollFallbackTimer);
+    scrollFallbackTimer = setTimeout(() => {
+        const current = window.pageYOffset;
+        if (Math.abs(current - targetTop) > 6) {
+            // 平滑滚动未生效，直接吸附到目标位置
+            window.scrollTo(0, targetTop);
+        }
+    }, 700);
+
+    // 高亮凸显：先清理旧状态，再重新触发动画。
+    // 与滚动动画解耦（只留很短延迟），确保无论如何都能看到凸显效果。
+    document.querySelectorAll('.category-title.is-locating').forEach(el => {
+        el.classList.remove('is-locating');
+    });
+    clearTimeout(locateTimer);
+
+    setTimeout(() => {
+        anchor.classList.add('is-locating');
+        locateTimer = setTimeout(() => anchor.classList.remove('is-locating'), 2000);
+    }, 260);
+
+    // 同步底部菜单高亮（此处 currentCategory 仍为 0，仅提示定位结果）
+    if (title) toast(`已定位到「${title}」`, 'fa-location-crosshairs');
 }
 
 // 渲染更多分类
@@ -900,6 +1010,11 @@ function renderCategorySection(category, websites) {
     // 创建分类标题 - 全部文字改为灰色
     const categoryTitle = document.createElement('h2');
     categoryTitle.className = 'category-title';
+    // 供"更多"菜单定位使用：带锚点 id，便于 scrollIntoView / 外部跳转
+    categoryTitle.dataset.categoryId = category.id;
+    if (category.id !== 0 && category.id !== FAVORITES_ID) {
+        categoryTitle.id = 'cat-anchor-' + category.id;
+    }
 
     // 根据分类名称设置合适的图标，与菜单栏保持一致
     let icon = category.icon;
@@ -1144,9 +1259,25 @@ function updateSearchClear() {
 }
 
 // Shift + ? / 设置面板入口：打开快捷键说明弹窗（独立弹窗）
-// 不再调用 closeAllPanels()，避免刚打开的弹窗被全局点击监听器立刻关闭
+//
+// 【修复】偶发"点了没反应、刷新后才弹窗"的问题，原因有两个：
+//   1) 同一帧内既收起设置面板、又给 body 加 overflow:hidden，
+//      滚动条消失引起的重排会让刚获得焦点的弹窗瞬间失焦并回落，
+//      紧接着文档级点击监听器调用 closeAllPanels() 把弹窗摘掉。
+//   2) 弹窗的 backdrop 设置了 visibility 的延迟过渡，
+//      过渡窗口内 .active 可能被误判为"未打开"。
+// 处理办法：先让弹窗可见并写入状态标记，滚动条锁定与聚焦都推迟到下一帧，
+//          同时用 isShortcutOpen 状态位兜住 document 监听器。
+let isShortcutOpen = false;
+
 function openShortcuts() {
     if (!shortcutModal) return;
+
+    // 已经打开时只保证可见，避免重复触发
+    if (isShortcutOpen) {
+        shortcutModal.classList.add('active');
+        return;
+    }
 
     // 只收起其它面板，不动弹窗本身
     [skinPanel, settingsPanel].forEach(panel => {
@@ -1154,19 +1285,36 @@ function openShortcuts() {
     });
     if (moreMenu) moreMenu.classList.remove('active');
 
+    // 让弹窗进入可见状态，并同步锁定页面滚动。
+    // 锁定必须同步完成：若放进 rAF，标签页处于后台时 rAF 会被节流，
+    // 弹窗会短暂出现"打开但页面仍能滚动"的空档。
+    isShortcutOpen = true;
     shortcutModal.classList.add('active');
     shortcutModal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('modal-open');
-    if (shortcutModalClose) shortcutModalClose.focus();
+
+    // 只有聚焦推迟到下一帧：弹窗刚显示时立即抢焦点会因布局未结算而失焦，
+    // 导致弹窗一出现就被文档级监听器收走。
+    requestAnimationFrame(() => {
+        if (isShortcutOpen && shortcutModalClose) {
+            try { shortcutModalClose.focus({ preventScroll: true }); } catch (e) { /* 忽略 */ }
+        }
+    });
 }
 
 // 关闭快捷键说明弹窗，返回是否真的关闭了
 function closeShortcuts() {
-    if (!shortcutModal || !shortcutModal.classList.contains('active')) return false;
+    if (!shortcutModal || !isShortcutOpen) return false;
+    isShortcutOpen = false;
     shortcutModal.classList.remove('active');
     shortcutModal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('modal-open');
     return true;
+}
+
+// 快捷键弹窗是否处于打开状态
+function isShortcutsOpen() {
+    return isShortcutOpen;
 }
 
 // 键盘快捷键总入口
@@ -1184,7 +1332,7 @@ function handleShortcutKeys(e) {
     }
     
     // 快捷键弹窗打开时，只响应 Esc 关闭
-    if (shortcutModal && shortcutModal.classList.contains('active')) return;
+    if (isShortcutsOpen()) return;
 
     // 正在输入时不触发字母快捷键
     if (isTypingTarget(e.target)) return;
@@ -1216,6 +1364,10 @@ function handleShortcutKeys(e) {
             e.preventDefault();
             toggleTaskbar();
             break;
+        case 'v': // 切换浏览风格
+            e.preventDefault();
+            cycleLayout();
+            break;
         default:
             break;
     }
@@ -1239,7 +1391,9 @@ function setupEventListeners() {
     skinPanel.addEventListener('click', (e) => e.stopPropagation());
     
     // 点击页面其他位置时关闭所有面板（面板 / 弹窗 / 更多菜单内部点击不处理）
+    // 【修复】快捷键弹窗打开时直接放行，避免刚打开就被这里关掉
     document.addEventListener('click', (e) => {
+        if (isShortcutsOpen()) return;
         if (e.target.closest &&
             e.target.closest('.panel.active, .modal-backdrop.active, .more-menu.active')) {
             return;
@@ -1512,6 +1666,77 @@ function updateSkinGridActiveState() {
     skinGrid.querySelectorAll('.skin-swatch').forEach(item => {
         item.classList.toggle('active', item.dataset.skin === currentSkin);
     });
+}
+
+// ===== 浏览风格系统 =====
+// 初始化：读取本地保存的风格
+function initLayout() {
+    const saved = storageGet(LAYOUT_STORAGE_KEY);
+    const valid = LAYOUTS.some(item => item.id === saved);
+    applyLayout(valid ? saved : 'card', true);
+    renderLayoutPicker();
+}
+
+// 渲染风格选择器
+function renderLayoutPicker() {
+    if (!layoutPicker) return;
+    layoutPicker.innerHTML = '';
+
+    LAYOUTS.forEach(layout => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'layout-option';
+        btn.dataset.layout = layout.id;
+        btn.title = layout.name + '：' + layout.desc;
+        btn.setAttribute('role', 'radio');
+        btn.setAttribute('aria-checked', String(layout.id === currentLayout));
+        btn.innerHTML = `
+            <span class="layout-thumb layout-thumb-${layout.id}">
+                <span></span><span></span><span></span><span></span>
+            </span>
+            <span class="layout-name">${layout.name}</span>
+        `;
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            applyLayout(layout.id);
+        });
+        layoutPicker.appendChild(btn);
+    });
+
+    updateLayoutPickerState();
+}
+
+// 应用指定浏览风格
+function applyLayout(layoutId, silent) {
+    const layout = LAYOUTS.find(item => item.id === layoutId) || LAYOUTS[0];
+    currentLayout = layout.id;
+
+    document.body.setAttribute('data-layout', layout.id);
+    storageSet(LAYOUT_STORAGE_KEY, layout.id);
+
+    updateLayoutPickerState();
+
+    if (!silent) {
+        toast(`浏览风格：${layout.name}`, 'fa-table-cells-large');
+    }
+}
+
+// 更新风格选择器的选中态
+function updateLayoutPickerState() {
+    if (!layoutPicker) return;
+    layoutPicker.querySelectorAll('.layout-option').forEach(item => {
+        const isActive = item.dataset.layout === currentLayout;
+        item.classList.toggle('active', isActive);
+        item.setAttribute('aria-checked', String(isActive));
+    });
+}
+
+// 快捷键 V：循环切换浏览风格
+function cycleLayout() {
+    const index = LAYOUTS.findIndex(item => item.id === currentLayout);
+    const next = LAYOUTS[(index + 1) % LAYOUTS.length];
+    applyLayout(next.id);
+    toast(`浏览风格：${next.name}（按 V 继续切换）`, 'fa-table-cells-large');
 }
 
 // 轻提示
